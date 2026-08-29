@@ -1,4 +1,4 @@
-import {Estados} from "./EstadosActivosInactivos"
+import {Estados} from "../enums/EstadosActivosInactivos"
 
 export interface Rutas{
     id_ruta: number,
