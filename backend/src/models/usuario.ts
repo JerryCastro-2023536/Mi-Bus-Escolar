@@ -1,7 +1,7 @@
 import { userRol } from "../enums/userRol";
 
 export interface Usuario{
-    id_usuario: number;
+    id_usuario?: number;
     nombre: string;
     apellido: string;
     correo: string;
