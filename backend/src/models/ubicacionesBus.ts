@@ -1,4 +1,4 @@
-export interface ubicacionesBus{
+export interface UbicacionesBus{
     id_ubicacion: number;
     id_viaje: number;
     latitud: number;
