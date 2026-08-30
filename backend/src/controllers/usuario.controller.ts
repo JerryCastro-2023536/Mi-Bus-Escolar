@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { agregarUsuario, buscarUsuarioById, editarUsuarioById, eliminarUsuarioById, listarUsuarios } from "../services/usuario.services";
+import { agregarUsuario, buscarUsuarioById, editarUsuarioById, eliminarUsuarioById, listarUsuarios } from "../services/usuario.service";
 import { Usuario } from "../models/usuario";
 
 export async function getUsuarios(_req: Request, res: Response, next: NextFunction) {
