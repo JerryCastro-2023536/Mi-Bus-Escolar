@@ -1,0 +1,15 @@
+import express from "express";
+import cors from "cors";
+import { pruebaConexion } from "./config/Conexion";
+
+const app = express();
+const port = 3000;
+
+app.use(cors());
+app.use(express.json())
+app.use();
+
+app.listen(port, () =>{
+    pruebaConexion();
+    console.log(`Servidor corriendo en http://localhost:${port}`);
+});
