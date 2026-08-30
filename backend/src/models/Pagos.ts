@@ -1,7 +1,7 @@
 import { EstadoPago } from "../enums/EstadoPago";
 
 export interface Pagos{
-    id_pago : number,
+    id_pago? : number,
     id_estudiante : number,
     id_servicio : number,
     periodo_mes : number,

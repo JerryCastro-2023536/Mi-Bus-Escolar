@@ -1,5 +1,5 @@
 export interface Paradas{
-    id_parada : number,
+    id_parada? : number,
     nombre : string,
     direccion : string,
     latitud : number,
