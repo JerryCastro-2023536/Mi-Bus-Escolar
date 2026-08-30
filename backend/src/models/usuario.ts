@@ -10,6 +10,6 @@ export interface Usuario{
     foto_usuario: string | null;
     rol: userRol;
     correo_verificado: boolean;
-    fecha_creacion: Date;
-    fecha_actualizacion: Date;
+    fecha_creacion?: Date;
+    fecha_actualizacion?: Date;
 }

@@ -31,8 +31,8 @@ export async function getUsuarioById(req: Request, res: Response, next: NextFunc
 
 export async function postUsuario(req: Request, res: Response, next: NextFunction) {
     try {
-        const { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado, fecha_creacion, fecha_actualizacion } = req.body;
-        const newUser: Usuario = { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado, fecha_creacion, fecha_actualizacion };
+        const { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado} = req.body;
+        const newUser: Usuario = { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado};
 
         const usuarioCreado = await agregarUsuario(newUser);
         return res.status(201).json({
@@ -48,8 +48,8 @@ export async function postUsuario(req: Request, res: Response, next: NextFunctio
 export async function putUsuarioByID(req: Request, res: Response, next: NextFunction) {
     try {
         const id = Number(req.params.id);
-        const { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado, fecha_creacion, fecha_actualizacion } = req.body;
-        const newUser: Usuario = { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado, fecha_creacion, fecha_actualizacion };
+        const { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado} = req.body;
+        const newUser: Usuario = { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado};
 
         const usuarioEditado = await editarUsuarioById(id, newUser);
         return res.status(200).json({
