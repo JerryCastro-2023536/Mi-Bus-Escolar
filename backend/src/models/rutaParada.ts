@@ -3,6 +3,6 @@ export interface RutaParada{
     id_ruta: number;
     id_parada: number;
     orden_parada: number;
-    minutos_estimados: number
-    hora_estimada: Date
+    minutos_estimados: number | null
+    hora_estimada: Date | null
 }

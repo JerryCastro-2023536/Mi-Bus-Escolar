@@ -7,7 +7,7 @@ export interface Usuario{
     correo: string;
     password: string;
     telefono: string;
-    foto_usuario: string;
+    foto_usuario: string | null;
     rol: userRol;
     correo_verificado: boolean;
     fecha_creacion: Date;
