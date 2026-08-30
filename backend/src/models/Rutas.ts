@@ -1,7 +1,7 @@
 import {Estados} from "../enums/EstadosActivosInactivos"
 
 export interface Rutas{
-    id_ruta: number,
+    id_ruta?: number,
     id_servicio: number,
     id_vehiculo: number,
     id_chofer: number,
