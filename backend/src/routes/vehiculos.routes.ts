@@ -1,10 +1,12 @@
 import { Router } from "express"
-import { listarVehiculos, obtenerVehiculoPorId, crearVehiculo, editarVehiculo, eliminarVehiculo } from "../controllers/vehiculos.controller"
+import { obtenerVehiculos, obtenerVehiculoPorId, crearVehiculo, editarVehiculo, eliminarVehiculos } from "../controllers/vehiculos.controller"
 
 export const router = Router();
 
-router.get("/listarVehiculos", listarVehiculos);
-router.get("/listarVehiculoPorId", obtenerVehiculoPorId);
-router.post("/agregarVehiculo", crearVehiculo);
-router.put("/editarVehiculo", editarVehiculo);
-router.delete("/eliminarVehiculo", eliminarVehiculo);
+router.get("/vehiculos", obtenerVehiculos);
+router.get("/vehiculos/:id", obtenerVehiculoPorId);
+router.post("/vehiculos", crearVehiculo);
+router.put("/vehiculos/:id", editarVehiculo);
+router.delete("/vehiculos/:id", eliminarVehiculos);
+
+export default router;

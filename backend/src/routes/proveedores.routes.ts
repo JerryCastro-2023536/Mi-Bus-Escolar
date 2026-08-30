@@ -1,10 +1,12 @@
 import { Router } from "express"
-import {listarProveedor, obtenerProveedorPorId, agregarProveedores, editarProveedor, eliminarProveedorPorId} from "../controllers/proveedores.controller"
+import {obtenerProveedores, obtenerProveedorPorId, crearProveedor, editarProveedor, eliminarProveedores} from "../controllers/proveedores.controller"
 
-export const router = Router();
+const router = Router();
 
-router.get("/listarProveedores", listarProveedor);
-router.get("/listarProveedorPorId", obtenerProveedorPorId);
-router.post("/agregarProveedor", agregarProveedores);
-router.put("/editarProveedor", editarProveedor);
-router.delete("/eliminarProveedor", eliminarProveedorPorId);
+router.get("/proveedores", obtenerProveedores);
+router.get("/proveedor/:id", obtenerProveedorPorId);
+router.post("/proveedores", crearProveedor);
+router.put("/proveedores/:id", editarProveedor);
+router.delete("/proveedores/:id", eliminarProveedores);
+
+export default router;

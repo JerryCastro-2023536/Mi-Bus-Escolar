@@ -1,10 +1,12 @@
 import {Router} from "express"
-import { listarServicios, obtenerServicioPorId, crearServicio, editarServicio, eliminarServicio } from "../controllers/servicios.controller"
+import { obtenerServicios, obtenerServicioPorId, crearServicio, editarServicio, eliminarServicios } from "../controllers/servicios.controller"
 
 export const router = Router();
 
-router.get("/listarServicios", listarServicios);
-router.get("/listarServicioPorId", obtenerServicioPorId);
-router.post("/agregarServicio", crearServicio);
-router.put("/editarServicio", editarServicio);
-router.delete("/eliminarServicio", eliminarServicio);
+router.get("/servicios", obtenerServicios);
+router.get("/servicios/:id", obtenerServicioPorId);
+router.post("/servicios", crearServicio);
+router.put("/servicios/:id", editarServicio);
+router.delete("/servicios/:id", eliminarServicios);
+
+export default router;

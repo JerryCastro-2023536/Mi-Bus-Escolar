@@ -1,10 +1,12 @@
 import { Router } from "express"
-import { obtenerIncidencias, obtenerIncidenciaPorId, AgregarIncidencia, editarIncidencia, eliminarIncidenciaPorId } from "../controllers/incidencias.controller"
+import { obtenerIncidencias, obtenerIncidenciaPorId, crearIncidencia, editarIncidencia, eliminarIncidencias } from "../controllers/incidencias.controller"
 
-export const router = Router();
+const router = Router();
 
-router.get("/listarIncidencias", obtenerIncidencias);
-router.get("/listarIncidenciaPorId", obtenerIncidenciaPorId);
-router.post("/agregarIncidencia", AgregarIncidencia);
-router.put("/editarIncidencia", editarIncidencia);
-router.delete("/eliminarIncidencia", eliminarIncidenciaPorId);
+router.get("/incidencias", obtenerIncidencias);
+router.get("/incidencia/:id", obtenerIncidenciaPorId);
+router.post("/incidencias", crearIncidencia);
+router.put("/incidencias/:id", editarIncidencia);
+router.delete("/incidencias/:id", eliminarIncidencias);
+
+export default router;
