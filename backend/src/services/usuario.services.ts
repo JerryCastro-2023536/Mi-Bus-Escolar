@@ -20,8 +20,8 @@ export async function agregarUsuario(u: Usuario) {
 }
 
 export async function editarUsuarioById(id: number, u: Usuario) {
-    const values = [u.nombre, u.apellido, u.correo, u.password, u.telefono, u.foto_usuario, u.rol, u.correo_verificado, u.fecha_creacion, u.fecha_actualizacion]
-    const query = 'UPDATE usuarios SET nombre = $1, apellido = $2, correo = $3, password = $4, telefono = $5, foto_usuario = $6, rol = $7, correo_verificado = $8, fecha_actualizacion = $9WHERE id = $10 RETURNING *';
+    const values = [u.nombre, u.apellido, u.correo, u.password, u.telefono, u.foto_usuario, u.rol, u.correo_verificado, u.fecha_actualizacion, id]
+    const query = 'UPDATE usuarios SET nombre = $1, apellido = $2, correo = $3, password = $4, telefono = $5, foto_usuario = $6, rol = $7, correo_verificado = $8, fecha_actualizacion = $9 WHERE id_usuario = $10 RETURNING *';
     const res = await pool.query(query, values);
     return res.rows[0] || null;
 }
