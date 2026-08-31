@@ -1,4 +1,4 @@
-import {Estados} from "../enums/EstadosActivosInactivos"
+import {EstadoAbiertoCerrado} from "../enums/EstadoAbiertoCerrado";
  
 export interface Incidencias{
     id_incidencia?: number,
@@ -10,5 +10,5 @@ export interface Incidencias{
     latitud: number,
     longitud: number,
     fecha_hora: Date,
-    estado: Estados
+    estado: EstadoAbiertoCerrado
 }
