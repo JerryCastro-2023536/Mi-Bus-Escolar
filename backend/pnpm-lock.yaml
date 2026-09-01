@@ -252,6 +252,9 @@ importers:
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
+      zod:
+        specifier: ^4.5.4
+        version: 4.5.4
 
 packages:
 
@@ -981,6 +984,9 @@ packages:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
 
+  zod@4.5.4:
+    resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
+
 snapshots:
 
   '@esbuild/aix-ppc64@0.28.2':
@@ -1654,3 +1660,5 @@ snapshots:
   wrappy@1.0.2: {}
 
   xtend@4.0.2: {}
+
+  zod@4.5.4: {}
