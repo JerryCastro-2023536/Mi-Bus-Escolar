@@ -7,4 +7,6 @@ router.get("/paradas", getParadas);
 router.post("/paradas", postParadas);
 router.get("/paradas/:id", getParadaById);
 router.put("/paradas/:id", putParada);
-router.delete("/paradas/:id", deleteParada)
+router.delete("/paradas/:id", deleteParada);
+
+export default router;

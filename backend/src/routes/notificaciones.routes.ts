@@ -8,3 +8,5 @@ router.get("/notificaciones/:id", getNotificacionById);
 router.post("/notificaciones", postNotificaciones);
 router.put("/notificaciones/:id", putNotificacion);
 router.delete("/notificaciones/:id", deleteNotificacion);
+
+export default router;
