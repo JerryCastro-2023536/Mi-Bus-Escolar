@@ -1,3 +1,4 @@
+import { create } from "domain";
 import { z } from "zod";
 
 const requiredString = (field: string) =>
@@ -24,7 +25,7 @@ const userRolEnum = z.enum(
     }
 );
 
-export const userSchema = z.object({
+const userSchema = z.object({
     id_usuario: z.number()
         .int("El ID de usuario debe ser un número entero")
         .positive("El ID de usuario debe ser positivo")
@@ -83,3 +84,11 @@ export const userSchema = z.object({
 
     fecha_actualizacion: z.date().optional(),
 });
+
+export const createUserSchema = userSchema.omit({
+    id_usuario: true,
+    fecha_creacion: true,
+    fecha_actualizacion: true
+});;
+
+export const updateUserSchema = createUserSchema;
