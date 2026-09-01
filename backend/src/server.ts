@@ -3,6 +3,7 @@ import cors from 'cors';
 import { pruebaConexion } from "./config/conexion";
 import express from 'express';
 import apiRouter from './routes/apiRouter';
+import { errorHandler } from './errors/errorHandler';
 
 dotenv.config();
 const app = express();
@@ -12,8 +13,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 pruebaConexion();
-
 app.use('/api', apiRouter);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
     console.log(`SERVIDOR EJECUTANDOSE EN PUERTO: ${PORT}` )
