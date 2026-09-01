@@ -1,17 +1,18 @@
 import { Router } from "express";
-import {deleteColegio,
-    getColegioById,
-    getColegios,
-    postColegios,
-    putColegio
-} from "../controllers/colegios.controller";
+import {
+    deleteEstudiante,
+    getEstudianteById,
+    getEstudiantes,
+    postEstudiantes,
+    putEstudiante
+} from "../controllers/estudiantes.controller";
 
 const router = Router();
 
-router.get("/colegios", getColegios);
-router.get("/colegios/:id", getColegioById);
-router.post("/colegios", postColegios);
-router.put("/colegios/:id", putColegio);
-router.delete("/colegios/:id", deleteColegio);
+router.get("/estudiantes", getEstudiantes);
+router.get("/estudiantes/:id", getEstudianteById);
+router.post("/estudiantes", postEstudiantes);
+router.put("/estudiantes/:id", putEstudiante);
+router.delete("/estudiantes/:id", deleteEstudiante);
 
 export default router;
