@@ -20,7 +20,7 @@ export async function buscarParadaPorId(id : number){
 }
 
 export async function actualizarParada(p_paradas : Paradas, id: number){
-    const valores = [p_paradas.nombre, p_paradas.direccion, p_paradas.latitud, p_paradas.longitud];
+    const valores = [p_paradas.nombre, p_paradas.direccion, p_paradas.latitud, p_paradas.longitud, id];
     const consulta = `UPDATE paradas SET nombre = $1, direccion = $2, latitud = $3, longitud = $4 WHERE id_parada = $5`; 
     const resultado = await pool.query(consulta, valores);
     return resultado.rows[0];
