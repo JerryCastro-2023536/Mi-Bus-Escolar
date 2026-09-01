@@ -15,19 +15,19 @@ export async function agregarNotificaciones(p_notificaciones : Notificaciones){
 
 export async function buscarNotificacionPorId(id : number){
     const valor = [id];
-    const resultado = await pool.query("SELECT * FROM notificaciones WHERE id_notificaciones = $1", valor);
+    const resultado = await pool.query("SELECT * FROM notificaciones WHERE id_notificacion = $1", valor);
     return resultado.rows[0];
 }
 
 export async function actualizarNotificacion(p_notificaciones : Notificaciones, id: number){
     const valores = [p_notificaciones.id_usuario, p_notificaciones.id_incidencia, p_notificaciones.id_asistencia, p_notificaciones.tipo, p_notificaciones.titulo, p_notificaciones.mensaje, p_notificaciones.leida, p_notificaciones.fecha_envio, id];
-    const consulta = `UPDATE notificaciones SET id_usuario = $1, id_incidencia = $2, id_asistencia = $3, tipo = $4, titulo = $5, mensaje = $6, leida = $7, fecha_envio = $8 WHERE id_notificaciones = $9`;
+    const consulta = `UPDATE notificaciones SET id_usuario = $1, id_incidencia = $2, id_asistencia = $3, tipo = $4, titulo = $5, mensaje = $6, leida = $7, fecha_envio = $8 WHERE id_notificacion = $9`;
     const resultado = await pool.query(consulta, valores);
     return resultado.rows[0];
 }
 
 export async function eliminarNotificacion(id : number) {
     const valor = [id];
-    const resultado = await pool.query("DELETE FROM notificaciones WHERE id_notificaciones = $1", valor);
+    const resultado = await pool.query("DELETE FROM notificaciones WHERE id_notificacion = $1", valor);
     console.log("Eliminado correctamente");
 }
