@@ -1,9 +1,8 @@
 import { pool } from "../config/conexion";
-import { InternalError } from "../errors/500.error";
-import { DatabaseError } from "../errors/database.error";
 import { NotFoundError } from "../errors/notFound.error";
 
 import { Usuario } from "../models/usuario";
+import { errorThrower } from "../utils/middleware/errorThrower";
 
 export async function listarUsuarios() {
     try {
@@ -67,31 +66,4 @@ export async function eliminarUsuarioById(id: number) {
     } catch (error) {
         errorThrower(error);
     }
-}
-
-function errorThrower(error: any) {
-    if (error.statusCode || error instanceof DatabaseError || error instanceof InternalError || error instanceof NotFoundError) {
-        throw error;
-    }
-
-    if (typeof error === 'object' && error !== null && 'code' in error) {
-        let campo = error.constraint;
-        
-        // UNIQUE
-        if (error.code === '23505') {
-            if (campo === "usuarios_correo_key"){
-                throw new DatabaseError("Error en la base de datos", "El correo que ingresó ya existe");
-            }
-            if (campo === "usuarios_telefono_key"){
-                throw new DatabaseError("Error en la base de datos", "El telefono que ingresó ya existe");
-            }
-        }
-
-        /* CONSTRAINT FOREIGN KEY
-        if (error.code === '23503') {
-            throw new DatabaseError("Restricción de datos", "No se puede eliminar el usuario porque tiene registros asociados.");
-        }*/
-    }
-    
-    throw new InternalError();
 }
