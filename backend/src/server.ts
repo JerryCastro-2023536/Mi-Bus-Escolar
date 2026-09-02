@@ -4,6 +4,7 @@ import { pruebaConexion } from "./config/conexion";
 import express from 'express';
 import apiRouter from './routes/apiRouter';
 import { errorHandler } from './errors/errorHandler';
+import { notFoundHandler } from './utils/middleware/notFound.middleware';
 
 dotenv.config();
 const app = express();
@@ -16,6 +17,7 @@ pruebaConexion();
 
 
 app.use('/api', apiRouter);
+app.use(notFoundHandler)
 app.use(errorHandler)
 
 app.listen(PORT, () => {
