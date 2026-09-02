@@ -1,12 +1,12 @@
 import {z} from "zod"
 
-const EstadoActivoInactivo = z.enum(["activo", "inactivo"], {
+const EstadoActivoInactivo = z.enum(["ACTIVO", "INACTIVO"], {
     error:(issue) => {
         if(issue === undefined){
             return `el estado es obligatorio`
         }
 
-        return "el estado debe de ser 'activo' o 'inactivo'"
+        return "el estado debe de ser 'ACTIVO' o 'INACTIVO'"
     }
 })
 

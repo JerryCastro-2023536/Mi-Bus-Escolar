@@ -12,13 +12,13 @@ const requiredString = (field: String) =>
         }
     })
 
-const incidenciaEstadoAbiertoCerrado = z.enum(["abierto", "cerrado"], {
+const incidenciaEstadoAbiertoCerrado = z.enum(["ABIERTO", "CERRADO"], {
     error: (issue) => {
         if(issue === undefined){
             return "el estado es obligatorio"
         }
         
-        return "el estado debe de ser 'abierto' o 'cerrado'"
+        return "el estado debe de ser 'ABIERTO' o 'CERRADA'"
     }   
 })
 
