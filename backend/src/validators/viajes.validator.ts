@@ -1,68 +1,19 @@
-import { z } from "zod";
-
-const nullableNumber = (field: string) =>
-    z.number({
-        error: (issue) => {
-            if (issue.input === undefined) {
-                return `El ${field} es obligatorio (puede ser null, pero debe enviarse)`;
-            }
-            return `El ${field} debe ser un número`;
-        },
-    })
-    .int(`El ${field} debe ser un número entero`)
-    .positive(`El ${field} debe ser positivo`)
-    .nullable();
-
-const requiredDate = (field: string) =>
-    z.coerce.date({
-        error: (issue) => {
-            if (issue.input === undefined) {
-                return `La ${field} es obligatoria`;
-            }
-            return `La ${field} debe ser una fecha válida`;
-        },
-    });
-
-const timeString = (field: string) =>
-    z.string({
-        error: (issue) => {
-            if (issue.input === undefined) return undefined;
-            return `La ${field} debe ser un texto en formato HH:mm o HH:mm:ss`;
-        },
-    })
-    .regex(/^([01]\d|2[0-3]):([0-5]\d)(:([0-5]\d))?$/, `La ${field} debe tener el formato HH:mm o HH:mm:ss`)
-    .nullable()
-    .optional();
-
-
-const estadoViajesEnum = z.enum(
-    ["PROGRAMADO", "ACTIVO", "FINALIZADO"],
-    {
-        error: (issue) => {
-            if (issue.input === undefined) {
-                return "El estado es obligatorio";
-            }
-            return "El estado ingresado no es válido";
-        },
-    }
-);
+import { z } from "zod"; 
+import { zUtils } from "../utils/zodHelpers";
 
 const viajeSchema = z.object({
-    id_viaje: z.number()
-        .int("El ID de viaje debe ser un número entero")
-        .positive("El ID de viaje debe ser positivo")
-        .optional(),
+    id_viaje: zUtils.optionalPositiveInt("ID de viaje"),
 
-    id_ruta: nullableNumber("ID de ruta"),
-    id_chofer: nullableNumber("ID de chofer"),
-    id_vehiculo: nullableNumber("ID de vehículo"),
+    id_ruta: zUtils.nullablePositiveInt("ID de ruta"),
+    id_chofer: zUtils.nullablePositiveInt("ID de chofer"),
+    id_vehiculo: zUtils.nullablePositiveInt("ID de vehículo"),
 
-    fecha_viaje: requiredDate("Fecha del viaje"),
+    fecha_viaje: zUtils.requiredDate("Fecha del viaje"),
 
-    hora_inicio: timeString("Hora de inicio"),
-    hora_fin: timeString("Hora de fin"),
+    hora_inicio: zUtils.optionalTimeString("Hora de inicio"),
+    hora_fin: zUtils.optionalTimeString("Hora de fin"),
 
-    estado: estadoViajesEnum.default("PROGRAMADO"),
+    estado: zUtils.requiredEnum("estado", ["PROGRAMADO", "ACTIVO", "FINALIZADO"]).default("PROGRAMADO"),
 })
 .refine((data) => {
     if (data.hora_inicio && data.hora_fin) {
