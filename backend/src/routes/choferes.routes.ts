@@ -1,4 +1,7 @@
 import { Router } from "express";
+import { validateSchema } from "../utils/middleware/schemaValidator";
+import { createChoferSchema } from "../validators/choferes.validator";
+
 import {
     deleteChofer,
     getChoferById,
@@ -11,8 +14,8 @@ const router = Router();
 
 router.get("/choferes", getChoferes);
 router.get("/choferes/:id", getChoferById);
-router.post("/choferes", postChoferes);
-router.put("/choferes/:id", putChofer);
+router.post("/choferes", validateSchema(createChoferSchema), postChoferes);
+router.put("/choferes/:id", validateSchema(createChoferSchema), putChofer);
 router.delete("/choferes/:id", deleteChofer);
 
 export default router;
