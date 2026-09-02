@@ -49,6 +49,18 @@ export const zUtils = {
             .int(`El campo '${field}' debe ser un número entero`)
             .positive(`El campo '${field}' debe ser positivo`),
 
+    //IDs autogenerados
+    optionalPositiveInt: (field: string) =>
+        z.number({
+            error: (issue) => {
+                if (issue.input === undefined) return undefined;
+                return `El campo '${field}' debe ser un número`;
+            },
+        })
+        .int(`El campo '${field}' debe ser un número entero`)
+        .positive(`El campo '${field}' debe ser positivo`)
+        .optional(),
+
     //Fecha obligatoria
     requiredDate: (field: string) =>
         z.coerce.date({
