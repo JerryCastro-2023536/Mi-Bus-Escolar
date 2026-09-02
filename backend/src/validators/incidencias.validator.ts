@@ -8,7 +8,7 @@ const requiredString = (field: String) =>
                 return `el ${field} es obligatorio `
             }
 
-            return `el ${field} debe de ser texto, animal`
+            return `el ${field} debe de ser texto`
         }
     })
 
@@ -23,21 +23,25 @@ const incidenciaEstadoAbiertoCerrado = z.enum(["abierto", "cerrado"], {
 })
 
 const incidenciaSchema = z.object({
+    id_incidencia: z.number()
+    .int("el id de la inciencia tiene que ser un numero entero")
+    .positive("el id tiene que ser positivo")
+    .optional(),
+
     id_viaje: z.number()
         .int("el id del viaje tiene que ser un numero entero")
         .positive("el id del viaje tiene que ser un numero positivo")
-        .optional()
         .nullable(),
 
     id_ruta: z.number()
     .int("el id del viaje tiene que ser un numero entero")
     .positive("el id del viaje tiene que ser un numero positivo")
-    .optional().nullable(),
+    .nullable(),
 
     id_usuario_reporta: z.number()
     .int("el id del usuario tiene que ser un numero entero")
     .positive("el id del usuario tiene que ser un numero positivo")
-    .optional().nullable(),
+    .nullable(),
 
     titulo: requiredString("titulo").trim().min(1, "el titulo es obligatorio").max(100, "el titulo no puede tener mas de 100 caracteres"),
 
@@ -52,3 +56,7 @@ const incidenciaSchema = z.object({
     estado: incidenciaEstadoAbiertoCerrado
 
 })
+
+export const createIncidenciaSchema = incidenciaSchema.omit({id_viaje: true, id_ruta: true, id_usuario_reporta: true}) 
+
+export const updateIncidenciaSchema = createIncidenciaSchema
