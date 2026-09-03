@@ -31,7 +31,7 @@ const rutasSchema = z.object({
     .int("el id del servicio tiene que ser un numero entero")
     .positive("el id tiene que ser un numero positivo"),
 
-    id_vehiculos: z.number()
+    id_vehiculo: z.number()
     .int("el id de vehiculos tiene que ser un numero entero")
     .positive("el id tiene que ser un numero positivo")
     .nullable()
@@ -46,9 +46,9 @@ const rutasSchema = z.object({
     nombre: requiredString("nombre")
     .trim()
     .min(1, "el nombre de la ruta no puede estar vacio")
-    .max(150, "el nopmbre de la ruta no puede exceder los 150"),
+    .max(150, "el nombre de la ruta no puede exceder los 150"),
 
-    hora_inicia_estimada: z.string()
+    hora_inicio_estimada: z.string()
     .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/,"La hora de inicio debe tener formato HH:MM o HH:MM:SS")
     .nullable()
     .optional(),
