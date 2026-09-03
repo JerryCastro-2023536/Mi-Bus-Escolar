@@ -12,13 +12,13 @@ const requiredString = (field: String) =>
         }
     })
 
-const incidenciaEstadoAbiertoCerrado = z.enum(["ABIERTO", "CERRADO"], {
+const incidenciaEstadoAbiertoCerrado = z.enum(["ABIERTA", "CERRADA"], {
     error: (issue) => {
         if(issue === undefined){
             return "el estado es obligatorio"
         }
         
-        return "el estado debe de ser 'ABIERTO' o 'CERRADA'"
+        return "el estado debe de ser 'ABIERTA' o 'CERRADA'"
     }   
 })
 
@@ -31,17 +31,18 @@ const incidenciaSchema = z.object({
     id_viaje: z.number()
         .int("el id del viaje tiene que ser un numero entero")
         .positive("el id del viaje tiene que ser un numero positivo")
-        .nullable(),
+        .nullable()
+        .optional(),
 
     id_ruta: z.number()
-    .int("el id del viaje tiene que ser un numero entero")
-    .positive("el id del viaje tiene que ser un numero positivo")
-    .nullable(),
+    .int("el id de la ruta tiene que ser un numero entero")
+    .positive("el id de la ruta tiene que ser un numero positivo"),
 
     id_usuario_reporta: z.number()
     .int("el id del usuario tiene que ser un numero entero")
     .positive("el id del usuario tiene que ser un numero positivo")
-    .nullable(),
+    .nullable()
+    .optional(),
 
     titulo: requiredString("titulo").trim().min(1, "el titulo es obligatorio").max(100, "el titulo no puede tener mas de 100 caracteres"),
 
@@ -57,6 +58,6 @@ const incidenciaSchema = z.object({
 
 })
 
-export const createIncidenciaSchema = incidenciaSchema.omit({id_viaje: true, id_ruta: true, id_usuario_reporta: true}) 
+export const createIncidenciaSchema = incidenciaSchema.omit({ id_incidencia: true });
 
-export const updateIncidenciaSchema = createIncidenciaSchema
+export const updateIncidenciaSchema = createIncidenciaSchema;
