@@ -1,69 +1,29 @@
-import {z} from "zod"
-
-const EstadoActivoInactivo = z.enum(["ACTIVO", "INACTIVO"], {
-    error:(issue) => {
-        if(issue === undefined){
-            return `el estado es obligatorio`
-        }
-
-        return "el estado debe de ser 'ACTIVO' o 'INACTIVO'"
-    }
-})
-
-const requiredString = (field: String) =>
-    z.string({
-        error: (issue) =>{
-            if(issue === undefined){
-                return `el ${field} es obligatorio `
-            }
-
-            return `el ${field} debe de ser texto`
-        }
-    })
+import { z } from "zod";
+import { zUtils } from "../utils/zodHelpers";
 
 const rutasSchema = z.object({
-    id_ruta: z.number()
-    .int("el id de la ruta tiene que ser un numero entero")
-    .positive("el id tiene que ser un numero positivo")
-    .optional(),
+    id_ruta: zUtils.optionalPositiveInt("id_ruta"),
 
-    id_servicio: z.number()
-    .int("el id del servicio tiene que ser un numero entero")
-    .positive("el id tiene que ser un numero positivo"),
+    id_servicio: zUtils.requiredPositiveInt("id_servicio"),
 
-    id_vehiculo: z.number()
-    .int("el id de vehiculos tiene que ser un numero entero")
-    .positive("el id tiene que ser un numero positivo")
-    .nullable()
-    .optional(),
+    id_vehiculo: zUtils.optionalPositiveInt("id_vehiculo").nullable(),
 
-    id_chofer: z.number()
-    .int("el id del chofer debe ser un numero entero")
-    .positive("el id del chofer tiene que ser positivo")
-    .nullable()
-    .optional(),
+    id_chofer: zUtils.optionalPositiveInt("id_chofer").nullable(),
 
-    nombre: requiredString("nombre")
-    .trim()
-    .min(1, "el nombre de la ruta no puede estar vacio")
-    .max(150, "el nombre de la ruta no puede exceder los 150"),
+    nombre: zUtils.requiredString("nombre")
+        .trim()
+        .min(1, "El nombre de la ruta no puede estar vacío")
+        .max(150, "El nombre de la ruta no puede exceder los 150 caracteres"),
 
-    hora_inicio_estimada: z.string()
-    .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/,"La hora de inicio debe tener formato HH:MM o HH:MM:SS")
-    .nullable()
-    .optional(),
+    hora_inicio_estimada: zUtils.optionalTimeString("hora_inicio_estimada"),
 
-    hora_fin_estimada: z.string()
-    .regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/,"La hora de inicio debe tener formato HH:MM o HH:MM:SS")
-    .nullable()
-    .optional(),
+    hora_fin_estimada: zUtils.optionalTimeString("hora_fin_estimada"),
 
-    estado: EstadoActivoInactivo
-    
-})
+    estado: zUtils.requiredEnum("estado", ["ACTIVO", "INACTIVO"])
+});
 
 export const createRutaSchema = rutasSchema.omit({
     id_ruta: true
-})
+});
 
-export const updateSchema = createRutaSchema
+export const updateSchema = createRutaSchema;
