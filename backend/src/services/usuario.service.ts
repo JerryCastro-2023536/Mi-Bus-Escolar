@@ -2,8 +2,9 @@ import { pool } from "../config/conexion";
 import { NotFoundError } from "../errors/notFound.error";
 import { ValidationError } from "../errors/validation.error";
 import bcrypt from 'bcryptjs';
-import { Usuario, UsuarioLoginDTO } from "../models/usuario";
+import { Usuario, UsuarioLoginDTO, UsuarioRegisterDTO } from "../models/usuario";
 import { errorThrower } from "../utils/middleware/errorThrower";
+import { userRol } from "../enums/userRol";
 
 export async function listarUsuarios() {
     try {
@@ -95,6 +96,19 @@ export async function login(u: UsuarioLoginDTO) {
         return usuario;
 
     } catch (error) {
+        errorThrower(error);
+    }
+}
+
+export async function register(u: UsuarioRegisterDTO) {
+    try {
+        const hashedPassword = await bcrypt.hash(u.password, 10);
+        const values = [u.nombre, u.apellido, u.correo, hashedPassword, u.telefono, u.foto_usuario, userRol.USUARIO];
+        const query = 'INSERT INTO Usuarios(nombre, apellido, correo, password, telefono, foto_usuario, rol) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *';
+        const res = await pool.query(query, values);
+        return res.rows[0];
+    } catch (error) {
+        console.log(error)
         errorThrower(error);
     }
 }
