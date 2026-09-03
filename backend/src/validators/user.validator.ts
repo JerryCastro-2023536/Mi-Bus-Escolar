@@ -28,6 +28,7 @@ const userSchema = z.object({
         .regex(/^\+?[0-9]+$/, "El teléfono solo debe contener números y opcionalmente un '+' al inicio"),
 
     foto_usuario: z.union([zUtils.optionalString("foto de usuario"), z.url("La foto debe ser una URL válida")]),
+
     rol: zUtils.requiredEnum("rol", ["ADMINISTRADOR", "PROVEEDOR", "CHOFER", "USUARIO"]),
 
     correo_verificado: zUtils.requiredBoolean("correo verificado").default(false),
@@ -42,5 +43,17 @@ export const createUserSchema = userSchema.omit({
     fecha_creacion: true,
     fecha_actualizacion: true
 });
+
+export const loginUserSchema = userSchema.omit({
+    id_usuario: true,
+    fecha_creacion: true,
+    fecha_actualizacion: true,
+    nombre: true,
+    apellido: true,
+    telefono: true,
+    foto_usuario: true,
+    rol: true,
+    correo_verificado: true
+})
 
 export const updateUserSchema = createUserSchema;
