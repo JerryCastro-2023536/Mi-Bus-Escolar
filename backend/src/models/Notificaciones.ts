@@ -8,6 +8,6 @@ export interface Notificaciones{
     tipo : TipoNoti,
     titulo : string,
     mensaje : string,
-    leida : number,
+    leida : boolean,
     fecha_envio : Date
 }
