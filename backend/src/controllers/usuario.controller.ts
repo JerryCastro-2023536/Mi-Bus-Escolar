@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { agregarUsuario, buscarUsuarioById, editarUsuarioById, eliminarUsuarioById, listarUsuarios } from "../services/usuario.service";
+import { agregarUsuario, buscarUsuarioById, editarUsuarioById, eliminarUsuarioById, listarUsuarios, login } from "../services/usuario.service";
 import { Usuario } from "../models/usuario";
+import { generarToken } from "../utils/jwt";
+import { InternalError } from "../errors/500.error";
+import { errorThrower } from "../utils/middleware/errorThrower";
 
 export async function getUsuarios(_req: Request, res: Response, next: NextFunction) {
     try {
@@ -31,8 +34,8 @@ export async function getUsuarioById(req: Request, res: Response, next: NextFunc
 
 export async function postUsuario(req: Request, res: Response, next: NextFunction) {
     try {
-        const { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado} = req.body;
-        const newUser: Usuario = { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado};
+        const { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado } = req.body;
+        const newUser: Usuario = { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado };
 
         const usuarioCreado = await agregarUsuario(newUser);
         return res.status(201).json({
@@ -48,8 +51,8 @@ export async function postUsuario(req: Request, res: Response, next: NextFunctio
 export async function putUsuarioByID(req: Request, res: Response, next: NextFunction) {
     try {
         const id = Number(req.params.id);
-        const { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado} = req.body;
-        const newUser: Usuario = { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado};
+        const { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado } = req.body;
+        const newUser: Usuario = { nombre, apellido, correo, password, telefono, foto_usuario, rol, correo_verificado };
 
         const usuarioEditado = await editarUsuarioById(id, newUser);
         return res.status(200).json({
@@ -76,3 +79,25 @@ export async function deleteUsuarioById(req: Request, res: Response, next: NextF
         next(error);
     }
 }
+
+export const loginUsuario = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { correo, password } = req.body;
+
+        const validatedUser = await login({correo, password});
+
+        const token = generarToken({
+            id: validatedUser.id,
+            email: validatedUser.correo,
+            rol: validatedUser.rol
+        });
+
+        return res.status(200).json({
+            message: 'Autenticación exitosa',
+            token,
+            usuario: validatedUser
+        });
+    } catch (error) {
+        next(error);
+    }
+};
