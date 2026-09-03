@@ -5,7 +5,7 @@ import { createProveedorSchema, updateProveedorSchema } from "../validators/prov
 const router = Router();
 
 router.get("/proveedores", obtenerProveedores);
-router.get("/proveedor/:id", obtenerProveedorPorId);
+router.get("/proveedores/:id", obtenerProveedorPorId);
 router.post("/proveedores", validateSchema(createProveedorSchema) ,crearProveedor);
 router.put("/proveedores/:id", validateSchema(updateProveedorSchema) ,editarProveedor);
 router.delete("/proveedores/:id", eliminarProveedores);

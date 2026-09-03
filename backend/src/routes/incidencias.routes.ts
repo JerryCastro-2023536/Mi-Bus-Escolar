@@ -5,7 +5,7 @@ import { createIncidenciaSchema, updateIncidenciaSchema } from "../validators/in
 const router = Router();
 
 router.get("/incidencias", obtenerIncidencias);
-router.get("/incidencia/:id", obtenerIncidenciaPorId);
+router.get("/incidencias/:id", obtenerIncidenciaPorId);
 router.post("/incidencias", validateSchema(createIncidenciaSchema), crearIncidencia);
 router.put("/incidencias/:id",validateSchema(updateIncidenciaSchema) ,editarIncidencia);
 router.delete("/incidencias/:id", eliminarIncidencias);
