@@ -3,6 +3,8 @@ import { ValidationError } from './validation.error';
 import { DatabaseError } from './database.error';
 import { InternalError } from './500.error';
 import { NotFoundError } from './notFound.error';
+import { AuthorizationError } from './auth.error';
+import { InvalidToken } from './expiredToken.error';
 
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
     console.error(`[Error]: ${err.message}`); 
@@ -24,6 +26,20 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
     }
 
     if (err instanceof NotFoundError){
+        return res.status(err.statusCode).json({
+            success: false,
+            message: err.message
+        })
+    }
+
+    if (err instanceof AuthorizationError){
+        return res.status(err.statusCode).json({
+            success: false,
+            message: err.message
+        })
+    }
+
+    if (err instanceof InvalidToken){
         return res.status(err.statusCode).json({
             success: false,
             message: err.message
