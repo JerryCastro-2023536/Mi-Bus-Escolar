@@ -13,3 +13,9 @@ export interface Usuario{
     fecha_creacion?: Date;
     fecha_actualizacion?: Date;
 }
+
+export interface UsuarioLoginDTO{
+    correo: string;
+    password: string;
+}
+
