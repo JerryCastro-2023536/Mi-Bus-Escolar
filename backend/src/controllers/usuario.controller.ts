@@ -2,8 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { agregarUsuario, buscarUsuarioById, editarUsuarioById, eliminarUsuarioById, listarUsuarios, login, register } from "../services/usuario.service";
 import { Usuario, UsuarioRegisterDTO } from "../models/usuario";
 import { generarToken } from "../utils/jwt";
-import { InternalError } from "../errors/500.error";
-import { errorThrower } from "../utils/middleware/errorThrower";
 
 export async function getUsuarios(_req: Request, res: Response, next: NextFunction) {
     try {
