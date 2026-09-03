@@ -3,7 +3,7 @@ export class AuthorizationError extends Error {
     
     constructor(message: string) {
         super(message);
-        this.name = "NotFoundError";
+        this.name = "AuthorizationError";
         this.statusCode = 401;
         Object.setPrototypeOf(this, AuthorizationError.prototype);
     }
