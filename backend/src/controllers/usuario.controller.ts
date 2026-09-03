@@ -113,7 +113,7 @@ export const registerUsuario = async (req: Request, res: Response, next: NextFun
             rol: createdUser.rol
         });
 
-        return res.status(200).json({
+        return res.status(201).json({
             message: 'Registro exitoso',
             token,
             usuario: createdUser
