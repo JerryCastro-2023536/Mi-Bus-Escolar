@@ -1,3 +1,6 @@
-export enum userRol{
-    'ADMINISTRADOR', 'PROVEEDOR', 'CHOFER', 'USUARIO'
+export enum userRol {
+    ADMINISTRADOR = 'ADMINISTRADOR',
+    PROVEEDOR = 'PROVEEDOR',
+    CHOFER = 'CHOFER',
+    USUARIO = 'USUARIO'
 }

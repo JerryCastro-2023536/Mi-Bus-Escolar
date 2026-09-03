@@ -1,3 +1,5 @@
 export enum estadoViajes{
-    'PROGRAMADO','ACTIVO','FINALIZADO'
+    PROGRAMADO ='PROGRAMADO',
+    ACTIVO = 'ACTIVO',
+    FINALIZADO ='FINALIZADO'
 }
