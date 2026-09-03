@@ -21,7 +21,7 @@ export const verificarAutenticacion = (req: Request, res: Response, next: NextFu
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        throw new AuthorizationError("Sin informacion del usario")
+        throw new AuthorizationError("Sin informacion del usuario")
     }
 
     const token = authHeader.split(' ')[1];
