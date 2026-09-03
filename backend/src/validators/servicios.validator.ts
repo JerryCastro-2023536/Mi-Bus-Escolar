@@ -69,14 +69,14 @@ const serviciosSchema = z.object({
 
     estado: EstadoActivoInactivo,
 
-    fecha_creacion: z.string()
-        .datetime({ message: "la fecha de creacion debe ser una fecha ISO 8601 valida" })
-        .optional(),
+    fecha_creacion: z.union([
+        z.string().datetime({ message: "la fecha de creacion debe ser una fecha valida" }),
+        z.coerce.date()
+    ]).optional(),
 });
 
 export const createServicioSchema = serviciosSchema.omit({
     id_servicio: true,
-    fecha_creacion: true,
 });
 
 export const updateServicioSchema = createServicioSchema;
