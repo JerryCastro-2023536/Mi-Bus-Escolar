@@ -32,8 +32,8 @@ export async function getUbicacionBusById(req: Request, res: Response, next: Nex
 
 export async function postUbicacionBus(req: Request, res: Response, next: NextFunction) {
     try {
-        const { id_viaje, latitud, longitud, velocidad, fecha_hora } = req.body;
-        const newUbicacion: UbicacionesBus = { id_viaje, latitud, longitud, velocidad, fecha_hora };
+        const { id_viaje, latitud, longitud, velocidad } = req.body;
+        const newUbicacion: UbicacionesBus = { id_viaje, latitud, longitud, velocidad };
 
         const ubicacionCreada = await agregarUbicacionBus(newUbicacion);
         return res.status(201).json({
