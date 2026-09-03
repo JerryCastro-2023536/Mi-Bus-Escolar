@@ -3,6 +3,9 @@ import { ValidationError } from './validation.error';
 import { DatabaseError } from './database.error';
 import { InternalError } from './500.error';
 import { NotFoundError } from './notFound.error';
+import { AuthorizationError } from './auth.error';
+import { InvalidToken } from "./expiredToken.error";
+import { JsonError } from './json.error';
 
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
     console.error(`[Error]: ${err.message}`); 
@@ -15,7 +18,7 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
         });
     }
 
-   if (err instanceof DatabaseError){
+    if (err instanceof DatabaseError){
         return res.status(err.statusCode).json({
             success: false,
             message: err.message,
@@ -30,10 +33,32 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
         })
     }
 
-    if (err instanceof InternalError){
+    if (err instanceof AuthorizationError){
         return res.status(err.statusCode).json({
             success: false,
             message: err.message
+        })
+    }
+
+    if (err instanceof InvalidToken){
+        return res.status(err.statusCode).json({
+            success: false,
+            message: err.message
+        })
+    }
+
+    if (err instanceof JsonError){
+        return res.status(err.statusCode).json({
+            success: false,
+            message: err.message
+        })
+    }
+
+    if (err instanceof InternalError){
+        return res.status(err.statusCode).json({
+            success: false,
+            message: err.message,
+            error: err.error
         })
     }
 }
