@@ -1,7 +1,8 @@
 import { pool } from "../config/conexion";
 import { NotFoundError } from "../errors/notFound.error";
+import { ValidationError } from "../errors/validation.error";
 
-import { Usuario } from "../models/usuario";
+import { Usuario, UsuarioLoginDTO } from "../models/usuario";
 import { errorThrower } from "../utils/middleware/errorThrower";
 
 export async function listarUsuarios() {
@@ -63,6 +64,21 @@ export async function eliminarUsuarioById(id: number) {
         }
         
         return true; 
+    } catch (error) {
+        errorThrower(error);
+    }
+}
+
+export async function login(u: UsuarioLoginDTO){
+    try {
+        const values = [u.correo, u.password]
+        const query = 'SELECT * FROM Usuarios WHERE correo = $1 AND password = $2';
+        const res = await pool.query(query, values);
+        if (res.rowCount === 0){
+            throw new ValidationError("Error al logearse", ["Credenciales invalidas"]);
+        }
+        console.log(res.rows[0])
+        return res.rows[0];
     } catch (error) {
         errorThrower(error);
     }
