@@ -1,62 +1,36 @@
-import {union, z, ZodObject} from 'zod';
-
-
-const requiredString = (field: String) =>
-    z.string({
-        error: (issue) =>{
-            if(issue === undefined){
-                return `el ${field} es obligatorio `
-            }
-
-            return `el ${field} debe de ser texto`
-        }
-    })
-
-const incidenciaEstadoAbiertoCerrado = z.enum(["ABIERTA", "CERRADA"], {
-    error: (issue) => {
-        if(issue === undefined){
-            return "el estado es obligatorio"
-        }
-        
-        return "el estado debe de ser 'ABIERTA' o 'CERRADA'"
-    }   
-})
+import { z } from 'zod';
+import { zUtils } from '../utils/zodHelpers';
 
 const incidenciaSchema = z.object({
-    id_incidencia: z.number()
-    .int("el id de la inciencia tiene que ser un numero entero")
-    .positive("el id tiene que ser positivo")
-    .optional(),
+    id_incidencia: zUtils.optionalPositiveInt("id_incidencia"),
 
-    id_viaje: z.number()
-        .int("el id del viaje tiene que ser un numero entero")
-        .positive("el id del viaje tiene que ser un numero positivo")
-        .nullable()
-        .optional(),
+    id_viaje: zUtils.optionalPositiveInt("id_viaje").nullable(),
 
-    id_ruta: z.number()
-    .int("el id de la ruta tiene que ser un numero entero")
-    .positive("el id de la ruta tiene que ser un numero positivo"),
+    id_ruta: zUtils.requiredPositiveInt("id_ruta"),
 
-    id_usuario_reporta: z.number()
-    .int("el id del usuario tiene que ser un numero entero")
-    .positive("el id del usuario tiene que ser un numero positivo")
-    .nullable()
-    .optional(),
+    id_usuario_reporta: zUtils.optionalPositiveInt("id_usuario_reporta").nullable(),
 
-    titulo: requiredString("titulo").trim().min(1, "el titulo es obligatorio").max(100, "el titulo no puede tener mas de 100 caracteres"),
+    titulo: zUtils.requiredString("titulo")
+        .trim()
+        .min(1, "El campo 'titulo' es obligatorio")
+        .max(100, "El campo 'titulo' no puede tener mas de 100 caracteres"),
 
-    descripcion: requiredString("descripcion").trim().min(1, "la descripcion es obligatoria").max(500, "la descripcion no puede tener mas de 500 caracteres"),
+    descripcion: zUtils.optionalString("descripcion"),
 
-    latitud: z.number().min(-90, "la latitud no puede ser menor a -90").max(90, "la latitud no puede ser mayor a 90"),
+    latitud: zUtils.optionalNumber("latitud")
+        .refine(val => val === null || val === undefined || (val >= -90 && val <= 90), {
+            message: "La latitud debe estar entre -90 y 90"
+        }),
 
-    longitud: z.number().min(-180, "la longitud no puede ser menor a -180").max(180, "la longitud no puede ser mayor a 180"),
+    longitud: zUtils.optionalNumber("longitud")
+        .refine(val => val === null || val === undefined || (val >= -180 && val <= 180), {
+            message: "La longitud debe estar entre -180 y 180"
+        }),
 
-    fecha_hora: union([z.string().datetime({message: "la fecha y hora debe de ser un string con formato ISO 8601"}), z.coerce.date("la fecha y hora debe de ser una fecha válida").optional()]),
+    fecha_hora: zUtils.requiredDate("fecha_hora").optional(),
 
-    estado: incidenciaEstadoAbiertoCerrado
-
-})
+    estado: zUtils.requiredEnum("estado", ["ABIERTA", "CERRADA"])
+});
 
 export const createIncidenciaSchema = incidenciaSchema.omit({ id_incidencia: true });
 
