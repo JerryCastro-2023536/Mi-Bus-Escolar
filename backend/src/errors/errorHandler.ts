@@ -49,7 +49,8 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
     if (err instanceof InternalError){
         return res.status(err.statusCode).json({
             success: false,
-            message: err.message
+            message: err.message,
+            error: err.error
         })
     }
 }
