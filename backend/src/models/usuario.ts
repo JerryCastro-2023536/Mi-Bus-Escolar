@@ -19,3 +19,11 @@ export interface UsuarioLoginDTO{
     password: string;
 }
 
+export interface UsuarioRegisterDTO{
+    nombre: string;
+    apellido: string;
+    correo: string;
+    password: string;
+    telefono: string;
+    foto_usuario: string | null;
+}
