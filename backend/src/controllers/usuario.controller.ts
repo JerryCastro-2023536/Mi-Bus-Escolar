@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { agregarUsuario, buscarUsuarioById, editarUsuarioById, eliminarUsuarioById, listarUsuarios, login } from "../services/usuario.service";
-import { Usuario } from "../models/usuario";
+import { agregarUsuario, buscarUsuarioById, editarUsuarioById, eliminarUsuarioById, listarUsuarios, login, register } from "../services/usuario.service";
+import { Usuario, UsuarioRegisterDTO } from "../models/usuario";
 import { generarToken } from "../utils/jwt";
 import { InternalError } from "../errors/500.error";
 import { errorThrower } from "../utils/middleware/errorThrower";
@@ -96,6 +96,29 @@ export const loginUsuario = async (req: Request, res: Response, next: NextFuncti
             message: 'Autenticación exitosa',
             token,
             usuario: validatedUser
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const registerUsuario = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { nombre, apellido, correo, password, telefono, foto_usuario } = req.body;
+
+        const user: UsuarioRegisterDTO ={ nombre, apellido, correo, password, telefono, foto_usuario};
+        const createdUser = await register(user);
+
+        const token = generarToken({
+            id: createdUser.id,
+            email: createdUser.correo,
+            rol: createdUser.rol
+        });
+
+        return res.status(200).json({
+            message: 'Registro exitoso',
+            token,
+            usuario: createdUser
         });
     } catch (error) {
         next(error);
