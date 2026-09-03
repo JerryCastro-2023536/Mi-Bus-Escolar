@@ -44,10 +44,12 @@ export const createUserSchema = userSchema.omit({
     fecha_actualizacion: true
 });
 
-export const loginUserSchema = userSchema.omit({
-    id_usuario: true,
-    fecha_creacion: true,
-    fecha_actualizacion: true,
+export const registerUserSchema = userSchema.omit({
+    rol: true,
+    correo_verificado: true,
+})
+
+export const loginUserSchema = createUserSchema.omit({
     nombre: true,
     apellido: true,
     telefono: true,
