@@ -14,7 +14,8 @@ export async function listarServicios(){
 
 export async function agregarServicio(serv: Servicios){
     try{
-        const values = [serv.id_proveedor, serv.nombre, serv.descripcion, serv.precio_mensual, serv.estado, serv.fecha_creacion]
+        const fecha = serv.fecha_creacion ?? new Date();
+        const values = [serv.id_proveedor, serv.nombre, serv.descripcion, serv.precio_mensual, serv.estado, fecha]
         const consulta = "insert into servicios(id_proveedor, nombre, descripcion, precio_mensual, estado, fecha_creacion) values($1, $2, $3, $4, $5, $6) returning *"
         const resultado = await pool.query(consulta, values)
         return resultado.rows[0];
@@ -37,7 +38,8 @@ export async function buscarServicio(id: number){
 
 export async function actualizarServicio(id: number, serv: Servicios){
     try{
-        const values = [serv.id_proveedor, serv.nombre, serv.descripcion, serv.precio_mensual, serv.estado, serv.fecha_creacion, id]
+        const fecha = serv.fecha_creacion ?? new Date();
+        const values = [serv.id_proveedor, serv.nombre, serv.descripcion, serv.precio_mensual, serv.estado, fecha, id]
         const consulta = "update servicios set id_proveedor=$1, nombre=$2, descripcion=$3, precio_mensual=$4, estado=$5, fecha_creacion=$6 where id_servicio=$7 returning *"
         const resultado = await pool.query(consulta, values)
 
