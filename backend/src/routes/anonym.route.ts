@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import { loginUsuario } from '../controllers/usuario.controller';
+import { loginUsuario, registerUsuario } from '../controllers/usuario.controller';
 import { validateSchema } from '../utils/middleware/schemaValidator';
-import { loginUserSchema } from '../validators/user.validator';
+import { loginUserSchema, registerUserSchema } from '../validators/user.validator';
 
 const router = Router();
 
 router.post('/login', validateSchema(loginUserSchema),loginUsuario);
+router.post('/register', validateSchema(registerUserSchema),registerUsuario);
 
 export default router;
