@@ -1,54 +1,27 @@
-import {z} from 'zod';
-
-const requiredString = (field: String) =>
-    z.string({
-        error: (issue) =>{
-            if(issue === undefined){
-                return `el ${field} es obligatorio `
-            }
-
-            return `el ${field} debe de ser texto`
-        }
-    })
-
-const optionalString = (field: string, maxLength: number) =>
-    z.string({
-        error: (issue) => {
-            if (issue === undefined) {
-                return undefined;
-            }
-            return `el ${field} debe de ser texto`;
-        }
-    })
-    .trim()
-    .max(maxLength, `el ${field} no puede tener mas de ${maxLength} caracteres`)
-    .nullable()
-    .optional()
-    .transform((val) => (val === "" ? null : val));
+import { z } from 'zod';
+import { zUtils } from '../utils/zodHelpers';
 
 const proveedorSchema = z.object({
-    id_proveedor: z.number().int("el id del proveedor tiene que ser un numero entero")
-    .positive("el id del proveedor debe de ser positivo")
-    .optional(),
+    id_proveedor: zUtils.optionalPositiveInt("id_proveedor"),
 
-    id_usuario: z.number().int("el id del usuario tiene que ser un numero entero")
-    .positive("el id del usuario tiene que ser un numero positivo"),
+    id_usuario: zUtils.requiredPositiveInt("id_usuario"),
 
-    nombre_negocio: requiredString("nombre del negocio")
-    .min(1, "el nombre del negocio no puede estar vacio")
-    .max(150, "el nombre del negocio no puede tener mas de 150 caracteres"),
+    nombre_negocio: zUtils.requiredString("nombre_negocio")
+        .trim()
+        .min(1, "El campo 'nombre_negocio' no puede estar vacío")
+        .max(150, "El campo 'nombre_negocio' no puede tener más de 150 caracteres"),
 
-    direccion: optionalString("direccion", 255),
+    direccion: zUtils.optionalString("direccion")
+        .transform((val) => (val === "" ? null : val)),
 
-    telefono_contacto: z.string("el telefono de contacto debe de ser texto")
-    .min(8, "el telefono debe de tener al menos 8 caracteres")
-    .max(20, "el telefono de contacto no puede ser mas de 20 caracteres")
-    .regex(/^\+?[0-9]+$/, "el telefono solo debe contener numeros y opcionalmente el '+' del inicio")
-
-})
+    telefono_contacto: zUtils.requiredString("telefono_contacto")
+        .min(8, "El teléfono de contacto debe tener al menos 8 caracteres")
+        .max(20, "El teléfono de contacto no puede tener más de 20 caracteres")
+        .regex(/^\+?[0-9]+$/, "El teléfono solo debe contener números y opcionalmente el '+' al inicio"),
+});
 
 export const createProveedorSchema = proveedorSchema.omit({
     id_proveedor: true
-})
+});
 
-export const updateProveedorSchema = createProveedorSchema
+export const updateProveedorSchema = createProveedorSchema;
