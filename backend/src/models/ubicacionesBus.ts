@@ -4,5 +4,5 @@ export interface UbicacionesBus{
     latitud: number;
     longitud: number;
     velocidad: number | null;
-    fecha_hora: Date | null;
+    fecha_hora?: Date;
 }
