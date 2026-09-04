@@ -18,7 +18,6 @@ import valoracionesRoutes from './valoraciones.routes';
 import asignacionesRoutes from './asignaciones_rutas.routes';
 import notificacionesRoutes from './notificaciones.routes';
 import pagosRoutes from './pagos.routes';
-import rutasParadasRoutes from './paradas.routes';
 
 const apiRouter = Router();
 
