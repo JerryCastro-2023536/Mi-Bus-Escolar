@@ -856,3 +856,886 @@ CREATE INDEX idx_pagos_servicio_periodo
         periodo_anio,
         periodo_mes
     );
+
+    -- ============================================================
+-- 1. VALORACIONES
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION obtener_valoraciones()
+RETURNS SETOF valoraciones
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM valoraciones;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION crear_valoracion(
+    p_id_proveedor INTEGER,
+    p_comentario TEXT,
+    p_calificacion DOUBLE PRECISION
+)
+RETURNS valoraciones
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    valoracion_creada valoraciones;
+BEGIN
+    INSERT INTO valoraciones (
+        id_proveedor,
+        comentario,
+        calificacion
+    )
+    VALUES (
+        p_id_proveedor,
+        p_comentario,
+        p_calificacion
+    )
+    RETURNING * INTO valoracion_creada;
+
+    RETURN valoracion_creada;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION buscar_valoracion_por_id(
+    p_id_valoracion INTEGER
+)
+RETURNS SETOF valoraciones
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM valoraciones
+    WHERE id_valoracion = p_id_valoracion;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION editar_valoracion(
+    p_id_valoracion INTEGER,
+    p_id_proveedor INTEGER,
+    p_comentario TEXT,
+    p_calificacion DOUBLE PRECISION
+)
+RETURNS valoraciones
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    valoracion_actualizada valoraciones;
+BEGIN
+    UPDATE valoraciones
+    SET
+        id_proveedor = p_id_proveedor,
+        comentario = p_comentario,
+        calificacion = p_calificacion
+    WHERE id_valoracion = p_id_valoracion
+    RETURNING * INTO valoracion_actualizada;
+
+    RETURN valoracion_actualizada;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION eliminar_valoracion(
+    p_id_valoracion INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM valoraciones
+    WHERE id_valoracion = p_id_valoracion;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+
+-- ============================================================
+-- 2. CHOFERES
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION obtener_choferes()
+RETURNS SETOF choferes
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM choferes;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION crear_chofer(
+    p_id_usuario INTEGER,
+    p_telefono_contacto VARCHAR(20),
+    p_estado VARCHAR(10)
+)
+RETURNS choferes
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    chofer_creado choferes;
+BEGIN
+    INSERT INTO choferes (
+        id_usuario,
+        telefono_contacto,
+        estado
+    )
+    VALUES (
+        p_id_usuario,
+        p_telefono_contacto,
+        p_estado
+    )
+    RETURNING * INTO chofer_creado;
+
+    RETURN chofer_creado;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION buscar_chofer_por_id(
+    p_id_chofer INTEGER
+)
+RETURNS SETOF choferes
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM choferes
+    WHERE id_chofer = p_id_chofer;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION editar_chofer(
+    p_id_chofer INTEGER,
+    p_id_usuario INTEGER,
+    p_telefono_contacto VARCHAR(20),
+    p_estado VARCHAR(10)
+)
+RETURNS choferes
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    chofer_actualizado choferes;
+BEGIN
+    UPDATE choferes
+    SET
+        id_usuario = p_id_usuario,
+        telefono_contacto = p_telefono_contacto,
+        estado = p_estado
+    WHERE id_chofer = p_id_chofer
+    RETURNING * INTO chofer_actualizado;
+
+    RETURN chofer_actualizado;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION eliminar_chofer(
+    p_id_chofer INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM choferes
+    WHERE id_chofer = p_id_chofer;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+
+-- ============================================================
+-- 3. COLEGIOS
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION obtener_colegios()
+RETURNS SETOF colegios
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM colegios;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION crear_colegio(
+    p_nombre VARCHAR(200),
+    p_direccion VARCHAR(255),
+    p_telefono_contacto VARCHAR(20)
+)
+RETURNS colegios
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    colegio_creado colegios;
+BEGIN
+    INSERT INTO colegios (
+        nombre,
+        direccion,
+        telefono_contacto
+    )
+    VALUES (
+        p_nombre,
+        p_direccion,
+        p_telefono_contacto
+    )
+    RETURNING * INTO colegio_creado;
+
+    RETURN colegio_creado;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION buscar_colegio_por_id(
+    p_id_colegio INTEGER
+)
+RETURNS SETOF colegios
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM colegios
+    WHERE id_colegio = p_id_colegio;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION editar_colegio(
+    p_id_colegio INTEGER,
+    p_nombre VARCHAR(200),
+    p_direccion VARCHAR(255),
+    p_telefono_contacto VARCHAR(20)
+)
+RETURNS colegios
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    colegio_actualizado colegios;
+BEGIN
+    UPDATE colegios
+    SET
+        nombre = p_nombre,
+        direccion = p_direccion,
+        telefono_contacto = p_telefono_contacto
+    WHERE id_colegio = p_id_colegio
+    RETURNING * INTO colegio_actualizado;
+
+    RETURN colegio_actualizado;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION eliminar_colegio(
+    p_id_colegio INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM colegios
+    WHERE id_colegio = p_id_colegio;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+
+-- ============================================================
+-- 4. ESTUDIANTES
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION obtener_estudiantes()
+RETURNS SETOF estudiantes
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM estudiantes;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION crear_estudiante(
+    p_id_usuario_tutor INTEGER,
+    p_id_colegio INTEGER,
+    p_nombre VARCHAR(100),
+    p_apellido VARCHAR(100),
+    p_fecha_nacimiento DATE,
+    p_foto_estudiante TEXT,
+    p_grado VARCHAR(50)
+)
+RETURNS estudiantes
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    estudiante_creado estudiantes;
+BEGIN
+    INSERT INTO estudiantes (
+        id_usuario_tutor,
+        id_colegio,
+        nombre,
+        apellido,
+        fecha_nacimiento,
+        foto_estudiante,
+        grado
+    )
+    VALUES (
+        p_id_usuario_tutor,
+        p_id_colegio,
+        p_nombre,
+        p_apellido,
+        p_fecha_nacimiento,
+        p_foto_estudiante,
+        p_grado
+    )
+    RETURNING * INTO estudiante_creado;
+
+    RETURN estudiante_creado;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION buscar_estudiante_por_id(
+    p_id_estudiante INTEGER
+)
+RETURNS SETOF estudiantes
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM estudiantes
+    WHERE id_estudiante = p_id_estudiante;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION editar_estudiante(
+    p_id_estudiante INTEGER,
+    p_id_usuario_tutor INTEGER,
+    p_id_colegio INTEGER,
+    p_nombre VARCHAR(100),
+    p_apellido VARCHAR(100),
+    p_fecha_nacimiento DATE,
+    p_foto_estudiante TEXT,
+    p_grado VARCHAR(50)
+)
+RETURNS estudiantes
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    estudiante_actualizado estudiantes;
+BEGIN
+    UPDATE estudiantes
+    SET
+        id_usuario_tutor = p_id_usuario_tutor,
+        id_colegio = p_id_colegio,
+        nombre = p_nombre,
+        apellido = p_apellido,
+        fecha_nacimiento = p_fecha_nacimiento,
+        foto_estudiante = p_foto_estudiante,
+        grado = p_grado
+    WHERE id_estudiante = p_id_estudiante
+    RETURNING * INTO estudiante_actualizado;
+
+    RETURN estudiante_actualizado;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION eliminar_estudiante(
+    p_id_estudiante INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM estudiantes
+    WHERE id_estudiante = p_id_estudiante;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+
+-- ============================================================
+-- 5. ASISTENCIAS
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION obtener_asistencias()
+RETURNS SETOF asistencias
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM asistencias;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION crear_asistencia(
+    p_id_viaje INTEGER,
+    p_id_estudiante INTEGER,
+    p_estado_abordaje VARCHAR(10),
+    p_hora_abordaje TIMESTAMP,
+    p_estado_descenso VARCHAR(20),
+    p_hora_descenso TIMESTAMP
+)
+RETURNS asistencias
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    asistencia_creada asistencias;
+BEGIN
+    INSERT INTO asistencias (
+        id_viaje,
+        id_estudiante,
+        estado_abordaje,
+        hora_abordaje,
+        estado_descenso,
+        hora_descenso
+    )
+    VALUES (
+        p_id_viaje,
+        p_id_estudiante,
+        p_estado_abordaje,
+        p_hora_abordaje,
+        p_estado_descenso,
+        p_hora_descenso
+    )
+    RETURNING * INTO asistencia_creada;
+
+    RETURN asistencia_creada;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION buscar_asistencia_por_id(
+    p_id_asistencia INTEGER
+)
+RETURNS SETOF asistencias
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM asistencias
+    WHERE id_asistencia = p_id_asistencia;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION editar_asistencia(
+    p_id_asistencia INTEGER,
+    p_id_viaje INTEGER,
+    p_id_estudiante INTEGER,
+    p_estado_abordaje VARCHAR(10),
+    p_hora_abordaje TIMESTAMP,
+    p_estado_descenso VARCHAR(20),
+    p_hora_descenso TIMESTAMP
+)
+RETURNS asistencias
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    asistencia_actualizada asistencias;
+BEGIN
+    UPDATE asistencias
+    SET
+        id_viaje = p_id_viaje,
+        id_estudiante = p_id_estudiante,
+        estado_abordaje = p_estado_abordaje,
+        hora_abordaje = p_hora_abordaje,
+        estado_descenso = p_estado_descenso,
+        hora_descenso = p_hora_descenso
+    WHERE id_asistencia = p_id_asistencia
+    RETURNING * INTO asistencia_actualizada;
+
+    RETURN asistencia_actualizada;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION eliminar_asistencia(
+    p_id_asistencia INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM asistencias
+    WHERE id_asistencia = p_id_asistencia;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+
+-- ============================================================
+-- 6. PROVEEDORES
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION obtener_proveedores()
+RETURNS SETOF proveedores
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM proveedores;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION crear_proveedor(
+    p_id_usuario INTEGER,
+    p_nombre_negocio VARCHAR(150),
+    p_direccion VARCHAR(255),
+    p_telefono_contacto VARCHAR(20)
+)
+RETURNS proveedores
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    proveedor_creado proveedores;
+BEGIN
+    INSERT INTO proveedores (
+        id_usuario,
+        nombre_negocio,
+        direccion,
+        telefono_contacto
+    )
+    VALUES (
+        p_id_usuario,
+        p_nombre_negocio,
+        p_direccion,
+        p_telefono_contacto
+    )
+    RETURNING * INTO proveedor_creado;
+
+    RETURN proveedor_creado;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION buscar_proveedor_por_id(
+    p_id_proveedor INTEGER
+)
+RETURNS SETOF proveedores
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM proveedores
+    WHERE id_proveedor = p_id_proveedor;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION editar_proveedor(
+    p_id_proveedor INTEGER,
+    p_id_usuario INTEGER,
+    p_nombre_negocio VARCHAR(150),
+    p_direccion VARCHAR(255),
+    p_telefono_contacto VARCHAR(20)
+)
+RETURNS proveedores
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    proveedor_actualizado proveedores;
+BEGIN
+    UPDATE proveedores
+    SET
+        id_usuario = p_id_usuario,
+        nombre_negocio = p_nombre_negocio,
+        direccion = p_direccion,
+        telefono_contacto = p_telefono_contacto
+    WHERE id_proveedor = p_id_proveedor
+    RETURNING * INTO proveedor_actualizado;
+
+    RETURN proveedor_actualizado;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION eliminar_proveedor(
+    p_id_proveedor INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM proveedores
+    WHERE id_proveedor = p_id_proveedor;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+
+-- ============================================================
+-- 7. RUTAS
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION obtener_rutas()
+RETURNS SETOF rutas
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM rutas;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION crear_ruta(
+    p_id_servicio INTEGER,
+    p_id_vehiculo INTEGER,
+    p_id_chofer INTEGER,
+    p_nombre VARCHAR(150),
+    p_hora_inicio_estimada TIME,
+    p_hora_fin_estimada TIME,
+    p_estado VARCHAR(10)
+)
+RETURNS rutas
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    ruta_creada rutas;
+BEGIN
+    INSERT INTO rutas (
+        id_servicio,
+        id_vehiculo,
+        id_chofer,
+        nombre,
+        hora_inicio_estimada,
+        hora_fin_estimada,
+        estado
+    )
+    VALUES (
+        p_id_servicio,
+        p_id_vehiculo,
+        p_id_chofer,
+        p_nombre,
+        p_hora_inicio_estimada,
+        p_hora_fin_estimada,
+        p_estado
+    )
+    RETURNING * INTO ruta_creada;
+
+    RETURN ruta_creada;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION buscar_ruta_por_id(
+    p_id_ruta INTEGER
+)
+RETURNS SETOF rutas
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM rutas
+    WHERE id_ruta = p_id_ruta;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION editar_ruta(
+    p_id_ruta INTEGER,
+    p_id_servicio INTEGER,
+    p_id_vehiculo INTEGER,
+    p_id_chofer INTEGER,
+    p_nombre VARCHAR(150),
+    p_hora_inicio_estimada TIME,
+    p_hora_fin_estimada TIME,
+    p_estado VARCHAR(10)
+)
+RETURNS rutas
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    ruta_actualizada rutas;
+BEGIN
+    UPDATE rutas
+    SET
+        id_servicio = p_id_servicio,
+        id_vehiculo = p_id_vehiculo,
+        id_chofer = p_id_chofer,
+        nombre = p_nombre,
+        hora_inicio_estimada = p_hora_inicio_estimada,
+        hora_fin_estimada = p_hora_fin_estimada,
+        estado = p_estado
+    WHERE id_ruta = p_id_ruta
+    RETURNING * INTO ruta_actualizada;
+
+    RETURN ruta_actualizada;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION eliminar_ruta(
+    p_id_ruta INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM rutas
+    WHERE id_ruta = p_id_ruta;
+
+    RETURN FOUND;
+END;
+$$;
+
+
+
+-- ============================================================
+-- 8. INCIDENCIAS
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION obtener_incidencias()
+RETURNS SETOF incidencias
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM incidencias;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION crear_incidencia(
+    p_id_viaje INTEGER,
+    p_id_ruta INTEGER,
+    p_id_usuario_reporta INTEGER,
+    p_titulo VARCHAR(40),
+    p_descripcion TEXT,
+    p_latitud DECIMAL(10,7),
+    p_longitud DECIMAL(10,7),
+    p_estado VARCHAR(7)
+)
+RETURNS incidencias
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    incidencia_creada incidencias;
+BEGIN
+    INSERT INTO incidencias (
+        id_viaje,
+        id_ruta,
+        id_usuario_reporta,
+        titulo,
+        descripcion,
+        latitud,
+        longitud,
+        estado
+    )
+    VALUES (
+        p_id_viaje,
+        p_id_ruta,
+        p_id_usuario_reporta,
+        p_titulo,
+        p_descripcion,
+        p_latitud,
+        p_longitud,
+        p_estado
+    )
+    RETURNING * INTO incidencia_creada;
+
+    RETURN incidencia_creada;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION buscar_incidencia_por_id(
+    p_id_incidencia INTEGER
+)
+RETURNS SETOF incidencias
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT *
+    FROM incidencias
+    WHERE id_incidencia = p_id_incidencia;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION editar_incidencia(
+    p_id_incidencia INTEGER,
+    p_id_viaje INTEGER,
+    p_id_ruta INTEGER,
+    p_id_usuario_reporta INTEGER,
+    p_titulo VARCHAR(40),
+    p_descripcion TEXT,
+    p_latitud DECIMAL(10,7),
+    p_longitud DECIMAL(10,7),
+    p_estado VARCHAR(7)
+)
+RETURNS incidencias
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    incidencia_actualizada incidencias;
+BEGIN
+    UPDATE incidencias
+    SET
+        id_viaje = p_id_viaje,
+        id_ruta = p_id_ruta,
+        id_usuario_reporta = p_id_usuario_reporta,
+        titulo = p_titulo,
+        descripcion = p_descripcion,
+        latitud = p_latitud,
+        longitud = p_longitud,
+        estado = p_estado
+    WHERE id_incidencia = p_id_incidencia
+    RETURNING * INTO incidencia_actualizada;
+
+    RETURN incidencia_actualizada;
+END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION eliminar_incidencia(
+    p_id_incidencia INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    DELETE FROM incidencias
+    WHERE id_incidencia = p_id_incidencia;
+
+    RETURN FOUND;
+END;
+$$;
