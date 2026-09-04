@@ -2,7 +2,7 @@ import  dotenv  from 'dotenv';
 import cors from 'cors';
 import { pruebaConexion } from "./config/conexion";
 import express from 'express';
-import apiRouter from './routes/ApiRouter';
+import apiRouter from './routes/apiRouter';
 import { errorHandler } from './errors/errorHandler';
 import { notFoundHandler } from './utils/middleware/notFound.middleware';
 
