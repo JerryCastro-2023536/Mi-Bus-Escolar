@@ -1,6 +1,6 @@
 import { ZodObject } from 'zod';
 import { Request, Response, NextFunction } from 'express';
-import { ValidationError } from '../../errors/validation.error';
+import { ValidationError } from './../../errors/validation.error';
 
 export const validateSchema = (schema: ZodObject<any>) =>
   (req: Request, res: Response, next: NextFunction) => {

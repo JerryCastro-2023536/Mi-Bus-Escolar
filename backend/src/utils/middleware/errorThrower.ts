@@ -1,5 +1,7 @@
 import { InternalError } from "../../errors/500.error";
+import { AuthorizationError } from "../../errors/auth.error";
 import { DatabaseError } from "../../errors/database.error";
+import { InvalidToken } from "../../errors/expiredToken.error";
 import { NotFoundError } from "../../errors/notFound.error";
 
 const NOMBRES_LEGIBLES: Record<string, string> = {
@@ -35,7 +37,9 @@ export function errorThrower(error: any): never {
         error.statusCode ||
         error instanceof DatabaseError ||
         error instanceof InternalError ||
-        error instanceof NotFoundError
+        error instanceof NotFoundError ||
+        error instanceof InvalidToken ||
+        error instanceof AuthorizationError
     ) {
         throw error;
     }
@@ -102,5 +106,5 @@ export function errorThrower(error: any): never {
         }
     }
 
-    throw new InternalError();
+    throw new InternalError(error);
 }

@@ -105,4 +105,25 @@ export const zUtils = {
                 return `El campo '${field}' debe ser verdadero o falso`;
             },
         }),
+    
+    // Número requerido (permite decimales, enteros, negativos o positivos)
+    requiredNumber: (field: string) =>
+        z.number({
+            error: (issue) => {
+                if (issue.input === undefined)
+                    return `El campo '${field}' es obligatorio`;
+                return `El campo '${field}' debe ser un número`;
+            },
+        }),
+
+    // Número opcional, solo valida si lo enviado es un número
+    optionalNumber: (field: string) =>
+        z.number({
+            error: (issue) => {
+                if (issue.input === undefined) return undefined;
+                return `El campo '${field}' debe ser un número`;
+            },
+        })
+        .nullable()
+        .optional(),
 };
