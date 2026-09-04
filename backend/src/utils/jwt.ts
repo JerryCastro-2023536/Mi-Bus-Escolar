@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { userRol } from '../enums/userRol';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secreto_predeterminado';
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '8h';
+const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN as string;
 
 interface JwtPayload {
     id: string | number;
