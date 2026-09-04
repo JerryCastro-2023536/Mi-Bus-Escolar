@@ -4,7 +4,7 @@ import { DatabaseError } from './database.error';
 import { InternalError } from './500.error';
 import { NotFoundError } from './notFound.error';
 import { AuthorizationError } from './auth.error';
-import { InvalidToken } from "./expiredToken.error";
+import { InvalidToken } from './expiredToken.error';
 import { JsonError } from './json.error';
 
 export function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
