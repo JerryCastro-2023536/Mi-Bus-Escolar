@@ -5,6 +5,7 @@ import express from 'express';
 import apiRouter from './routes/apiRouter';
 import { errorHandler } from './errors/errorHandler';
 import { notFoundHandler } from './utils/middleware/notFound.middleware';
+import { JsonSyntaxError, validateEmptyBody } from './utils/middleware/jsonValid.middleware';
 
 dotenv.config();
 const app = express();
@@ -12,14 +13,14 @@ const PORT = process.env.APP_PORT;
 
 app.use(cors());
 app.use(express.json());
+app.use(JsonSyntaxError);
+app.use(validateEmptyBody);
 app.use(express.urlencoded({ extended: true }));
 pruebaConexion();
-
-
 app.use('/api', apiRouter);
-app.use(notFoundHandler)
-app.use(errorHandler)
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
-    console.log(`SERVIDOR EJECUTANDOSE EN PUERTO: ${PORT}`);
+    console.log(`SERVIDOR EJECUTANDOSE EN PUERTO: ${PORT}` )
 });
