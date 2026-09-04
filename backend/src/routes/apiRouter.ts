@@ -15,6 +15,10 @@ import choferesRoutes from './choferes.routes';
 import colegiosRoutes from './colegios.routes';
 import estudiantesRoutes from './estudiantes.routes';
 import valoracionesRoutes from './valoraciones.routes';
+import asignacionesRoutes from './asignaciones_rutas.routes';
+import notificacionesRoutes from './notificaciones.routes';
+import pagosRoutes from './pagos.routes';
+import rutasParadasRoutes from './paradas.routes';
 
 const apiRouter = Router();
 
@@ -37,5 +41,10 @@ apiRouter.use(choferesRoutes);
 apiRouter.use(colegiosRoutes);
 apiRouter.use(estudiantesRoutes);
 apiRouter.use(valoracionesRoutes);
+
+apiRouter.use(asignacionesRoutes);
+apiRouter.use(notificacionesRoutes);
+apiRouter.use(pagosRoutes);
+apiRouter.use(rutasParadasRoutes);
 
 export default apiRouter;

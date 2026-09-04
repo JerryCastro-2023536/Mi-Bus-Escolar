@@ -1,0 +1,6 @@
+export enum TipoNoti{
+    INCIDENTE = "INCIDENTE",
+    ASISTENCIA = "ASISTENCIA",
+    INASISTENCIA = "INASISTENCIA",
+    OTRO = "OTRO"
+}
