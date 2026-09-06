@@ -1,5 +1,5 @@
-import  dotenv  from 'dotenv';
-import cors from 'cors';
+import dotenv from 'dotenv';
+import cors, { CorsOptions } from 'cors';
 import { pruebaConexion } from "./config/conexion";
 import express from 'express';
 import apiRouter from './routes/apiRouter';
@@ -11,7 +11,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.APP_PORT;
 
-app.use(cors());
+const corsOptions: CorsOptions = {
+    origin: process.env.ANGULAR_PORT,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(JsonSyntaxError);
 app.use(validateEmptyBody);
@@ -22,5 +29,5 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-    console.log(`SERVIDOR EJECUTANDOSE EN PUERTO: ${PORT}` )
+    console.log(`SERVIDOR EJECUTANDOSE EN PUERTO: ${PORT}`)
 });
