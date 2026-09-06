@@ -5,7 +5,7 @@ import { errorThrower } from "../utils/middleware/errorThrower";
 
 export async function listarValoraciones() {
     try {
-        const resultado = await pool.query("SELECT * FROM valoraciones");
+        const resultado = await pool.query("select * from sp_valoraciones_obtener()");
         return resultado.rows;
     } catch (error) {
         errorThrower(error);
@@ -15,7 +15,7 @@ export async function listarValoraciones() {
 export async function buscarValoracionPorId(id: number) {
     try {
         const resultado = await pool.query(
-            "SELECT * FROM valoraciones WHERE id_valoracion = $1",
+            "select * from sp_valoraciones_buscar($1)",
             [id]
         );
 
@@ -38,9 +38,7 @@ export async function agregarValoraciones(p_valoraciones: Valoraciones) {
         ];
 
         const consulta = `
-            INSERT INTO valoraciones(id_proveedor, comentario, calificacion)
-            VALUES ($1, $2, $3)
-            RETURNING *
+            select * from sp_valoraciones_crear($1, $2, $3)
         `;
 
         const resultado = await pool.query(consulta, valores);
@@ -53,19 +51,14 @@ export async function agregarValoraciones(p_valoraciones: Valoraciones) {
 export async function actualizarValoracion(p_valoraciones: Valoraciones, id: number) {
     try {
         const valores = [
+            id,
             p_valoraciones.id_proveedor,
             p_valoraciones.comentario,
-            p_valoraciones.calificacion,
-            id
+            p_valoraciones.calificacion
         ];
 
         const consulta = `
-            UPDATE valoraciones
-            SET id_proveedor = $1,
-                comentario = $2,
-                calificacion = $3
-            WHERE id_valoracion = $4
-            RETURNING *
+            select * from sp_valoraciones_editar($1, $2, $3, $4)
         `;
 
         const resultado = await pool.query(consulta, valores);
@@ -83,7 +76,7 @@ export async function actualizarValoracion(p_valoraciones: Valoraciones, id: num
 export async function eliminarValoracion(id: number) {
     try {
         const resultado = await pool.query(
-            "DELETE FROM valoraciones WHERE id_valoracion = $1",
+            "select sp_valoraciones_eliminar($1)",
             [id]
         );
 
