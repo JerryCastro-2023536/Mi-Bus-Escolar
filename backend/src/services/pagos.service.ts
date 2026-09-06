@@ -1,62 +1,74 @@
-import { pool } from "../config/Conexion";
+import { pool } from "../config/conexion";
 import { NotFoundError } from "../errors/notFound.error";
 import { Pagos } from "../models/Pagos";
 import { errorThrower } from "../utils/middleware/errorThrower";
 
 export async function listarPagos() {
     try {
-        const resultado = await pool.query("SELECT * FROM pagos");
+        const resultado = await pool.query("SELECT * FROM sp_pagos_listar()");
         return resultado.rows;
     } catch (error) {
         errorThrower(error);
     }
 }
 
-export async function agregarPagos(p_pagos : Pagos){
+export async function buscarPagoById(id: number) {
     try {
-        const valores = [p_pagos.id_estudiante, p_pagos.id_servicio, p_pagos.periodo_mes, p_pagos.periodo_anio, p_pagos.monto, p_pagos.metodo_pago, p_pagos.referencia_pago, p_pagos.foto_comprobante, p_pagos.estado, p_pagos.fecha_pago_limite, p_pagos.fecha_verificacion, p_pagos.verificado_por, p_pagos.observaciones];
-        const consulta = `INSERT INTO pagos(id_estudiante, id_servicio, periodo_mes, periodo_anio, monto, metodo_pago, referencia_pago, foto_comprobante, estado, fecha_pago_limite, fecha_verificacion, verificado_por, observaciones) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`
-        const resultado = await pool.query(consulta, valores);
-        return resultado.rows[0];
+        const res = await pool.query("SELECT * FROM sp_pagos_buscar_por_id($1)", [id]);
+
+        if (!res.rows[0]) {
+            throw new NotFoundError(`El pago con ID ${id} no fue encontrado.`);
+        }
+
+        return res.rows[0];
     } catch (error) {
         errorThrower(error);
     }
 }
 
-export async function buscarPagoPorId(id : number){
+export async function agregarPago(p: Pagos) {
     try {
-        const valor = [id];
-        const resultado = await pool.query("SELECT * FROM pagos WHERE id_pago = $1", valor);
-        if (!resultado.rows[0]) {
-            throw new NotFoundError(`El pago con ID ${id} no fue encontrado.`);
-        }
-        return resultado.rows[0];
+        const values = [
+            p.id_estudiante, p.id_servicio, p.periodo_mes, p.periodo_anio, p.monto,
+            p.metodo_pago, p.referencia_pago, p.foto_comprobante, p.estado,
+            p.fecha_pago_limite, p.fecha_verificacion, p.verificado_por, p.observaciones
+        ];
+        const query = "SELECT * FROM sp_pagos_agregar($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)";
+        const res = await pool.query(query, values);
+        return res.rows[0];
     } catch (error) {
         errorThrower(error);
     }
 }
 
-export async function actualizarPago(p_pagos : Pagos, id: number){
+export async function editarPagoById(id: number, p: Pagos) {
     try {
-        const valores = [p_pagos.id_estudiante, p_pagos.id_servicio, p_pagos.periodo_mes, p_pagos.periodo_anio, p_pagos.monto, p_pagos.metodo_pago, p_pagos.referencia_pago, p_pagos.foto_comprobante, p_pagos.estado, p_pagos.fecha_pago_limite, p_pagos.fecha_verificacion, p_pagos.verificado_por, p_pagos.observaciones, id];
-        const consulta = `UPDATE pagos SET id_estudiante = $1, id_servicio = $2, periodo_mes = $3, periodo_anio = $4, monto = $5, metodo_pago = $6, referencia_pago = $7, foto_comprobante = $8, estado = $9, fecha_pago_limite = $10, fecha_verificacion = $11, verificado_por = $12, observaciones = $13 WHERE id_pago = $14`;
-        const resultado = await pool.query(consulta, valores);
-        if (!resultado.rows[0]) {
-            throw new NotFoundError(`El pago con ID ${id} no fue encontrado.`);
+        const values = [
+            p.id_estudiante, p.id_servicio, p.periodo_mes, p.periodo_anio, p.monto,
+            p.metodo_pago, p.referencia_pago, p.foto_comprobante, p.estado,
+            p.fecha_pago_limite, p.fecha_verificacion, p.verificado_por, p.observaciones, id
+        ];
+        const query = "SELECT * FROM sp_pagos_actualizar($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)";
+        const res = await pool.query(query, values);
+
+        if (!res.rows[0]) {
+            throw new NotFoundError(`No se puede editar: El pago con ID ${id} no existe.`);
         }
-        return resultado.rows[0];
+
+        return res.rows[0];
     } catch (error) {
         errorThrower(error);
     }
 }
 
-export async function eliminarPago(id : number) {
+export async function eliminarPagoById(id: number) {
     try {
-        const valor = [id];
-        const resultado = await pool.query("DELETE FROM pagos WHERE id_pago = $1", valor);
-        if (resultado.rowCount === 0) {
-            throw new NotFoundError(`El pago con ID ${id} no fue encontrado.`);
+        const res = await pool.query("SELECT sp_pagos_eliminar($1) AS filas_afectadas", [id]);
+
+        if (res.rows[0].filas_afectadas === 0) {
+            throw new NotFoundError(`No se puede eliminar: El pago con ID ${id} no existe.`);
         }
+
         return true;
     } catch (error) {
         errorThrower(error);
