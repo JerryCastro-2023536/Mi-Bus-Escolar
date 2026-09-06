@@ -1,62 +1,67 @@
-import { pool } from "../config/Conexion";
+import { pool } from "../config/conexion";
 import { NotFoundError } from "../errors/notFound.error";
 import { Asignaciones_Ruta } from "../models/Asignaciones_Rutas";
 import { errorThrower } from "../utils/middleware/errorThrower";
 
-export async function listarAsignacionesRutas() {
+
+export async function listarAsignacionesRuta() {
     try {
-        const resultado = await pool.query("SELECT * FROM asignaciones_ruta");
+        const resultado = await pool.query("SELECT * FROM sp_asignaciones_ruta_listar()");
         return resultado.rows;
     } catch (error) {
         errorThrower(error);
     }
 }
 
-export async function agregarAsignacionesRutas(p_asignacion_ruta : Asignaciones_Ruta){
+export async function buscarAsignacionRutaById(id: number) {
     try {
-        const valores = [p_asignacion_ruta.id_estudiante, p_asignacion_ruta.id_ruta, p_asignacion_ruta.id_parada_recogida, p_asignacion_ruta.id_parada_descenso];
-        const consulta = `INSERT INTO asignaciones_ruta(id_estudiante, id_ruta, id_parada_recogida, id_parada_descenso) VALUES ($1, $2, $3, $4)`
-        const resultado = await pool.query(consulta, valores);
-        return resultado.rows[0];
+        const res = await pool.query("SELECT * FROM sp_asignaciones_ruta_buscar_por_id($1)", [id]);
+
+        if (!res.rows[0]) {
+            throw new NotFoundError(`La asignación de ruta con ID ${id} no fue encontrada.`);
+        }
+
+        return res.rows[0];
     } catch (error) {
         errorThrower(error);
     }
 }
 
-export async function buscarAsignacionRutaPorId(id : number){
+export async function agregarAsignacionRuta(a: Asignaciones_Ruta) {
     try {
-        const valor = [id];
-        const resultado = await pool.query("SELECT * FROM asignaciones_ruta WHERE id_asignacion = $1", valor);
-        if (!resultado.rows[0]) {
-            throw new NotFoundError(`La asignación con ID ${id} no fue encontrada.`);
-        }
-        return resultado.rows[0];
+        const values = [a.id_estudiante, a.id_ruta, a.id_parada_recogida, a.id_parada_descenso];
+        const query = "SELECT * FROM sp_asignaciones_ruta_agregar($1, $2, $3, $4)";
+        const res = await pool.query(query, values);
+        return res.rows[0];
     } catch (error) {
         errorThrower(error);
     }
 }
 
-export async function actualizarAsignacionRuta(p_asignacion_ruta : Asignaciones_Ruta, id: number){
+export async function editarAsignacionRutaById(id: number, a: Asignaciones_Ruta) {
     try {
-        const valores = [p_asignacion_ruta.id_estudiante, p_asignacion_ruta.id_ruta, p_asignacion_ruta.id_parada_recogida, p_asignacion_ruta.id_parada_descenso, id];
-        const consulta = `UPDATE asignaciones_ruta SET id_estudiante = $1, id_ruta = $2, id_parada_recogida = $3, id_parada_descenso = $4 WHERE id_asignacion = $5`;
-        const resultado = await pool.query(consulta, valores);
-        if (!resultado.rows[0]) {
-            throw new NotFoundError(`La asignación con ID ${id} no fue encontrada.`);
+        const values = [a.id_estudiante, a.id_ruta, a.id_parada_recogida, a.id_parada_descenso, id];
+        const query = "SELECT * FROM sp_asignaciones_ruta_actualizar($1, $2, $3, $4, $5)";
+        const res = await pool.query(query, values);
+
+        if (!res.rows[0]) {
+            throw new NotFoundError(`No se puede editar: La asignación de ruta con ID ${id} no existe.`);
         }
-        return resultado.rows[0];
+
+        return res.rows[0];
     } catch (error) {
         errorThrower(error);
     }
 }
 
-export async function eliminarAsignacionRuta(id : number) {
+export async function eliminarAsignacionRutaById(id: number) {
     try {
-        const valor = [id];
-        const resultado = await pool.query("DELETE FROM asignaciones_ruta WHERE id_asignacion = $1", valor);
-        if (resultado.rowCount === 0) {
-            throw new NotFoundError(`La asignación con ID ${id} no fue encontrada.`);
+        const res = await pool.query("SELECT sp_asignaciones_ruta_eliminar($1) AS filas_afectadas", [id]);
+
+        if (res.rows[0].filas_afectadas === 0) {
+            throw new NotFoundError(`No se puede eliminar: La asignación de ruta con ID ${id} no existe.`);
         }
+
         return true;
     } catch (error) {
         errorThrower(error);
