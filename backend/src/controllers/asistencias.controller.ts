@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { actualizarAsistencia, agregarAsistencias, buscarAsistenciaPorId, eliminarAsistencia, listarAsistencias } from "../services/asistencias.service";
+import { editarAsistenciaById, agregarAsistencia, buscarAsistenciaById, eliminarAsistenciaById, listarAsistencias } from "../services/asistencias.service";
 import { Asistencias } from "../models/asistencias";
 
 export async function getAsistencias(req: Request, res: Response, next: NextFunction){
@@ -18,7 +18,7 @@ export async function getAsistencias(req: Request, res: Response, next: NextFunc
 export async function postAsistencias(req: Request, res: Response, next: NextFunction) {
     const { id_viaje, id_estudiante, estado_abordaje, hora_abordaje, estado_descenso, hora_descenso } = req.body
     const nuevaAsistencia : Asistencias = { id_asistencia: 0, id_viaje, id_estudiante, estado_abordaje, hora_abordaje, estado_descenso, hora_descenso }
-    const asistenciaCreada = await agregarAsistencias(nuevaAsistencia);
+    const asistenciaCreada = await agregarAsistencia(nuevaAsistencia);
     try{
         return res.status(201).json({
             success: true,
@@ -33,7 +33,7 @@ export async function postAsistencias(req: Request, res: Response, next: NextFun
 export async function getAsistenciaById(req: Request, res: Response, next: NextFunction) {
     try{
         const id = Number(req.params.id);
-        const asistenciaEncontrada = await buscarAsistenciaPorId(id);
+        const asistenciaEncontrada = await buscarAsistenciaById(id);
         return res.status(200).json({
             success: true,
             message: `Asistencia con id: ${id} encontrada`,
@@ -49,7 +49,7 @@ export async function putAsistencia(req: Request, res: Response, next: NextFunct
         const id = Number(req.params.id);
         const { id_viaje, id_estudiante, estado_abordaje, hora_abordaje, estado_descenso, hora_descenso } = req.body;
         const asistenciaActualizar : Asistencias = { id_asistencia: id, id_viaje, id_estudiante, estado_abordaje, hora_abordaje, estado_descenso, hora_descenso }
-        const asistenciaEditada = await actualizarAsistencia(asistenciaActualizar, id);
+        const asistenciaEditada = await editarAsistenciaById(id, asistenciaActualizar);
 
         return res.status(200).json({
             success: true,
@@ -64,7 +64,7 @@ export async function putAsistencia(req: Request, res: Response, next: NextFunct
 export async function deleteAsistencia(req: Request, res: Response, next: NextFunction){
     try{
         const id = Number(req.params.id);
-        const resultado = await eliminarAsistencia(id);
+        const resultado = await eliminarAsistenciaById(id);
          
         return res.status(200).json({
             success: true,

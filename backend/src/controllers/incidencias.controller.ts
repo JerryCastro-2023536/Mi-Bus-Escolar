@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { listarIncidencias, buscarIncidencia, agregarIncidencia, actualizarIncidencia, eliminarIncidencia } from "../services/incidencias.service";
+import { listarIncidencias, buscarIncidenciaById, agregarIncidencia, editarIncidenciaById, eliminarIncidenciaById } from "../services/incidencias.service";
 import { Incidencias } from "../models/Incidencias";
 
 export async function obtenerIncidencias(_req: Request, res: Response, next: NextFunction) {
@@ -18,7 +18,7 @@ export async function obtenerIncidencias(_req: Request, res: Response, next: Nex
 export async function obtenerIncidenciaPorId(req: Request, res: Response, next: NextFunction) {
     try {
         const id = Number(req.params.id);
-        const incidencia = await buscarIncidencia(id);
+        const incidencia = await buscarIncidenciaById(id);
 
         return res.status(200).json({
             success: true,
@@ -52,7 +52,7 @@ export async function editarIncidencia(req: Request, res: Response, next: NextFu
         const { id_viaje, id_ruta, id_usuario_reporta, titulo, descripcion, latitud, longitud, fecha_hora, estado } = req.body;
         const newIncidencia: Incidencias = { id_viaje, id_ruta, id_usuario_reporta, titulo, descripcion, latitud, longitud, fecha_hora, estado };
 
-        const incidenciaEditada = await actualizarIncidencia(id, newIncidencia);
+        const incidenciaEditada = await editarIncidenciaById(id, newIncidencia);
         return res.status(200).json({
             success: true,
             message: `Incidencia con id: ${id} editada`,
@@ -66,7 +66,7 @@ export async function editarIncidencia(req: Request, res: Response, next: NextFu
 export async function eliminarIncidencias(req: Request, res: Response, next: NextFunction) {
     try {
         const id = Number(req.params.id);
-        const resultado = await eliminarIncidencia(id);
+        const resultado = await eliminarIncidenciaById(id);
 
         return res.status(200).json({
             success: true,

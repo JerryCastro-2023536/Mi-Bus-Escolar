@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { actualizarColegio, agregarColegios, buscarColegioPorId, eliminarColegio, listarColegios } from "../services/colegios.service";
+import { editarColegioById, agregarColegio, buscarColegioById, eliminarColegioById, listarColegios } from "../services/colegios.service";
 import { Colegios } from "../models/colegios";
 
 export async function getColegios(req: Request, res: Response, next: NextFunction){
@@ -19,7 +19,7 @@ export async function postColegios(req: Request, res: Response, next: NextFuncti
     try{
         const { nombre, direccion, telefono_contacto } = req.body
         const nuevoColegio : Colegios = { id_colegio: 0, nombre, direccion, telefono_contacto }
-        const colegioCreado = await agregarColegios(nuevoColegio);
+        const colegioCreado = await agregarColegio(nuevoColegio);
         return res.status(201).json({
             success: true,
             message: "Colegio creado",
@@ -33,7 +33,7 @@ export async function postColegios(req: Request, res: Response, next: NextFuncti
 export async function getColegioById(req: Request, res: Response, next: NextFunction) {
     try{
         const id = Number(req.params.id);
-        const colegioEncontrado = await buscarColegioPorId(id);
+        const colegioEncontrado = await buscarColegioById(id);
         return res.status(200).json({
             success: true,
             message: `Colegio con id: ${id} encontrado`,
@@ -49,7 +49,7 @@ export async function putColegio(req: Request, res: Response, next: NextFunction
         const id = Number(req.params.id);
         const { nombre, direccion, telefono_contacto } = req.body;
         const colegioActualizar : Colegios = { id_colegio: id, nombre, direccion, telefono_contacto }
-        const colegioEditado = await actualizarColegio(colegioActualizar, id);
+        const colegioEditado = await editarColegioById(id, colegioActualizar);
 
         return res.status(200).json({
             success: true,
@@ -64,7 +64,7 @@ export async function putColegio(req: Request, res: Response, next: NextFunction
 export async function deleteColegio(req: Request, res: Response, next: NextFunction){
     try{
         const id = Number(req.params.id);
-        const resultado = await eliminarColegio(id);
+        const resultado = await eliminarColegioById(id);
          
         return res.status(200).json({
             sucess: true,

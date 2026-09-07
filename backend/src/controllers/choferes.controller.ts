@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { actualizarChofer, agregarChoferes, buscarChoferPorId, eliminarChofer, listarChoferes } from "../services/choferes.service";
+import { editarChoferById, agregarChofer, buscarChoferById, eliminarChoferById, listarChoferes } from "../services/choferes.service";
 import { Choferes } from "../models/choferes";
 
 export async function getChoferes(req: Request, res: Response, next: NextFunction){
@@ -18,7 +18,7 @@ export async function getChoferes(req: Request, res: Response, next: NextFunctio
 export async function postChoferes(req: Request, res: Response, next: NextFunction) {
     const { id_chofer, id_usuario, telefono_contacto, estado } = req.body
     const nuevoChofer : Choferes = { id_chofer, id_usuario, telefono_contacto, estado }
-    const choferCreado = await agregarChoferes(nuevoChofer);
+    const choferCreado = await agregarChofer(nuevoChofer);
     try{
         return res.status(201).json({
             success: true,
@@ -33,7 +33,7 @@ export async function postChoferes(req: Request, res: Response, next: NextFuncti
 export async function getChoferById(req: Request, res: Response, next: NextFunction) {
     try{
         const id = Number(req.params.id);
-        const choferEncontrado = await buscarChoferPorId(id);
+        const choferEncontrado = await buscarChoferById(id);
         return res.status(200).json({
             success: true,
             message: `Chofer con id: ${id} encontrado`,
@@ -49,7 +49,7 @@ export async function putChofer(req: Request, res: Response, next: NextFunction)
         const id = Number(req.params.id);
         const { id_chofer, id_usuario, telefono_contacto, estado } = req.body;
         const choferActualizar : Choferes = { id_chofer, id_usuario, telefono_contacto, estado }
-        const choferEditado = await actualizarChofer(choferActualizar, id);
+        const choferEditado = await editarChoferById(id, choferActualizar);
 
         return res.status(200).json({
             success: true,
@@ -64,7 +64,7 @@ export async function putChofer(req: Request, res: Response, next: NextFunction)
 export async function deleteChofer(req: Request, res: Response, next: NextFunction){
     try{
         const id = Number(req.params.id);
-        const resultado = await eliminarChofer(id);
+        const resultado = await eliminarChoferById(id);
          
         return res.status(200).json({
             success: true,
