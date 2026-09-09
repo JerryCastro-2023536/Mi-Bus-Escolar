@@ -9,7 +9,7 @@
         </thead>
 
         <tbody>
-            @for (row of data(); track row.id_usuario ?? row.id) {
+            @for (row of data(); track row[idKey()]) {
                 <tr (click)="onRowClick(row)">
                     @for (col of columns(); track col.key) {
 
