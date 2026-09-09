@@ -13,6 +13,7 @@ export class TableComponent {
   // --- Entradas ---
   columns = input.required<TableColumn[]>();
   data = input.required<any[]>();
+  idKey = input.required<string>()
 
   // --- Salidas ---
   rowClick = output<any>();
