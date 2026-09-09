@@ -1,1 +1,355 @@
-<p>login works!</p>
+<div class="auth-page">
+  <!-- PANEL IZQUIERDO / VISUAL BRANDING (basado en el PDF) -->
+  <div class="auth-visual">
+    <div class="visual-top">
+      <div class="brand-logo">
+        <svg class="brand-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 30c2-6 4-11 10-14 5-3 9 1 13-2 4-3 8-6 14-4" stroke="#5FB89C" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M40 10c-3 2-3 5 0 7" stroke="#5FB89C" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <rect x="10" y="24" width="20" height="10" rx="3" fill="#FFD141"/>
+          <rect x="12.5" y="26.5" width="4.5" height="4" rx="1" fill="#1A456B"/>
+          <rect x="18.5" y="26.5" width="4.5" height="4" rx="1" fill="#1A456B"/>
+          <circle cx="14" cy="35" r="2.4" fill="#1A456B"/>
+          <circle cx="26" cy="35" r="2.4" fill="#1A456B"/>
+        </svg>
+        <div class="brand-word">
+          <span class="brand-name">MI BUS ESCOLAR</span>
+          <span class="brand-tagline">Transporte Seguro y Conectado</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="visual-mid">
+      <span class="visual-rule"></span>
+      <h1 class="visual-headline">Conectando familias con el transporte escolar.</h1>
+      <p class="visual-copy">Monitorea rutas en tiempo real, recibe alertas de llegada y mantén a tus hijos seguros en cada trayecto.</p>
+
+      <div class="visual-stats">
+        <div class="stat">
+          <span class="stat-value">2,400+</span>
+          <span class="stat-label">familias registradas</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">98%</span>
+          <span class="stat-label">puntualidad</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">24/7</span>
+          <span class="stat-label">soporte activo</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="visual-badge">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M12 3l7 3v5c0 4.5-3 8.2-7 9.5-4-1.3-7-5-7-9.5V6l7-3z" stroke="#FFD141" stroke-width="1.6" stroke-linejoin="round"/>
+        <path d="M9 12l2 2 4-4" stroke="#FFD141" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <strong>Plataforma certificada</strong>
+        <span>Cumple normativa de transporte escolar</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-panel">
+
+    <div *ngIf="currentUser()" class="card profile-card">
+      <div class="profile-avatar">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.5" stroke="#1A456B" stroke-width="1.7"/>
+          <path d="M4.5 20c1.4-4 4.2-6 7.5-6s6.1 2 7.5 6" stroke="#1A456B" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <h2>Bienvenido, {{ currentUser().nombre }} {{ currentUser().apellido }}</h2>
+
+      <div class="profile-field">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 6.5l9 6 9-6M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z" stroke="#5D737E" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <div><span class="field-label">Correo</span><span class="field-value">{{ currentUser().correo }}</span></div>
+      </div>
+
+      <div class="profile-field">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6l8-4z" stroke="#5D737E" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <div><span class="field-label">Rol</span><span class="field-value">{{ currentUser().rol }}</span></div>
+      </div>
+
+      <div class="profile-field">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 3h4l1.5 4-2 1.3a12 12 0 006.2 6.2l1.3-2 4 1.5v4a2 2 0 01-2.2 2A17 17 0 014 5.2 2 2 0 016 3z" stroke="#5D737E" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <div><span class="field-label">Teléfono</span><span class="field-value">{{ currentUser().telefono }}</span></div>
+      </div>
+
+      <button type="button" class="btn btn-danger" (click)="onLogout()">Cerrar sesión</button>
+    </div>
+
+    <div *ngIf="!currentUser()" class="card auth-card">
+
+      <div class="tabs">
+        <button type="button" [class.active]="isLoginMode()" (click)="toggleMode(true)">Iniciar sesión</button>
+        <button type="button" [class.active]="!isLoginMode()" (click)="toggleMode(false)">Registrarse</button>
+      </div>
+
+      <div *ngIf="successMessage()" class="alert alert-success">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>{{ successMessage() }}</span>
+      </div>
+
+      <div *ngIf="errorMessage()" class="alert alert-error">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>{{ errorMessage() }}</span>
+      </div>
+
+      <form *ngIf="isLoginMode()" (ngSubmit)="onLogin()">
+        <h3>Bienvenido de vuelta</h3>
+        <p class="form-sub">Accede a tu panel de transporte escolar.</p>
+
+        <div class="form-group">
+          <label for="login-correo">Correo electrónico</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 6.5l9 6 9-6M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <input
+              type="email"
+              id="login-correo"
+              name="correo"
+              [(ngModel)]="loginForm.correo"
+              required
+              placeholder="correo@ejemplo.com"
+              [attr.aria-invalid]="fieldError('correo') ? true : null"
+              [attr.aria-describedby]="fieldError('correo') ? 'login-correo-error' : null">
+          </div>
+
+          <span *ngIf="fieldError('correo')" id="login-correo-error" class="field-error" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            {{ fieldError('correo') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Contraseña</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.5"/></svg>
+            <input
+              [type]="showLoginPassword() ? 'text' : 'password'"
+              id="login-password"
+              name="password"
+              [(ngModel)]="loginForm.password"
+              required
+              placeholder="********"
+              [attr.aria-invalid]="fieldError('password') ? true : null"
+              [attr.aria-describedby]="fieldError('password') ? 'login-password-error' : null">
+
+            <button
+              type="button"
+              class="pw-toggle"
+              [class.is-on]="showLoginPassword()"
+              (click)="toggleLoginPassword()"
+              [attr.aria-label]="showLoginPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-pressed]="showLoginPassword()">
+              <svg viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="6" width="28" height="12" rx="4" class="bus-body"/>
+                <rect x="6" y="9" width="6" height="5" rx="1" class="bus-window"/>
+                <rect x="14" y="9" width="6" height="5" rx="1" class="bus-window"/>
+                <circle cx="10" cy="20" r="2.6" class="bus-wheel"/>
+                <circle cx="24" cy="20" r="2.6" class="bus-wheel"/>
+                <circle cx="32" cy="12" r="3.4" class="headlight"/>
+              </svg>
+            </button>
+          </div>
+          <span *ngIf="fieldError('password')" id="login-password-error" class="field-error" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            {{ fieldError('password') }}
+          </span>
+          <span class="pw-hint">{{ showLoginPassword() ? 'Luces encendidas: contraseña visible' : 'Luces apagadas: contraseña oculta' }}</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
+          {{ isLoading() ? 'Ingresando...' : 'Iniciar sesión' }}
+        </button>
+
+        <div class="divider"><span>o continúa con</span></div>
+
+        <div class="social-row">
+          <button type="button" class="btn btn-social">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.4-1.7 4.1-5.4 4.1-3.2 0-5.9-2.7-5.9-6s2.6-6 5.9-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.7 14.6 2.7 12 2.7 6.9 2.7 2.7 6.9 2.7 12S6.9 21.3 12 21.3c6.9 0 8.9-4.8 8.9-7.3 0-.5 0-.9-.1-1.3H12z"/></svg>
+            Google
+          </button>
+          <button type="button" class="btn btn-social">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16.4 12.9c0-2.2 1.8-3.3 1.9-3.4-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.9-.8-1.5 0-2.9.9-3.6 2.2-1.6 2.7-.4 6.7 1.1 8.9.7 1.1 1.6 2.3 2.8 2.3 1.1 0 1.5-.7 2.9-.7s1.7.7 2.9.7c1.2 0 2-1.1 2.7-2.2.8-1.3 1.2-2.5 1.2-2.6-.1 0-2.4-.9-2.5-3.5zM14.3 5.7c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.5.6-1 1.6-.8 2.6.9.1 1.9-.5 2.4-1.2z"/></svg>
+            Apple
+          </button>
+        </div>
+      </form>
+
+      <form *ngIf="!isLoginMode()" (ngSubmit)="onRegister()">
+        <h3>Crear cuenta</h3>
+        <p class="form-sub">Únete a la comunidad de transporte seguro.</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="reg-nombre">Nombre</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.5"/><path d="M5 20c1.3-3.6 3.9-5.4 7-5.4s5.7 1.8 7 5.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input
+                type="text"
+                id="reg-nombre"
+                name="nombre"
+                [(ngModel)]="registerForm.nombre"
+                required
+                placeholder="Ej. María"
+                [attr.aria-invalid]="fieldError('nombre') ? true : null"
+                [attr.aria-describedby]="fieldError('nombre') ? 'reg-nombre-error' : null">
+            </div>
+            <span *ngIf="fieldError('nombre')" id="reg-nombre-error" class="field-error" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              {{ fieldError('nombre') }}
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-apellido">Apellido</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="8" r="3.4" stroke="currentColor" stroke-width="1.5"/><path d="M5 20c1.3-3.6 3.9-5.4 7-5.4s5.7 1.8 7 5.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <input
+                type="text"
+                id="reg-apellido"
+                name="apellido"
+                [(ngModel)]="registerForm.apellido"
+                required
+                placeholder="Ej. González"
+                [attr.aria-invalid]="fieldError('apellido') ? true : null"
+                [attr.aria-describedby]="fieldError('apellido') ? 'reg-apellido-error' : null">
+            </div>
+
+            <span *ngIf="fieldError('apellido')" id="reg-apellido-error" class="field-error" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              {{ fieldError('apellido') }}
+            </span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-correo">Correo electrónico</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3 6.5l9 6 9-6M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <input
+              type="email"
+              id="reg-correo"
+              name="correo"
+              [(ngModel)]="registerForm.correo"
+              required
+              placeholder="correo@ejemplo.com"
+              [attr.aria-invalid]="fieldError('correo') ? true : null"
+              [attr.aria-describedby]="fieldError('correo') ? 'reg-correo-error' : null">
+          </div>
+
+          <span *ngIf="fieldError('correo')" id="reg-correo-error" class="field-error" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            {{ fieldError('correo') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-password">Contraseña</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.5"/></svg>
+            <input
+              [type]="showRegisterPassword() ? 'text' : 'password'"
+              id="reg-password"
+              name="password"
+              [(ngModel)]="registerForm.password"
+              required
+              placeholder="********"
+              [attr.aria-invalid]="fieldError('password') ? true : null"
+              [attr.aria-describedby]="fieldError('password') ? 'reg-password-error' : null">
+
+            <button
+              type="button"
+              class="pw-toggle"
+              [class.is-on]="showRegisterPassword()"
+              (click)="toggleRegisterPassword()"
+              [attr.aria-label]="showRegisterPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-pressed]="showRegisterPassword()">
+              <svg viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <rect x="3" y="6" width="28" height="12" rx="4" class="bus-body"/>
+                <rect x="6" y="9" width="6" height="5" rx="1" class="bus-window"/>
+                <rect x="14" y="9" width="6" height="5" rx="1" class="bus-window"/>
+                <circle cx="10" cy="20" r="2.6" class="bus-wheel"/>
+                <circle cx="24" cy="20" r="2.6" class="bus-wheel"/>
+                <circle cx="32" cy="12" r="3.4" class="headlight"/>
+              </svg>
+            </button>
+          </div>
+
+          <span *ngIf="fieldError('password')" id="reg-password-error" class="field-error" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            {{ fieldError('password') }}
+          </span>
+          <small class="help-text">Mínimo 8 caracteres, 1 mayúscula y 1 número</small>
+          <span class="pw-hint">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.4"/></svg>
+            Tu contraseña se guarda cifrada (hash) — enciende las luces del bus para revisarla antes de enviarla.
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-telefono">Teléfono</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M6 3h4l1.5 4-2 1.3a12 12 0 006.2 6.2l1.3-2 4 1.5v4a2 2 0 01-2.2 2A17 17 0 014 5.2 2 2 0 016 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+            <input
+              type="text"
+              id="reg-telefono"
+              name="telefono"
+              [(ngModel)]="registerForm.telefono"
+              required
+              placeholder="55512345"
+              [attr.aria-invalid]="fieldError('telefono') ? true : null"
+              [attr.aria-describedby]="fieldError('telefono') ? 'reg-telefono-error' : null">
+          </div>
+
+          <span *ngIf="fieldError('telefono')" id="reg-telefono-error" class="field-error" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            {{ fieldError('telefono') }}
+          </span>
+        </div>
+
+        <div class="form-group">
+          <label for="reg-foto">URL foto de usuario (opcional)</label>
+          <div class="input-wrap">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="10.5" r="1.6" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 16l4.5-4 3 2.6 3-3.4 4.5 4.8" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+            <input
+              type="url"
+              id="reg-foto"
+              name="foto_usuario"
+              [(ngModel)]="registerForm.foto_usuario"
+              placeholder="https://ejemplo.com/foto.jpg"
+              [attr.aria-invalid]="fieldError('foto_usuario') ? true : null"
+              [attr.aria-describedby]="fieldError('foto_usuario') ? 'reg-foto-error' : null">
+          </div>
+
+          <span *ngIf="fieldError('foto_usuario')" id="reg-foto-error" class="field-error" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            {{ fieldError('foto_usuario') }}
+          </span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
+          {{ isLoading() ? 'Registrando...' : 'Crear cuenta' }}
+        </button>
+
+        <div class="divider"><span>o continúa con</span></div>
+
+        <div class="social-row">
+          <button type="button" class="btn btn-social">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.9h5.4c-.2 1.4-1.7 4.1-5.4 4.1-3.2 0-5.9-2.7-5.9-6s2.6-6 5.9-6c1.9 0 3.1.8 3.8 1.5l2.6-2.5C16.8 3.7 14.6 2.7 12 2.7 6.9 2.7 2.7 6.9 2.7 12S6.9 21.3 12 21.3c6.9 0 8.9-4.8 8.9-7.3 0-.5 0-.9-.1-1.3H12z"/></svg>
+            Google
+          </button>
+          <button type="button" class="btn btn-social">
+            <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16.4 12.9c0-2.2 1.8-3.3 1.9-3.4-1-1.5-2.6-1.7-3.2-1.7-1.4-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.9-.8-1.5 0-2.9.9-3.6 2.2-1.6 2.7-.4 6.7 1.1 8.9.7 1.1 1.6 2.3 2.8 2.3 1.1 0 1.5-.7 2.9-.7s1.7.7 2.9.7c1.2 0 2-1.1 2.7-2.2.8-1.3 1.2-2.5 1.2-2.6-.1 0-2.4-.9-2.5-3.5zM14.3 5.7c.6-.7 1-1.7.9-2.7-.9 0-1.9.6-2.5 1.3-.5.6-1 1.6-.8 2.6.9.1 1.9-.5 2.4-1.2z"/></svg>
+            Apple
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
