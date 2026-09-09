@@ -28,6 +28,10 @@
                         <input [type]="field.type" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
                             [required]="!!field.required" />
                     }
+
+                    @if (errors()[field.key]) {
+                        <span class="error-text">{{ errors()[field.key] }}</span>
+                    }
                 </div>
             }
 
