@@ -120,3 +120,16 @@
 .btn-secondary:hover {
     background: #e5e7eb;
 }
+
+.field.has-error input,
+.field.has-error select {
+    border-color: #dc3545;
+    background-color: #fff8f8;
+}
+
+.error-text {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: block;
+}
