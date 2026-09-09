@@ -4,8 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { LoginService, UsuarioLoginDTO } from '../../services/login';
 import { RegisterService, UsuarioRegisterDTO } from '../../services/register';
 
-import { findFieldError, matchesField } from './field-error.util';
-
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -147,24 +145,9 @@ export class Login implements OnInit {
   toggleRegisterPassword(): void {
     this.showRegisterPassword.update(v => !v);
   }
-  private readonly aliasCampo: Record<string, string[]> = {
-  password:     ['contrasena', 'contraseña', 'clave', 'pass'],
-  correo:       ['email', 'correo_electronico', 'correoElectronico'],
-  nombre:       ['name', 'first_name', 'nombres'],
-  apellido:     ['lastname', 'last_name', 'apellidos'],
-  telefono:     ['phone', 'celular', 'tel'],
-  foto_usuario: ['foto', 'fotoUsuario', 'foto_perfil', 'avatar', 'url_foto']
-};
 
-fieldError(campo: string): string | null {
-  return findFieldError(this.fieldErrors(), campo, this.aliasCampo[campo] ?? []);
-}
-
-limpiarError(campo: string): void {
-  this.fieldErrors.update(errores =>
-    errores.filter(e => !matchesField(e.campo, campo, this.aliasCampo[campo] ?? []))
-  );
-}
-
+  fieldError(campo: string): string | null {
+    return this.fieldErrors().find(e => e.campo === campo)?.mensaje ?? null;
+  }
 
 }
