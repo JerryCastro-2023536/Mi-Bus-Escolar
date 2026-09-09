@@ -1,0 +1,39 @@
+<div class="overlay" (click)="onCancel()">
+    <div class="form-card" (click)="$event.stopPropagation()">
+
+        <div class="form-header">
+            <span class="eyebrow">{{ isEditMode ? 'Editar registro' : 'Nuevo registro' }}</span>
+            <button class="close-btn" (click)="onCancel()">✕</button>
+        </div>
+
+        <form class="form-body" (ngSubmit)="onSubmit()">
+            @for (field of fields(); track field.key) {
+                <div class="field">
+                    <label [for]="field.key">
+                        {{ field.label }} @if (field.required) { <span class="required">*</span> }
+                    </label>
+
+                    @if (field.type === 'select') {
+                        <select [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]" [required]="!!field.required">
+                            <option value="" disabled>Selecciona una opción</option>
+                            @for (opt of field.options; track opt.value) {
+                                <option [value]="opt.value">{{ opt.label }}</option>
+                            }
+                        </select>
+                    } @else if (field.type === 'checkbox') {
+                        <input type="checkbox" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]" />
+                    } @else {
+                        <input [type]="field.type" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
+                            [required]="!!field.required" />
+                    }
+                </div>
+            }
+
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" (click)="onCancel()">Cancelar</button>
+                <button type="submit" class="btn-primary">Guardar</button>
+            </div>
+        </form>
+
+    </div>
+</div>

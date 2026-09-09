@@ -1,0 +1,122 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+}
+
+.form-card {
+    width: 100%;
+    max-width: 460px;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #9ca3af;
+    cursor: pointer;
+}
+
+.form-body {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.required {
+    color: #dc2626;
+}
+
+.field input[type="text"],
+.field input[type="email"],
+.field input[type="password"],
+.field input[type="number"],
+.field select {
+    padding: 9px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    outline: none;
+}
+
+.field input:focus,
+.field select:focus {
+    border-color: #2563eb;
+}
+
+.field input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    align-self: flex-start;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    padding-top: 10px;
+}
+
+.btn-primary,
+.btn-secondary {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: #0f172a;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background: #1e293b;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
