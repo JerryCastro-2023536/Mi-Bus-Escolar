@@ -14,6 +14,7 @@ import { FormField } from '../../../models/crudDTO.interface';
 export class FormComponent {
   fields = input.required<FormField[]>();
   item = input<any | null>(null);
+  errors = input<Record<string, string>>({});
 
   save = output<any>();
   cancel = output<void>();
