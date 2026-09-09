@@ -16,7 +16,7 @@
 
     @if (formItem() !== undefined) {
         <app-crud-form [fields]="config().formFields" [item]="formItem()" (save)="onSaveForm($event)"
-            (cancel)="onCancelForm()" />
+            (cancel)="onCancelForm()" [errors]="serverErrors()"/>
     }
 
 </div>
