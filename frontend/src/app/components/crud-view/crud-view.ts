@@ -9,6 +9,7 @@ import { HeaderComponent } from './header/header';
 import { TableComponent } from './table/table';
 import { CardComponent } from './card/card';
 import { FormComponent } from './form/form';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-crud-view',
@@ -23,6 +24,7 @@ export class CrudViewComponent {
 
   //Archivo config de la ruta
   config = computed<CrudConfig>(() => this.route.snapshot.data['config'] as CrudConfig);
+  serverErrors = signal<Record<string, string>>({});
 
   //Tabla
   items = signal<any[]>([]);
@@ -106,27 +108,46 @@ export class CrudViewComponent {
   // --- Eventos del formulario ---
   onCancelForm() {
     this.formItem.set(undefined);
+    this.serverErrors.set({});
   }
 
   onSaveForm(formData: any) {
     const cfg = this.config();
     const editing = this.formItem();
 
+    this.serverErrors.set({});
+    
     if (editing) {
       const id = editing[cfg.idKey];
       this.crudService.update<any>(cfg.apiEndpoint, id, formData).subscribe({
         next: (updated) => {
           this.items.update(list => list.map(i => (i === editing ? { ...i, ...updated } : i)));
           this.formItem.set(undefined);
-        }
+        },
+        error: (err: HttpErrorResponse) => this.handleBackendErrors(err)
       });
     } else {
       this.crudService.create<any>(cfg.apiEndpoint, formData).subscribe({
         next: (created) => {
           this.items.update(list => [...list, created]);
           this.formItem.set(undefined);
-        }
+        },
+        error: (err: HttpErrorResponse) => this.handleBackendErrors(err)
       });
     }
   }
+
+  private handleBackendErrors(err: HttpErrorResponse) {
+        if (err.error && Array.isArray(err.error.errors)) {
+            const errorMap: Record<string, string> = {};
+            // Convertimos [{campo: 'nombre', mensaje: '...'}, ...] a { nombre: '...', apellido: '...' }
+            err.error.errors.forEach((e: { campo: string; mensaje: string }) => {
+                errorMap[e.campo] = e.mensaje;
+            });
+            this.serverErrors.set(errorMap);
+        } else if (err.error && err.error.message) {
+            // Manejo de error general por si acaso (ej. "Error interno")
+            alert(err.error.message);
+        }
+    }
 }
