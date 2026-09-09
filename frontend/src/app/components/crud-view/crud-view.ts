@@ -113,7 +113,8 @@ export class CrudViewComponent {
     const editing = this.formItem();
 
     if (editing) {
-      const id = editing.id; //REVISAR
+      const id = editing[cfg.idKey];
+      console.log("ID" + id)
       this.crudService.update<any>(cfg.apiEndpoint, id, formData).subscribe({
         next: (updated) => {
           this.items.update(list => list.map(i => (i === editing ? { ...i, ...updated } : i)));
