@@ -1,0 +1,22 @@
+<div class="crud-view">
+
+    <app-crud-header [title]="config().title" [subtitle]="config().subtitle" [kpis]="config().kpis"
+        [kpiData]="kpiData()" (search)="onSearch($event)" (create)="onCreate()" />
+
+    @if (loading()) {
+        <p class="status-text">Cargando...</p>
+    } @else {
+        <app-crud-table [columns]="config().tableColumns" [data]="filteredItems()" (rowClick)="onRowClick($event)" />
+    }
+
+    @if (selectedItem(); as item) {
+        <app-crud-card [item]="item" [columns]="config().tableColumns" (close)="onCloseCard()"
+            (edit)="onEditFromCard($event)" (delete)="onDeleteFromCard($event)" />
+    }
+
+    @if (formItem() !== undefined) {
+        <app-crud-form [fields]="config().formFields" [item]="formItem()" (save)="onSaveForm($event)"
+            (cancel)="onCancelForm()" />
+    }
+
+</div>
