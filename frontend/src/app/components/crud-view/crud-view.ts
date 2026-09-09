@@ -10,6 +10,7 @@ import { TableComponent } from './table/table';
 import { CardComponent } from './card/card';
 import { FormComponent } from './form/form';
 import { HttpErrorResponse } from '@angular/common/http';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-crud-view',
@@ -88,19 +89,34 @@ export class CrudViewComponent {
 
   onEditFromCard(item: any) {
     this.selectedItem.set(null);
-    this.formItem.set(item); 
+    this.formItem.set(item);
   }
 
   onDeleteFromCard(item: any) {
     const cfg = this.config();
-    const id = item.id_usuario ?? item.id;
+    const id = this.selectedItem()[cfg.idKey];
 
-    if (!confirm('¿Seguro que quieres eliminar este registro?')) return;
-
-    this.crudService.delete(cfg.apiEndpoint, id).subscribe({
-      next: () => {
-        this.items.update(list => list.filter(i => i !== item));
-        this.selectedItem.set(null);
+    Swal.fire({
+      title: "Estas seguro de eliminar este registro?",
+      text: "Esta accion no se puede deshacer",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Eliminar de todas formas"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.crudService.delete(cfg.apiEndpoint, id).subscribe({
+          next: () => {
+            this.items.update(list => list.filter(i => i !== item));
+            this.selectedItem.set(null);
+          }
+        });
+        Swal.fire({
+          title: "Eliminado!",
+          text: "El registro ha sido eliminado.",
+          icon: "success"
+        });
       }
     });
   }
@@ -116,7 +132,7 @@ export class CrudViewComponent {
     const editing = this.formItem();
 
     this.serverErrors.set({});
-    
+
     if (editing) {
       const id = editing[cfg.idKey];
       this.crudService.update<any>(cfg.apiEndpoint, id, formData).subscribe({
@@ -138,16 +154,14 @@ export class CrudViewComponent {
   }
 
   private handleBackendErrors(err: HttpErrorResponse) {
-        if (err.error && Array.isArray(err.error.errors)) {
-            const errorMap: Record<string, string> = {};
-            // Convertimos [{campo: 'nombre', mensaje: '...'}, ...] a { nombre: '...', apellido: '...' }
-            err.error.errors.forEach((e: { campo: string; mensaje: string }) => {
-                errorMap[e.campo] = e.mensaje;
-            });
-            this.serverErrors.set(errorMap);
-        } else if (err.error && err.error.message) {
-            // Manejo de error general por si acaso (ej. "Error interno")
-            alert(err.error.message);
-        }
+    if (err.error && Array.isArray(err.error.errors)) {
+      const errorMap: Record<string, string> = {};
+      err.error.errors.forEach((e: { campo: string; mensaje: string }) => {
+        errorMap[e.campo] = e.mensaje;
+      });
+      this.serverErrors.set(errorMap);
+    } else if (err.error && err.error.message) {
+      alert(err.error.message);
     }
+  }
 }
