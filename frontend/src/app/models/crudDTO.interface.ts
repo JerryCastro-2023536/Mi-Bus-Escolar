@@ -10,7 +10,7 @@ export interface CrudConfig {
 export interface TableColumn {
     key: string;
     label: string;
-    type: 'text' | 'badge' | 'date';
+    type: 'text' | 'badge' | 'date' | 'number';
 }
 
 export interface KpiConfig {
