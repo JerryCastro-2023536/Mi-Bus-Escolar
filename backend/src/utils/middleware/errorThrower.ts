@@ -69,7 +69,7 @@ export function errorThrower(error: any): never {
                     "Restricción de datos",
                     [{
                         campo: nombreCampo,
-                        mensaje: `El ${nombreLegible} con valor "${valor}" no existe en la tabla "${tablaNoExiste}".`
+                        mensaje: `El ${nombreLegible} con ingresado no existe.`
                     }]
                 );
             }
@@ -80,7 +80,7 @@ export function errorThrower(error: any): never {
                     "Restricción de datos",
                     [{
                         campo: nombreCampo,
-                        mensaje: `No se puede eliminar: el ${nombreLegible} con valor "${valor}" todavía tiene registros asociados en la tabla "${tablaReferenciada}".`
+                        mensaje: `No se puede eliminar: el ${nombreLegible} todavía tiene registros asociados.`
                     }]
                 );
             }
@@ -90,7 +90,7 @@ export function errorThrower(error: any): never {
                     "Restricción de datos",
                     [{
                         campo: nombreCampo,
-                        mensaje: `No se puede completar la operación: el campo "${nombreLegible}" con valor "${valor}" está relacionado con otro registro y no existe o tiene datos asociados.`
+                        mensaje: `No se puede completar la operación: el campo "${nombreLegible}" está relacionado con otro registro y no existe o tiene datos asociados.`
                     }]
                 );
             }
