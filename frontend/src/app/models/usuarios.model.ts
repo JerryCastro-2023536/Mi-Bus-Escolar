@@ -49,7 +49,7 @@ export const usuariosConfig: CrudConfig = {
             key: 'telefono',
             label: 'Teléfono',
             type: 'text',
-            required: false
+            required: true
         },
         {
             key: 'foto_usuario',
