@@ -1,0 +1,39 @@
+<div class="table-wrapper">
+    <table class="crud-table">
+        <thead>
+            <tr>
+                @for (col of columns(); track col.key) {
+                    <th>{{ col.label }}</th>
+                }
+            </tr>
+        </thead>
+
+        <tbody>
+            @for (row of data(); track row.id_usuario ?? row.id) {
+                <tr (click)="onRowClick(row)">
+                    @for (col of columns(); track col.key) {
+
+                        @if (col.type === 'badge') {
+                            <td>
+                                <span class="badge" [style.background]="getBadgeColor(getValue(row, col)) + '1a'" [style.color]="getBadgeColor(getValue(row, col))">
+                                    {{ getValue(row, col) }}
+                                </span>
+                            </td>
+                        } @else if (col.type === 'date') {
+                            <td>{{ getValue(row, col) | date: 'yyyy-MM-dd HH:mm' }}</td>
+                        } @else {
+                            <td>{{ getValue(row, col) }}</td>
+                        }
+
+                    }
+                </tr>
+            } @empty {
+            <tr>
+                <td [attr.colspan]="columns().length" class="empty-state">
+                    No hay registros para mostrar.
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>
