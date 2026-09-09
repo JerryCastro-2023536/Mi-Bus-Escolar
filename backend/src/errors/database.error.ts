@@ -1,12 +1,12 @@
 export class DatabaseError extends Error {
     public statusCode: number;
-    public error: any;
+    public errors: any[];
 
-    constructor(message: string, error: any) {
+    constructor(message: string, errors: any[]) {
         super(message);
         this.name = "DatabaseError";
         this.statusCode = 400;
-        this.error = error;
+        this.errors = errors;
         Object.setPrototypeOf(this, DatabaseError.prototype);
     }
 }

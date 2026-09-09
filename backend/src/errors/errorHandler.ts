@@ -22,7 +22,7 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
         return res.status(err.statusCode).json({
             success: false,
             message: err.message,
-            error: err.error
+            error: err.errors
         })
     }
 

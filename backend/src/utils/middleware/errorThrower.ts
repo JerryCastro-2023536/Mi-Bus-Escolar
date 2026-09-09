@@ -4,9 +4,7 @@ import { DatabaseError } from "../../errors/database.error";
 import { InvalidToken } from "../../errors/expiredToken.error";
 import { NotFoundError } from "../../errors/notFound.error";
 
-const NOMBRES_LEGIBLES: Record<string, string> = {
-
-};
+const NOMBRES_LEGIBLES: Record<string, string> = {};
 
 function extraerCampoDeDetail(detail: string | undefined): string | null {
     if (!detail) return null;
@@ -33,6 +31,7 @@ function extraerTablaReferenciadaDesde(detail: string | undefined): string | nul
 }
 
 export function errorThrower(error: any): never {
+    // Si ya es un error formateado por nosotros, lo dejamos pasar
     if (
         error.statusCode ||
         error instanceof DatabaseError ||
@@ -47,26 +46,31 @@ export function errorThrower(error: any): never {
     if (typeof error === "object" && error !== null && "code" in error) {
         const campo = extraerCampoDeDetail(error.detail);
         const nombreLegible = campo ? (NOMBRES_LEGIBLES[campo] ?? campo) : "el valor";
+        const nombreCampo = campo ?? "general"; // Fallback si no se detecta el campo
 
-        if (error.code === "23505"){
+        // 23505: Unique violation (Registro duplicado)
+        if (error.code === "23505") {
             throw new DatabaseError(
                 "Error en la base de datos",
-                `El ${nombreLegible} que ingresó ya existe`
+                [{
+                    campo: nombreCampo,
+                    mensaje: `El ${nombreLegible} que ingresó ya existe`
+                }]
             );
         }
 
+        // 23503: Foreign key violation (Llaves foráneas)
         if (error.code === "23503") {
-            console.log("errorDetail:", error.detail);
-            
-            const campo = extraerCampoDeDetail(error.detail);
             const valor = extraerValorDeDetail(error.detail);
-            const nombreLegible = campo ? (NOMBRES_LEGIBLES[campo] ?? campo) : "el valor";
 
             const tablaNoExiste = extraerTablaDeDetail(error.detail);
             if (campo && valor && tablaNoExiste) {
                 throw new DatabaseError(
                     "Restricción de datos",
-                    `El ${nombreLegible} con valor "${valor}" no existe en la tabla "${tablaNoExiste}".`
+                    [{
+                        campo: nombreCampo,
+                        mensaje: `El ${nombreLegible} con valor "${valor}" no existe en la tabla "${tablaNoExiste}".`
+                    }]
                 );
             }
 
@@ -74,34 +78,52 @@ export function errorThrower(error: any): never {
             if (campo && valor && tablaReferenciada) {
                 throw new DatabaseError(
                     "Restricción de datos",
-                    `No se puede eliminar: el ${nombreLegible} con valor "${valor}" todavía tiene registros asociados en la tabla "${tablaReferenciada}".`
+                    [{
+                        campo: nombreCampo,
+                        mensaje: `No se puede eliminar: el ${nombreLegible} con valor "${valor}" todavía tiene registros asociados en la tabla "${tablaReferenciada}".`
+                    }]
                 );
             }
 
             if (campo && valor) {
                 throw new DatabaseError(
                     "Restricción de datos",
-                    `No se puede completar la operación: el campo "${nombreLegible}" con valor "${valor}" está relacionado con otro registro y no existe o tiene datos asociados.`
+                    [{
+                        campo: nombreCampo,
+                        mensaje: `No se puede completar la operación: el campo "${nombreLegible}" con valor "${valor}" está relacionado con otro registro y no existe o tiene datos asociados.`
+                    }]
                 );
             }
 
             throw new DatabaseError(
                 "Restricción de datos",
-                "No se puede completar la operación porque el registro tiene datos asociados o la referencia no existe."
+                [{
+                    campo: "general",
+                    mensaje: "No se puede completar la operación porque el registro tiene datos asociados o la referencia no existe."
+                }]
             );
         }
 
-        if (error.code === "23514"){
+        // 23514: Check violation (Reglas de validación)
+        if (error.code === "23514") {
             throw new DatabaseError(
-                "Restricción de datos",
-                `El valor ${nombreLegible} ingresado no cumple con las reglas permitidas para este campo.`
+                "Error de validación de datos",
+                [{
+                    campo: nombreCampo,
+                    mensaje: `El valor ${nombreLegible} ingresado no cumple con las reglas permitidas para este campo.`
+                }]
             );
         }
 
-        if (error.code === "23502"){
+        // 23502: Not null violation (Datos incompletos / obligatorios)
+        if (error.code === "23502") {
+            const campoFaltante = error.column ?? "requerido";
             throw new DatabaseError(
-                "Datos incompletos",
-                `El campo "${error.column ?? "requerido"}" no puede estar vacío.`
+                "Error de validación de datos",
+                [{
+                    campo: campoFaltante,
+                    mensaje: `El campo '${campoFaltante}' es obligatorio`
+                }]
             );
         }
     }
