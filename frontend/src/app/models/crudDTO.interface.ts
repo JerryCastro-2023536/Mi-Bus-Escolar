@@ -2,6 +2,7 @@ export interface CrudConfig {
     title: string;
     subtitle: string;
     apiEndpoint: string;
+    idKey: string;
     kpis: KpiConfig[];
     tableColumns: TableColumn[];
     formFields: FormField[];
