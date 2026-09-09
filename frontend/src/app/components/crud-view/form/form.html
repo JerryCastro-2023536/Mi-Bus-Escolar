@@ -22,6 +22,8 @@
                         </select>
                     } @else if (field.type === 'checkbox') {
                         <input type="checkbox" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]" />
+                    } @else if (field.type === 'number') {
+                        <input type="number" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]">
                     } @else {
                         <input [type]="field.type" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
                             [required]="!!field.required" />
