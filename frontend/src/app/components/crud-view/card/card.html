@@ -1,0 +1,24 @@
+<div class="overlay" (click)="onClose()">
+    <div class="card" (click)="$event.stopPropagation()">
+
+        <div class="card-header">
+            <span class="eyebrow">Detalle del registro</span>
+            <button class="close-btn" (click)="onClose()">✕</button>
+        </div>
+
+        <div class="card-body">
+            @for (col of columns(); track col.key) {
+            <div class="field-row">
+                <span class="field-label">{{ col.label }}</span>
+                <span class="field-value">{{ getValue(col) }}</span>
+            </div>
+            }
+        </div>
+
+        <div class="card-actions">
+            <button class="btn-edit" (click)="onEdit()">Editar</button>
+            <button class="btn-delete" (click)="onDelete()">Eliminar</button>
+        </div>
+
+    </div>
+</div>
