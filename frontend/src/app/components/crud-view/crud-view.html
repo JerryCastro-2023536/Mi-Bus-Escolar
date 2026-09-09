@@ -6,7 +6,7 @@
     @if (loading()) {
         <p class="status-text">Cargando...</p>
     } @else {
-        <app-crud-table [columns]="config().tableColumns" [data]="filteredItems()" (rowClick)="onRowClick($event)" />
+        <app-crud-table [columns]="config().tableColumns" [data]="filteredItems()" (rowClick)="onRowClick($event)" [idKey]="config().idKey" />
     }
 
     @if (selectedItem(); as item) {
