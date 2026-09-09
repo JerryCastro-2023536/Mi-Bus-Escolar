@@ -4,6 +4,7 @@ export const choferesCrudConfig: CrudConfig = {
     title: 'Choferes',
     subtitle: 'Gestión y administración de los choferes del sistema',
     apiEndpoint: '/choferes',
+    idKey: 'id_chofer',
     kpis: [
         {
             title: 'Total de Choferes',

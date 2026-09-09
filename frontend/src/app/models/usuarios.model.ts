@@ -4,7 +4,7 @@ export const usuariosConfig: CrudConfig = {
     title: 'Gestión de Usuarios',
     subtitle: 'Cuentas, roles y permisos de acceso a la plataforma.',
     apiEndpoint: '/usuarios',
-
+    idKey: 'id_usuario',
     kpis: [
         { title: 'USUARIOS TOTALES', valueKey: 'total' },
         { title: 'ACTIVOS HOY', valueKey: 'activos' }
