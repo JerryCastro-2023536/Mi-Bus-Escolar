@@ -1,11 +1,23 @@
 .crud-view {
+    --color-primary: #1A456B;
+    --color-primary-dark: #123553;
+    --color-secondary: #FFD141;
+    --color-tertiary: #5D737E;
+    --color-neutral: #F8F9FA;
+    --font-headline: 'Montserrat', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    font-family: var(--font-body);
+    background: var(--color-neutral);
     padding: 24px;
     max-width: 1200px;
     margin: 0 auto;
+    border-radius: 20px;
 }
 
 .status-text {
     text-align: center;
-    color: #9ca3af;
+    color: var(--color-tertiary);
     padding: 40px 0;
+    font-family: var(--font-body);
 }

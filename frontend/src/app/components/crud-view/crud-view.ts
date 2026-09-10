@@ -94,30 +94,56 @@ export class CrudViewComponent {
 
   onDeleteFromCard(item: any) {
     const cfg = this.config();
-    const id = this.selectedItem()[cfg.idKey];
+    const id = item[cfg.idKey];
 
     Swal.fire({
-      title: "Estas seguro de eliminar este registro?",
-      text: "Esta accion no se puede deshacer",
-      icon: "warning",
+      title: '¿Estás seguro de eliminar este registro?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Eliminar de todas formas"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.crudService.delete(cfg.apiEndpoint, id).subscribe({
-          next: () => {
-            this.items.update(list => list.filter(i => i !== item));
-            this.selectedItem.set(null);
-          }
-        });
-        Swal.fire({
-          title: "Eliminado!",
-          text: "El registro ha sido eliminado.",
-          icon: "success"
-        });
+      confirmButtonText: 'Eliminar de todas formas',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#dc2626',
+      cancelButtonColor: '#5D737E', 
+      customClass: {
+        popup: 'swal-brand-popup',
+        title: 'swal-brand-title',
+        confirmButton: 'swal-brand-btn',
+        cancelButton: 'swal-brand-btn'
       }
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+      this.crudService.delete(cfg.apiEndpoint, id).subscribe({
+        next: () => {
+          this.items.update(list => list.filter(i => i !== item));
+          this.selectedItem.set(null);
+
+          Swal.fire({
+            title: '¡Eliminado!',
+            text: 'El registro ha sido eliminado.',
+            icon: 'success',
+            confirmButtonColor: '#1A456B',
+            customClass: {
+              popup: 'swal-brand-popup',
+              title: 'swal-brand-title',
+              confirmButton: 'swal-brand-btn'
+            }
+          });
+        },
+        error: () => {
+          Swal.fire({
+            title: 'Error',
+            text: 'No se pudo eliminar el registro. Intenta de nuevo.',
+            icon: 'error',
+            confirmButtonColor: '#1A456B',
+            customClass: {
+              popup: 'swal-brand-popup',
+              title: 'swal-brand-title',
+              confirmButton: 'swal-brand-btn'
+            }
+          });
+        }
+      });
     });
   }
 
