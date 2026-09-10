@@ -1,0 +1,15 @@
+.swal-brand-popup {
+    border-radius: 16px !important;
+    font-family: 'Inter', sans-serif !important;
+}
+
+.swal-brand-title {
+    font-family: 'Montserrat', sans-serif !important;
+    color: #1A456B !important;
+}
+
+.swal-brand-btn {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    padding: 10px 20px !important;
+}
