@@ -1,11 +1,14 @@
 <div class="crud-header">
 
-    <div class="title-row">
-        <div>
-            <h1>{{ title() }}</h1>
-            @if (subtitle()) {
-                <p class="subtitle">{{ subtitle() }}</p>
-            }
+    <div class="header-card">
+        <div class="header-card-left">
+            <div class="header-icon">👥</div>
+            <div>
+                <h1>{{ title() }}</h1>
+                @if (subtitle()) {
+                    <p class="subtitle">{{ subtitle() }}</p>
+                }
+            </div>
         </div>
 
         <button class="btn-primary" (click)="onCreateClick()">
@@ -14,20 +17,25 @@
     </div>
 
     @if (kpis().length) {
-        <div class="kpi-row">
-            @for (kpi of kpis(); track kpi.valueKey) {
-                <div class="kpi-card">
-                    <span class="kpi-title">{{ kpi.title }}</span>
-                    <span class="kpi-value">{{ kpiData()[kpi.valueKey] ?? '—' }}</span>
-                    @if (kpi.subtitle) {
-                        <span class="kpi-subtitle">{{ kpi.subtitle }}</span>
-                    }
-                </div>
-            }
-        </div>
+    <div class="kpi-row">
+        @for (kpi of kpis(); track kpi.valueKey) {
+            <div class="kpi-card">
+                <span class="kpi-title">{{ kpi.title }}</span>
+                <span class="kpi-value">{{ kpiData()[kpi.valueKey] ?? '—' }}</span>
+                @if (kpi.subtitle) {
+                    <span class="kpi-subtitle">● {{ kpi.subtitle }}</span>
+                }
+            </div>
+        }
+    </div>
     }
 
     <div class="search-row">
+        <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
         <input type="text" placeholder="Buscar..." [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" />
     </div>
 
