@@ -54,7 +54,7 @@ export async function actualizarRuta(id: number, rut: Rutas){
 export async function eliminarRuta(id: number){
     try{
         const consulta = await pool.query("select sp_rutas_eliminar($1)", [id]);
-        if(consulta.rowCount === 0){
+        if (!consulta.rows[0].eliminado){
             throw new NotFoundError("no se pudo eliminar la ruta porque el id no existe")
         }
         return true
