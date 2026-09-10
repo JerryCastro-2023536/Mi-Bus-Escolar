@@ -33,4 +33,8 @@ export class CardComponent {
   getValue(column: TableColumn) {
     return this.item()[column.key];
   }
+
+  isBoolean(value: any): boolean {
+    return typeof value === 'boolean';
+  }
 }

@@ -10,7 +10,13 @@
             @for (col of columns(); track col.key) {
             <div class="field-row">
                 <span class="field-label">{{ col.label }}</span>
-                <span class="field-value">{{ getValue(col) }}</span>
+                @if (isBoolean(getValue(col))) {
+                    <span class="bool-box" [class.is-true]="getValue(col)" [class.is-false]="!getValue(col)">
+                        {{ getValue(col) ? '✓' : '✕' }}
+                    </span>
+                } @else {
+                    <span class="field-value">{{ getValue(col) }}</span>
+                }
             </div>
             }
         </div>
