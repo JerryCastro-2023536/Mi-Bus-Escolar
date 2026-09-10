@@ -24,7 +24,7 @@ export interface KpiConfig {
 export interface FormField {
     key: string;
     label: string;
-    type: 'text' | 'email' | 'password' | 'number' | 'select' | 'checkbox';
+    type: 'text' | 'email' | 'password' | 'number' | 'select' | 'checkbox' | 'date';
     required?: boolean;
     options?: FormSelectOption[];
 }
