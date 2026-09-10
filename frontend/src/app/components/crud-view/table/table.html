@@ -3,30 +3,38 @@
         <thead>
             <tr>
                 @for (col of columns(); track col.key) {
-                    <th>{{ col.label }}</th>
+                <th>{{ col.label }}</th>
                 }
             </tr>
         </thead>
 
         <tbody>
             @for (row of data(); track row[idKey()]) {
-                <tr (click)="onRowClick(row)">
-                    @for (col of columns(); track col.key) {
+            <tr (click)="onRowClick(row)">
+                @for (col of columns(); track col.key) {
 
-                        @if (col.type === 'badge') {
-                            <td>
-                                <span class="badge" [style.background]="getBadgeColor(getValue(row, col)) + '1a'" [style.color]="getBadgeColor(getValue(row, col))">
-                                    {{ getValue(row, col) }}
-                                </span>
-                            </td>
-                        } @else if (col.type === 'date') {
-                            <td>{{ getValue(row, col) | date: 'yyyy-MM-dd HH:mm' }}</td>
-                        } @else {
-                            <td>{{ getValue(row, col) }}</td>
-                        }
+                @if (isBoolean(getValue(row, col))) {
+                <td>
+                    <span class="bool-box" [class.is-true]="getValue(row, col)" [class.is-false]="!getValue(row, col)">
+                        {{ getValue(row, col) ? '✓' : '✕' }}
+                    </span>
+                </td>
+                } @else if (col.type === 'badge') {
+                <td>
+                    <span class="badge" [style.background]="getBadgeColor(getValue(row, col)).bg"
+                        [style.color]="getBadgeColor(getValue(row, col)).text">
+                        <span class="badge-dot" [style.background]="getBadgeColor(getValue(row, col)).text"></span>
+                        {{ getValue(row, col) }}
+                    </span>
+                </td>
+                } @else if (col.type === 'date') {
+                <td>{{ getValue(row, col) | date: 'yyyy-MM-dd HH:mm' }}</td>
+                } @else {
+                <td>{{ getValue(row, col) }}</td>
+                }
 
-                    }
-                </tr>
+                }
+            </tr>
             } @empty {
             <tr>
                 <td [attr.colspan]="columns().length" class="empty-state">

@@ -26,8 +26,29 @@ export class TableComponent {
     return row[column.key];
   }
 
-  getBadgeColor(value: string): string {
-    const palette = ['#2563EB', '#059669', '#D97706', '#DC2626', '#7C3AED', '#0891B2'];
+  isBoolean(value: any): boolean {
+    return typeof value === 'boolean';
+  }
+
+  getBadgeColor(value: string): { bg: string; text: string } {
+    const normalized = String(value ?? '').trim().toUpperCase();
+
+    const semantic: Record<string, string> = {
+      ACTIVO: '#16A34A',
+      ACTIVE: '#16A34A',
+      PENDIENTE: '#D97706',
+      PENDING: '#D97706',
+      SUSPENDIDO: '#DC2626',
+      INACTIVO: '#DC2626',
+      INACTIVE: '#DC2626'
+    };
+
+    const color = semantic[normalized] ?? this.hashBrandColor(normalized);
+    return { bg: color + '1a', text: color };
+  }
+
+  private hashBrandColor(value: string): string {
+    const palette = ['#1A456B', '#5D737E', '#B08900', '#0F766E', '#7C3AED', '#0891B2'];
     if (!value) return palette[0];
     let hash = 0;
     for (let i = 0; i < value.length; i++) {
