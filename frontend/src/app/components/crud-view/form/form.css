@@ -6,6 +6,17 @@
     justify-content: center;
     align-items: center;
     z-index: 50;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 .form-card {
@@ -16,35 +27,75 @@
     background: #fff;
     border-radius: 16px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    font-family: var(--font-body, 'Inter', sans-serif);
+
+    /* Animación: aparece con un pequeño "pop" en vez de solo aparecer */
+    animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.94) translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 .form-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 20px;
-    border-bottom: 1px solid #f3f4f6;
+    padding: 22px 24px;
+    background: linear-gradient(135deg, var(--color-primary, #1A456B), var(--color-tertiary, #5D737E));
+}
+
+.form-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .eyebrow {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #6b7280;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.form-header h2 {
+    margin: 0;
+    font-family: var(--font-headline, 'Montserrat', sans-serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
 }
 
 .close-btn {
-    background: none;
+    background: rgba(255, 255, 255, 0.15);
     border: none;
-    font-size: 1rem;
-    color: #9ca3af;
+    border-radius: 8px;
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+    color: #fff;
     cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.28);
 }
 
 .form-body {
-    padding: 16px 20px;
+    padding: 20px 24px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
 }
 
 .field {
@@ -63,27 +114,167 @@
     color: #dc2626;
 }
 
+/* --- Inputs de texto/email/password/number/date --- */
+
 .field input[type="text"],
 .field input[type="email"],
 .field input[type="password"],
 .field input[type="number"],
-.field select {
-    padding: 9px 12px;
+.field input[type="date"] {
+    padding: 10px 12px;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     font-size: 0.875rem;
+    font-family: var(--font-body, 'Inter', sans-serif);
     outline: none;
+    background: #fff;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.field input:focus,
-.field select:focus {
-    border-color: #2563eb;
+.field input[type="text"]:hover,
+.field input[type="email"]:hover,
+.field input[type="password"]:hover,
+.field input[type="number"]:hover,
+.field input[type="date"]:hover {
+    border-color: var(--color-tertiary, #5D737E);
 }
 
-.field input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    align-self: flex-start;
+.field input:focus {
+    border-color: var(--color-primary, #1A456B);
+}
+
+.field input[type="date"] {
+    color: #374151;
+}
+
+/* El ícono de calendario nativo, en el color de marca */
+.field input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(20%) sepia(23%) saturate(1400%) hue-rotate(163deg) brightness(90%);
+    cursor: pointer;
+}
+
+/* --- Select, con flecha personalizada --- */
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--color-tertiary, #5D737E);
+    border-bottom: 2px solid var(--color-tertiary, #5D737E);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+}
+
+.select-wrapper select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 36px 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-family: var(--font-body, 'Inter', sans-serif);
+    outline: none;
+    background: #fff;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+}
+
+.select-wrapper select:hover {
+    border-color: var(--color-tertiary, #5D737E);
+}
+
+.select-wrapper select:focus {
+    border-color: var(--color-primary, #1A456B);
+}
+
+/* --- Checkbox, como una fila con casilla + etiqueta --- */
+
+.field-checkbox {
+    flex-direction: row;
+    align-items: center;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.checkbox-row:hover {
+    border-color: var(--color-tertiary, #5D737E);
+    background: var(--color-neutral, #F8F9FA);
+}
+
+.checkbox-row input[type="checkbox"] {
+    /* El input real queda invisible; la casilla visual es .checkbox-box */
+    position: absolute;
+    opacity: 0;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.checkbox-box {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.checkbox-row input[type="checkbox"]:checked+.checkbox-box {
+    background: var(--color-primary, #1A456B);
+    border-color: var(--color-primary, #1A456B);
+}
+
+.checkbox-row input[type="checkbox"]:checked+.checkbox-box::after {
+    content: '✓';
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.checkbox-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* --- Estado de error: texto rojo + fondo suave en el input --- */
+
+.field.has-error input,
+.field.has-error select,
+.field.has-error .checkbox-row {
+    border-color: #dc2626;
+    background-color: #fef2f2;
+}
+
+.error-text {
+    color: #dc2626;
+    font-size: 0.8rem;
+    margin-top: 2px;
+    display: block;
 }
 
 .form-actions {
@@ -101,15 +292,16 @@
     font-weight: 600;
     cursor: pointer;
     border: none;
+    transition: background-color 0.15s ease;
 }
 
 .btn-primary {
-    background: #0f172a;
+    background: var(--color-primary, #1A456B);
     color: #fff;
 }
 
 .btn-primary:hover {
-    background: #1e293b;
+    background: var(--color-primary-dark, #123553);
 }
 
 .btn-secondary {
@@ -119,17 +311,4 @@
 
 .btn-secondary:hover {
     background: #e5e7eb;
-}
-
-.field.has-error input,
-.field.has-error select {
-    border-color: #dc3545;
-    background-color: #fff8f8;
-}
-
-.error-text {
-    color: #dc3545;
-    font-size: 0.85rem;
-    margin-top: 4px;
-    display: block;
 }

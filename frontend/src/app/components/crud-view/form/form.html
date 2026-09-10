@@ -2,37 +2,56 @@
     <div class="form-card" (click)="$event.stopPropagation()">
 
         <div class="form-header">
-            <span class="eyebrow">{{ isEditMode ? 'Editar registro' : 'Nuevo registro' }}</span>
+            <div class="form-header-text">
+                <span class="eyebrow">{{ isEditMode ? 'Editar registro' : 'Nuevo registro' }}</span>
+                <h2>{{ isEditMode ? 'Actualiza la información' : 'Completa los datos' }}</h2>
+            </div>
             <button class="close-btn" (click)="onCancel()">✕</button>
         </div>
 
         <form class="form-body" (ngSubmit)="onSubmit()">
             @for (field of fields(); track field.key) {
-                <div class="field">
-                    <label [for]="field.key">
-                        {{ field.label }} @if (field.required) { <span class="required">*</span> }
-                    </label>
+            <div class="field" [class.has-error]="errors()[field.key]"
+                [class.field-checkbox]="field.type === 'checkbox'">
 
-                    @if (field.type === 'select') {
-                        <select [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]" [required]="!!field.required">
-                            <option value="" disabled>Selecciona una opción</option>
-                            @for (opt of field.options; track opt.value) {
-                                <option [value]="opt.value">{{ opt.label }}</option>
-                            }
-                        </select>
-                    } @else if (field.type === 'checkbox') {
-                        <input type="checkbox" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]" />
-                    } @else if (field.type === 'number') {
-                        <input type="number" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]">
-                    } @else {
-                        <input [type]="field.type" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
-                            [required]="!!field.required" />
-                    }
+                @if (field.type !== 'checkbox') {
+                <label [for]="field.key">
+                    {{ field.label }} @if (field.required) { <span class="required">*</span> }
+                </label>
+                }
 
-                    @if (errors()[field.key]) {
-                        <span class="error-text">{{ errors()[field.key] }}</span>
-                    }
+                @if (field.type === 'select') {
+                <div class="select-wrapper">
+                    <select [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
+                        [required]="!!field.required">
+                        <option value="" disabled>Selecciona una opción</option>
+                        @for (opt of field.options; track opt.value) {
+                        <option [value]="opt.value">{{ opt.label }}</option>
+                        }
+                    </select>
                 </div>
+                } @else if (field.type === 'checkbox') {
+                <label class="checkbox-row" [for]="field.key">
+                    <input type="checkbox" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]" />
+                    <span class="checkbox-box"></span>
+                    <span class="checkbox-label">
+                        {{ field.label }} @if (field.required) { <span class="required">*</span> }
+                    </span>
+                </label>
+                } @else if (field.type === 'number') {
+                <input type="number" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]">
+                } @else if (field.type === 'date') {
+                <input type="date" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
+                    [required]="!!field.required" />
+                } @else {
+                <input [type]="field.type" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
+                    [required]="!!field.required" />
+                }
+
+                @if (errors()[field.key]) {
+                <span class="error-text">{{ errors()[field.key] }}</span>
+                }
+            </div>
             }
 
             <div class="form-actions">
