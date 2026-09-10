@@ -6,8 +6,8 @@ export const usuariosConfig: CrudConfig = {
     apiEndpoint: '/usuarios',
     idKey: 'id_usuario',
     kpis: [
-        { title: 'USUARIOS TOTALES', valueKey: 'total' },
-        { title: 'ACTIVOS HOY', valueKey: 'activos' }
+        { title: 'USUARIOS TOTALES', valueKey: 'total', icon: "" },
+        { title: 'ACTIVOS HOY', valueKey: 'activos', icon: "", }
     ],
 
     tableColumns: [
