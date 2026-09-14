@@ -24,7 +24,7 @@
   font-weight: bold;
 }
 .placeholder-map {
-  height: 420px;
+  height: 600px;
   border-radius: 12px;
   display: block;
   position: relative;
@@ -206,4 +206,271 @@
 .bg-absent {
   background: #fee2e2;
   color: #dc2626;
+}
+
+
+/* ================================
+   MODAL REPORTE
+================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 1000;
+
+  padding: 20px;
+}
+
+
+/* Contenedor del modal */
+
+.modal-reporte {
+  width: 100%;
+  max-width: 550px;
+
+  background: #F8F9FA;
+
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+
+  font-family: 'Inter', sans-serif;
+}
+
+
+/* ================================
+   HEADER
+================================ */
+
+.modal-header {
+  background: #1A456B;
+
+  color: white;
+
+  padding: 22px 26px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.modal-header h2 {
+  margin: 0 0 6px;
+
+  font-family: 'Montserrat', sans-serif;
+
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.modal-header p {
+  margin: 0;
+
+  color: #dce7ef;
+
+  font-size: 14px;
+}
+
+
+/* Botón cerrar */
+
+.btn-cerrar {
+  background: transparent;
+
+  border: none;
+
+  color: white;
+
+  font-size: 28px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  padding: 0 4px;
+}
+
+.btn-cerrar:hover {
+  opacity: 0.7;
+}
+
+
+/* ================================
+   FORMULARIO
+================================ */
+
+.form-container {
+  padding: 26px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+.form-group {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.form-group label {
+  font-weight: 600;
+
+  font-size: 14px;
+
+  color: #1A456B;
+}
+
+
+/* Inputs */
+
+.form-group input,
+.form-group textarea {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1px solid #c8d0d5;
+
+  border-radius: 7px;
+
+  background: white;
+
+  padding: 12px 14px;
+
+  font-family: 'Inter', sans-serif;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition: border 0.2s;
+}
+
+.form-group input {
+  height: 44px;
+}
+
+.form-group textarea {
+  resize: vertical;
+
+  min-height: 120px;
+}
+
+
+/* Focus */
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #1A456B;
+
+  box-shadow: 0 0 0 2px rgba(26, 69, 107, 0.12);
+}
+
+
+/* Contador */
+
+.contador {
+  text-align: right;
+
+  font-size: 12px;
+
+  color: #5D737E;
+}
+
+
+/* Error */
+
+.error {
+  font-size: 12px;
+
+  color: #d32f2f;
+}
+
+
+/* ================================
+   BOTONES
+================================ */
+
+.modal-actions {
+
+  background: white;
+
+  border-top: 1px solid #e3e6e8;
+
+  padding: 18px 26px;
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 12px;
+}
+
+
+/* Cancelar */
+
+.btn-cancelar {
+
+  background: transparent;
+
+  border: 1px solid #5D737E;
+
+  color: #5D737E;
+
+  border-radius: 6px;
+
+  padding: 10px 18px;
+
+  font-family: 'Inter', sans-serif;
+
+  cursor: pointer;
+}
+
+.btn-cancelar:hover {
+  background: #eef1f3;
+}
+
+
+/* Crear */
+
+.btn-crear {
+
+  background: #1A456B;
+
+  border: none;
+
+  color: white;
+
+  border-radius: 6px;
+
+  padding: 10px 20px;
+
+  font-family: 'Inter', sans-serif;
+
+  cursor: pointer;
+}
+
+.btn-crear:hover {
+  background: #123653;
+}
+
+.btn-crear:disabled {
+  background: #aab7c0;
+
+  cursor: not-allowed;
 }

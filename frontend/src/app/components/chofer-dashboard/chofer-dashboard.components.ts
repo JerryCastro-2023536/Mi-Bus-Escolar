@@ -2,35 +2,15 @@ import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PuntoRuta } from '../../models/mapas.type';
 import { MapaComponent } from '../mapa/mapa.component';
+import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
-  imports: [CommonModule, MapaComponent],
+  imports: [CommonModule, MapaComponent, ReactiveFormsModule],
   selector: 'app-chofer-dashboard.components',
   styleUrl: './chofer-dashboard.components.css',
   templateUrl: './chofer-dashboard.components.html',
 })
 export class ChoferDashboardComponents {
-  students = signal([
-    { id: 1, initials: 'MG', name: 'Mateo Gómez', grade: '5to Primaria - Par...', status: 'Presente' },
-    { id: 2, initials: 'SR', name: 'Sofia Ramírez', grade: '3ro Primaria - Par...', status: 'Presente' },
-    { id: 3, initials: 'LH', name: 'Lucas Herrera', grade: '6to Primaria - Par...', status: 'Ausente' },
-    { id: 4, initials: 'VC', name: 'Valentina Castro', grade: '2do Secundaria - ...', status: 'Presente' },
-    { id: 5, initials: 'DM', name: 'Diego Morales', grade: '1ro Secundaria - ...', status: 'Presente' }
-  ]);
-
-  // Contadores reactivos basados en el signal
-  totalAssigned = computed(() => this.students().length);
-  totalPresent = computed(() => this.students().filter(s => s.status === 'Presente').length);
-  totalAbsent = computed(() => this.students().filter(s => s.status === 'Ausente').length);
-
-  toggleAttendance(id: number) {
-    this.students.update(list => list.map(student => 
-      student.id === id 
-        ? { ...student, status: student.status === 'Presente' ? 'Ausente' : 'Presente' }
-        : student
-    ));
-  }
-
 
 
   rutaRutaAsignada: PuntoRuta[] = [
@@ -41,6 +21,61 @@ export class ChoferDashboardComponents {
   // Acepta 'any' o 'PuntoRuta' para compatibilidad con la vista
   enviarUbicacionAlServidor(coordenadas: PuntoRuta | any) {
     console.log('Enviando nueva posición del chofer al backend:', coordenadas);
+  }
+
+
+  mostrarModalReporte = false;
+
+  reporteForm: FormGroup;
+
+  constructor(
+    private fb: FormBuilder
+
+  ) {
+
+    this.reporteForm = this.fb.group({
+
+      titulo: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(40)
+        ]
+      ],
+
+      descripcion: [
+        ''
+      ]
+
+    });
+
+  }
+
+
+  abrirModalReporte(): void {
+    this.mostrarModalReporte = true;
+  }
+
+
+  cerrarModalReporte(): void {
+    this.mostrarModalReporte = false;
+
+    this.reporteForm.reset();
+  }
+
+
+  crearReporte(): void {
+
+    if (this.reporteForm.invalid) {
+      this.reporteForm.markAllAsTouched();
+      return;
+    }
+
+    const reporte = this.reporteForm.value;
+
+    console.log('Reporte:', reporte);
+
+    this.cerrarModalReporte();
   }
   
 }
