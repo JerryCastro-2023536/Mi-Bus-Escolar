@@ -26,12 +26,17 @@
               }
             ],
             "styles": [
+              "node_modules/leaflet/dist/leaflet.css",
               "src/styles.css"
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": []
+              "allowedHosts": [
+                "localhost",
+                "172.21.204.116",
+                ".devtunnels.ms"
+              ]
             },
             "ssr": {
               "entry": "src/server.ts"
