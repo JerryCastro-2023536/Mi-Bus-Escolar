@@ -80,9 +80,13 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
     });
     this.L.Marker.prototype.options.icon = defaultIcon;
 
+    requestAnimationFrame(() => {
+      this.mapa?.invalidateSize();
+    });
+
     setTimeout(() => {
       this.mapa?.invalidateSize();
-    }, 100);
+    }, 300);
 
     if (this.rol === 'chofer') {
       this.iniciarGpsChofer();
