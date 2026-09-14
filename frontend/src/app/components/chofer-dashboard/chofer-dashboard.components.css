@@ -1,0 +1,209 @@
+/* Estructura Base */
+.dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f8fafc;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+.dashboard-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Placeholders */
+.placeholder-header {
+  background: #0f172a;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  font-weight: bold;
+}
+.placeholder-map {
+  height: 420px;
+  border-radius: 12px;
+  display: block;
+  position: relative;
+  margin-bottom: 1.5rem;
+  border: 2px dashed #cbd5e1;
+  overflow: hidden;
+  background: #edf2f7;
+}
+
+.placeholder-map app-mapa {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Paneles */
+.sidebar {
+  width: 220px;
+  background: white;
+  padding: 1.5rem 1rem;
+  border-right: 1px solid #e2e8f0;
+}
+.main-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+.right-panel {
+  width: 360px;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+/* Tipografía y Elementos */
+.section-title,
+.list-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+}
+.nav-item {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  color: #475569;
+  cursor: pointer;
+  font-weight: 500;
+}
+.nav-item.active {
+  background: #0f172a;
+  color: white;
+}
+
+/* Tarjetas */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+.route-card {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+.route-metrics {
+  display: flex;
+  gap: 1.5rem;
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Botones */
+.btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  margin-bottom: 0.5rem;
+}
+.btn-primary {
+  background: #0f172a;
+  color: white;
+}
+.btn-secondary {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+.btn-block {
+  width: 100%;
+}
+.mt-4 {
+  margin-top: 1rem;
+}
+
+/* Asistencia */
+.attendance-stats {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  margin: 1rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+.stat strong {
+  font-size: 1.25rem;
+  color: #0f172a;
+}
+.stat span {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+.text-orange strong {
+  color: #f59e0b;
+}
+.text-red strong {
+  color: #ef4444;
+}
+
+/* Lista de Estudiantes */
+.student-row {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  gap: 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #1e293b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+.student-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.student-info strong {
+  font-size: 0.875rem;
+  color: #0f172a;
+}
+.student-info span {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* Toggle Estados */
+.status-toggle {
+  border: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.bg-present {
+  background: #fef3c7;
+  color: #d97706;
+}
+.bg-absent {
+  background: #fee2e2;
+  color: #dc2626;
+}

@@ -1,0 +1,102 @@
+<div class="dashboard-layout">
+  
+  <!-- COMPONENTE HEADER: Reemplazar con tu etiqueta, ej: <app-main-header /> -->
+  <header class="placeholder-header">
+    [ COMPONENTE HEADER ]
+  </header>
+
+  <div class="dashboard-body">
+    
+    <!-- Sidebar Izquierdo -->
+    <aside class="sidebar">
+      <p class="section-title">DESPACHO Y OPERACIONES</p>
+      <nav>
+        <div class="nav-item active">🗺️ Mapa de Rutas</div>
+        <div class="nav-item">👥 Estudiantes</div>
+        <div class="nav-item">🚌 Vehículos</div>
+        <div class="nav-item">📊 Historial & Data</div>
+      </nav>
+    </aside>
+
+    <!-- Contenido Central -->
+    <main class="main-content">
+      <div class="status-bar">
+        <span>📅 Jueves, 24 de Octubre - Turno Mañana (07:15 AM)</span>
+        <span class="active-badge">🟢 CENTRO DE CONTROL ACTIVO</span>
+      </div>
+
+      <div class="card route-card">
+        <h2>Ruta #04 - Zona Norte / Colegio San José</h2>
+        <div class="route-metrics">
+          <span>📍 Distancia: 14.2 km</span>
+          <span>⏱️ Est. Llegada: 07:55 AM</span>
+        </div>
+      </div>
+
+      <div class="placeholder-map">
+            <app-mapa 
+              [rol]="'chofer'" 
+              [rutaDefinida]="rutaRutaAsignada"
+              (cambioUbicacion)="enviarUbicacionAlServidor($event)">
+            </app-mapa>
+      </div>
+
+      <div class="fleet-status">
+        <h3>Estado de Flota Escolar Asignada</h3>
+        <div class="fleet-cards">
+          <div class="fleet-card">Bus #12 - En Servicio</div>
+          <div class="fleet-card">Bus #05 - En Ruta</div>
+          <div class="fleet-card">Bus #08 - En Espera</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Panel Derecho (Operaciones y Asistencia) -->
+    <aside class="right-panel">
+      
+      <!-- Flujo de Control -->
+      <div class="card flow-control">
+        <h3>FLUJO DE CONTROL OPERATIVO</h3>
+        <button class="btn btn-primary">📋 1. Tomar Asistencia</button>
+        <button class="btn btn-secondary">▶️ 2. Iniciar Ruta</button>
+      </div>
+
+      <!-- Pase de Asistencia -->
+      <div class="card attendance-section">
+        <div class="attendance-header">
+          <h3>Pase de Asistencia</h3>
+        </div>
+        
+        <div class="attendance-stats">
+          <div class="stat"><strong>{{ totalAssigned() }}</strong><span>Asignados</span></div>
+          <div class="stat text-orange"><strong>{{ totalPresent() }}</strong><span>Presentes</span></div>
+          <div class="stat text-red"><strong>{{ totalAbsent() }}</strong><span>Ausentes</span></div>
+        </div>
+
+        <div class="student-list">
+          <p class="list-title">LISTA DE ESTUDIANTES (RUTA 04)</p>
+          
+          @for (student of students(); track student.id) {
+            <div class="student-row">
+              <div class="avatar">{{ student.initials }}</div>
+              <div class="student-info">
+                <strong>{{ student.name }}</strong>
+                <span>{{ student.grade }}</span>
+              </div>
+              <button 
+                class="status-toggle"
+                [class.bg-present]="student.status === 'Presente'"
+                [class.bg-absent]="student.status === 'Ausente'"
+                (click)="toggleAttendance(student.id)">
+                {{ student.status }}
+              </button>
+            </div>
+          }
+        </div>
+
+        <button class="btn btn-primary btn-block mt-4">Guardar y Validar Asistencia</button>
+      </div>
+    </aside>
+
+  </div>
+</div>
