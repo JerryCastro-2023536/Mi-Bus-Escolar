@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { LoginService, UsuarioLoginDTO } from '../../services/login';
 import { RegisterService, UsuarioRegisterDTO } from '../../services/register';
 
@@ -14,6 +15,7 @@ import { RegisterService, UsuarioRegisterDTO } from '../../services/register';
 export class Login implements OnInit {
   private loginService = inject(LoginService);
   private registerService = inject(RegisterService);
+  private router = inject(Router);
 
   isLoginMode = signal(true);
   isLoading = signal(false);
@@ -70,7 +72,7 @@ export class Login implements OnInit {
           this.loginService.saveUser(res.usuario);
           this.currentUser.set(res.usuario);
           this.currentToken.set(res.token);
-          this.successMessage.set('Inicio de sesión exitoso');
+          this.router.navigateByUrl('/dashboard');
         } else {
           this.successMessage.set(res.message || 'Login exitoso');
         }
@@ -117,6 +119,10 @@ export class Login implements OnInit {
     this.currentToken.set(null);
     this.clearMessages();
     this.successMessage.set('Sesion cerrada correctamente');
+  }
+
+  goToDashboard(): void {
+    this.router.navigateByUrl('/dashboard');
   }
 
   private handleError(err: any): void {
