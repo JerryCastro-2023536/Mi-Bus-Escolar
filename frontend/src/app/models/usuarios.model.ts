@@ -6,8 +6,8 @@ export const usuariosConfig: CrudConfig = {
     apiEndpoint: '/usuarios',
     idKey: 'id_usuario',
     kpis: [
-        { title: 'USUARIOS TOTALES', valueKey: 'total', icon: "" },
-        { title: 'ACTIVOS HOY', valueKey: 'activos', icon: "", }
+        { title: 'USUARIOS TOTALES', valueKey: 'total', icon: '' },
+        { title: 'ACTIVOS HOY', valueKey: 'activos', icon: '' },
     ],
 
     tableColumns: [
@@ -26,36 +26,32 @@ export const usuariosConfig: CrudConfig = {
             key: 'nombre',
             label: 'Nombre',
             type: 'text',
-            required: true,
-            readonly: false
+            required: true
         },
         {
             key: 'apellido',
             label: 'Apellido',
             type: 'text',
-            required: true,
-            readonly: false
+            required: true
         },
         {
             key: 'correo',
             label: 'Correo Electrónico',
             type: 'email',
-            required: true,
-            readonly: false
+            required: true
         },
         {
             key: 'password',
             label: 'Contraseña',
             type: 'password',
             required: true,
-            readonly: true
+            readonlyOnEdit: true
         },
         {
             key: 'telefono',
             label: 'Teléfono',
             type: 'text',
-            required: true,
-            readonly: false
+            required: true
         },
         {
             key: 'rol',
@@ -67,22 +63,19 @@ export const usuariosConfig: CrudConfig = {
                 { value: 'PROVEEDOR', label: 'Proveedor' },
                 { value: 'CHOFER', label: 'Chofer' },
                 { value: 'USUARIO', label: 'Usuario' }
-            ],
-            readonly: false
+            ]
         },
         {
             key: 'correo_verificado',
             label: '¿Correo Verificado?',
             type: 'checkbox',
-            required: false,
-            readonly: false
+            required: false
         },
         {
             key: 'foto_usuario',
             label: 'Subir Foto',
             type: 'image',
-            required: false,
-            readonly: false
+            required: false
         }
-    ]
-};
+    ],
+}
