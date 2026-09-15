@@ -2,11 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { ApiResponse } from '../models/apiResponseDTO.interface';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class CrudService {
     private http = inject(HttpClient);
-    private baseUrl = 'http://localhost:3000/api';
+    private baseUrl = environment.API_URL;
 
     getAll<T>(endpoint: string): Observable<T[]> {
         return this.http.get<ApiResponse<T[]>>(`${this.baseUrl}${endpoint}`).pipe(map(res => res.data));
