@@ -29,7 +29,17 @@
                 </td>
                 } @else if (col.type === 'date') {
                 <td>{{ getValue(row, col) | date: 'yyyy-MM-dd HH:mm' }}</td>
-                } @else {
+                }@else if (col.type === 'image') {
+                <td>
+                    @if (getValue(row, col)) {
+                    <button type="button" class="btn-view-photo" (click)="onViewImage($event, getValue(row, col))">
+                        <span class="btn-view-photo__icon">🖼️</span> Ver foto
+                    </button>
+                    } @else {
+                    <span class="no-photo">Sin foto</span>
+                    }
+                </td>
+                }@else {
                 <td>{{ getValue(row, col) }}</td>
                 }
 
@@ -44,4 +54,10 @@
             }
         </tbody>
     </table>
+    @if (viewingImage(); as url) {
+        <div class="image-lightbox" (click)="closeImage()">
+            <img [src]="url" (click)="$event.stopPropagation()" />
+            <button type="button" class="lightbox-close" (click)="closeImage()">✕</button>
+        </div>
+    }
 </div>

@@ -1,5 +1,5 @@
 import { TableColumn } from './../../../models/crudDTO.interface';
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -30,6 +30,19 @@ export class TableComponent {
     return typeof value === 'boolean';
   }
 
+  //CLOUDINARY
+  viewingImage = signal<string | null>(null);
+
+  onViewImage(event: Event, url: string) {
+    event.stopPropagation(); 
+    this.viewingImage.set(url);
+  }
+
+  closeImage() {
+    this.viewingImage.set(null);
+  }
+
+  //COLORES ETIQUETAS
   getBadgeColor(value: string): { bg: string; text: string } {
     const normalized = String(value ?? '').trim().toUpperCase();
 
