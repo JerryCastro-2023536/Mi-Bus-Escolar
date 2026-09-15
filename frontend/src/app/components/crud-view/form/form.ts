@@ -1,7 +1,8 @@
-import { Component, input, output, effect } from '@angular/core';
+import { Component, input, output, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '../../../models/crudDTO.interface';
+import { CloudinaryService } from '../../../services/cloudinary.service';
 
 
 @Component({
@@ -12,6 +13,11 @@ import { FormField } from '../../../models/crudDTO.interface';
   styleUrl: './form.css'
 })
 export class FormComponent {
+  //CLOUDINARY
+  private cloudinaryService = inject(CloudinaryService);
+  uploading = signal<Record<string, boolean>>({});
+  imageFolder = input<string>('');
+
   fields = input.required<FormField[]>();
   item = input<any | null>(null);
   errors = input<Record<string, string>>({});
@@ -38,8 +44,82 @@ export class FormComponent {
     return !!this.item();
   }
 
+  //CLOUDINARY METHODS
+  onFileSelected(key: string, event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    this.uploading.update(state => ({ ...state, [key]: true }));
+
+    this.cloudinaryService.upload(file, this.imageFolder()).subscribe({
+      next: (url) => {
+        this.model[key] = url;
+        this.uploading.update(state => ({ ...state, [key]: false }));
+      },
+      error: () => {
+        this.uploading.update(state => ({ ...state, [key]: false }));
+        alert('No se pudo subir la imagen. Intenta de nuevo.');
+      }
+    });
+
+    input.value = '';
+  }
+
+  removeImage(key: string) {
+    this.model[key] = '';
+  }
+
+  isUploading(key: string): boolean {
+    return !!this.uploading()[key];
+  }
+
+  hasPendingUploads(): boolean {
+    return Object.values(this.uploading()).some(v => v);
+  }
+
   onSubmit() {
+    if (this.hasPendingUploads()) return;
     this.save.emit(this.model);
+  }
+
+  draggingImage = false;
+
+  onDragOverImage(event: DragEvent): void {
+    event.preventDefault(); 
+    event.stopPropagation();
+    this.draggingImage = true;
+  }
+
+
+  onDragLeaveImage(event: DragEvent): void {
+    event.preventDefault();
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    if (
+      event.clientX <= rect.left ||
+      event.clientX >= rect.right ||
+      event.clientY <= rect.top ||
+      event.clientY >= rect.bottom
+    ) {
+      this.draggingImage = false;
+    }
+  }
+
+  onFileDrop(key: string, event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.draggingImage = false;
+
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+
+    const input = document.getElementById(key) as HTMLInputElement | null;
+    if (!input) return;
+
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+    input.files = dataTransfer.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   onCancel() {

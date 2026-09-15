@@ -12,18 +12,19 @@
         <form class="form-body" (ngSubmit)="onSubmit()">
             @for (field of fields(); track field.key) {
             <div class="field" [class.has-error]="errors()[field.key]"
-                [class.field-checkbox]="field.type === 'checkbox'">
+                [class.field-checkbox]="field.type === 'checkbox'"
+                [class.field-readonly]="!!field.readonly">
 
                 @if (field.type !== 'checkbox') {
                 <label [for]="field.key">
-                    {{ field.label }} @if (field.required) { <span class="required">*</span> }
+                    {{ field.label }} @if (field.required && !field.readonly) { <span class="required">*</span> }
                 </label>
                 }
 
                 @if (field.type === 'select') {
                 <div class="select-wrapper">
                     <select [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
-                        [required]="!!field.required">
+                        [required]="!!field.required && !field.readonly" [disabled]="!!field.readonly">
                         <option value="" disabled>Selecciona una opción</option>
                         @for (opt of field.options; track opt.value) {
                         <option [value]="opt.value">{{ opt.label }}</option>
@@ -32,20 +33,61 @@
                 </div>
                 } @else if (field.type === 'checkbox') {
                 <label class="checkbox-row" [for]="field.key">
-                    <input type="checkbox" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]" />
+                    <input type="checkbox" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
+                        [disabled]="!!field.readonly" />
                     <span class="checkbox-box"></span>
                     <span class="checkbox-label">
-                        {{ field.label }} @if (field.required) { <span class="required">*</span> }
+                        {{ field.label }} @if (field.required && !field.readonly) { <span class="required">*</span> }
                     </span>
                 </label>
                 } @else if (field.type === 'number') {
-                <input type="number" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]">
+                <input type="number" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
+                    [required]="!!field.required && !field.readonly" [readonly]="!!field.readonly">
                 } @else if (field.type === 'date') {
                 <input type="date" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
-                    [required]="!!field.required" />
+                    [required]="!!field.required && !field.readonly" [disabled]="!!field.readonly" />
+                } @else if (field.type === 'image') {
+                <div class="image-field">
+                    @if (model[field.key]) {
+                    <div class="image-preview" [class.image-preview-readonly]="!!field.readonly">
+                        <img [src]="model[field.key]" alt="Vista previa" />
+                        @if (!field.readonly) {
+                        <button type="button" class="image-remove" (click)="removeImage(field.key)"
+                            title="Eliminar foto">✕</button>
+                        }
+                    </div>
+                    } @else if (field.readonly) {
+                    <div class="image-placeholder">Sin foto</div>
+                    } @else {
+                    <div class="dropzone-container" [class.drag-active]="draggingImage"
+                        (dragover)="onDragOverImage($event)"
+                        (dragleave)="onDragLeaveImage($event)"
+                        (drop)="onFileDrop(field.key, $event)">
+                        <div class="image-dropzone">
+                            @if (isUploading(field.key)) {
+                            <span class="image-spinner"></span>
+                            <span>Subiendo...</span>
+                            } @else {
+                            <span class="image-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="8 12 12 16 16 12"></polyline>
+                                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                                </svg>
+                            </span>
+                            <span class="dropzone-text">Puede arrastrar y soltar archivos aquí para añadirlos</span>
+                            <span class="dropzone-hint">o haz clic para buscarla en tu equipo</span>
+                            }
+                        </div>
+                        <input type="file" accept="image/*" [id]="field.key" class="image-input"
+                            [disabled]="isUploading(field.key)" (change)="onFileSelected(field.key, $event)" />
+                    </div>
+                    }
+                </div>
                 } @else {
                 <input [type]="field.type" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
-                    [required]="!!field.required" />
+                    [required]="!!field.required && !field.readonly" [readonly]="!!field.readonly" />
                 }
 
                 @if (errors()[field.key]) {
