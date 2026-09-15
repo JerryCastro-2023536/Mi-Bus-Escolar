@@ -1,0 +1,337 @@
+:host {
+  display: block;
+  width: 100%;
+  margin-bottom: 28px;
+}
+
+.dynamic-header-card {
+  position: relative;
+  background: linear-gradient(135deg, #1A456B 0%, #123249 100%);
+  border-radius: 20px;
+  padding: 30px 36px;
+  color: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(18, 50, 73, 0.18), 0 2px 8px rgba(18, 50, 73, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.header-glow {
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 260px;
+  height: 260px;
+  background: radial-gradient(circle, rgba(255, 209, 65, 0.18) 0%, rgba(26, 69, 107, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.header-pattern {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+.header-main-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+/* ---------- LEFT COLUMN ---------- */
+
+.header-info-col {
+  flex: 1;
+  min-width: 300px;
+}
+
+.header-top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.greeting-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.greeting-pill i {
+  color: #FFD141;
+  font-size: 12px;
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: #FFD141;
+  color: #123249;
+  box-shadow: 0 2px 8px rgba(255, 209, 65, 0.35);
+}
+
+.role-badge.administrador,
+.role-badge.admin {
+  background: linear-gradient(135deg, #FFD141 0%, #F59E0B 100%);
+  color: #123249;
+}
+
+.role-badge.proveedor {
+  background: linear-gradient(135deg, #5FB89C 0%, #1E7A46 100%);
+  color: #ffffff;
+}
+
+.role-badge.chofer {
+  background: linear-gradient(135deg, #60A5FA 0%, #2563EB 100%);
+  color: #ffffff;
+}
+
+.role-badge.usuario {
+  background: linear-gradient(135deg, #0EA5E9 0%, #0369A1 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(3, 105, 161, 0.25);
+}
+
+
+.header-headline {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 8px;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.header-description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0 0 18px;
+  max-width: 540px;
+}
+
+/* Role Dynamic Chips */
+.role-chips-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.role-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.88);
+  transition: all 0.2s ease;
+}
+
+.role-chip i {
+  color: #FFD141;
+  font-size: 12px;
+}
+
+.role-chip:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+/* ---------- RIGHT COLUMN: WIDGETS ---------- */
+
+.header-widget-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 240px;
+}
+
+.live-status-box {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.live-dot-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: #5FB89C;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px #5FB89C;
+}
+
+.pulse-ring {
+  position: absolute;
+  left: -2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #5FB89C;
+  animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+  0% { transform: scale(0.7); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+.status-text {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #5FB89C;
+}
+
+.clock-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.clock-display i {
+  color: #FFD141;
+  font-size: 16px;
+}
+
+.calendar-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.72);
+  text-transform: capitalize;
+}
+
+.calendar-display i {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+/* Quick Profile */
+.user-quick-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.avatar-ring {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(135deg, #38BDF8 0%, #0284C7 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+}
+
+.avatar-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #0F2D44;
+  color: #38BDF8;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.profile-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.profile-role-tag {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .dynamic-header-card {
+    padding: 24px;
+  }
+  
+  .header-main-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-widget-col {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .live-status-box,
+  .user-quick-profile {
+    flex: 1;
+    min-width: 200px;
+  }
+}
