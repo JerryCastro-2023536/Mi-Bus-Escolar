@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableColumn } from '../../../models/crudDTO.interface';
 
@@ -13,6 +13,8 @@ import { TableColumn } from '../../../models/crudDTO.interface';
 export class CardComponent {
   item = input.required<any>();
   columns = input.required<TableColumn[]>();
+  viewingImage = signal<string | null>(null);
+
 
   close = output<void>();
   edit = output<any>();
@@ -36,5 +38,13 @@ export class CardComponent {
 
   isBoolean(value: any): boolean {
     return typeof value === 'boolean';
+  }
+ 
+  onViewImage(url: string) {
+    this.viewingImage.set(url);
+  }
+ 
+  closeImage() {
+    this.viewingImage.set(null);
   }
 }
