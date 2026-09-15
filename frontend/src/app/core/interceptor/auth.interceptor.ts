@@ -4,12 +4,20 @@ import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const platformId = inject(PLATFORM_ID);
+    
     if (!isPlatformBrowser(platformId)) {
         return next(req);
     }
 
-    const token = localStorage.getItem('token');
+    if (req.url.includes('cloudinary.com')) {
+        return next(req);
+    }
 
+    if (!req.url.includes('/api')) {
+        return next(req);
+    }
+
+    const token = localStorage.getItem('token');
     if (!token) {
         return next(req);
     }
