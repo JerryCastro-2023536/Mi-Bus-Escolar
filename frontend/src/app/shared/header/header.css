@@ -196,29 +196,14 @@
   position: relative;
 }
 
-.pulse-dot {
-  width: 8px;
-  height: 8px;
+.static-dot {
+  width: 7px;
+  height: 7px;
   background: #5FB89C;
   border-radius: 50%;
   display: inline-block;
-  box-shadow: 0 0 8px #5FB89C;
 }
 
-.pulse-ring {
-  position: absolute;
-  left: -2px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid #5FB89C;
-  animation: pulse-animation 2s infinite;
-}
-
-@keyframes pulse-animation {
-  0% { transform: scale(0.7); opacity: 1; }
-  100% { transform: scale(1.8); opacity: 0; }
-}
 
 .status-text {
   font-size: 11px;
