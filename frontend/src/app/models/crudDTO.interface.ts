@@ -11,7 +11,7 @@ export interface CrudConfig {
 export interface TableColumn {
     key: string;
     label: string;
-    type: 'text' | 'badge' | 'date' | 'number';
+    type: 'text' | 'badge' | 'date' | 'number' | 'image';
 }
 
 export interface KpiConfig {
@@ -24,8 +24,9 @@ export interface KpiConfig {
 export interface FormField {
     key: string;
     label: string;
-    type: 'text' | 'email' | 'password' | 'number' | 'select' | 'checkbox' | 'date';
+    type: 'text' | 'email' | 'password' | 'number' | 'select' | 'checkbox' | 'date' | 'image';
     required?: boolean;
+    readonly?: boolean;
     options?: FormSelectOption[];
 }
 
