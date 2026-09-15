@@ -1,0 +1,74 @@
+<div class="dynamic-header-card">
+
+  <div class="header-glow"></div>
+  <div class="header-pattern"></div>
+
+  <div class="header-main-content">
+    
+    <div class="header-info-col">
+      <div class="header-top-row">
+        <span class="greeting-pill">
+          <i [class]="'fa-solid ' + greetingInfo().icon"></i>
+          <span>{{ greetingInfo().desc }}</span>
+        </span>
+
+        @if (user()?.role) {
+          <span class="role-badge" [ngClass]="(user()?.role || '').toLowerCase()">
+            <i [class]="'fa-solid ' + roleIcon()"></i>
+            <span>{{ roleLabel() }}</span>
+          </span>
+        }
+      </div>
+
+      <h1 class="header-headline">{{ displayTitle() }}</h1>
+      <p class="header-description">{{ displaySubtitle() }}</p>
+
+
+      <div class="role-chips-row">
+        @for (chip of roleChips(); track chip.label) {
+          <div class="role-chip">
+            <i [class]="'fa-solid ' + chip.icon"></i>
+            <span>{{ chip.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Right Section: Live Time & Status Widget -->
+    <div class="header-widget-col">
+      
+      <div class="live-status-box">
+        <div class="live-dot-wrap">
+          <span class="pulse-dot"></span>
+          <span class="pulse-ring"></span>
+          <span class="status-text">EN LÍNEA</span>
+        </div>
+
+        <div class="clock-display">
+          <i class="fa-regular fa-clock"></i>
+          <span class="clock-time">{{ currentTime() }}</span>
+        </div>
+
+        <div class="calendar-display">
+          <i class="fa-regular fa-calendar-days"></i>
+          <span class="calendar-date">{{ currentDate() }}</span>
+        </div>
+      </div>
+
+      @if (user(); as u) {
+        <div class="user-quick-profile">
+          <div class="avatar-ring">
+            <div class="avatar-circle">{{ userInitial() }}</div>
+          </div>
+          <div class="profile-details">
+            <span class="profile-name">{{ u.name }}</span>
+            <span class="profile-role-tag">{{ roleLabel() }}</span>
+          </div>
+        </div>
+      }
+
+    </div>
+
+  </div>
+
+</div>
