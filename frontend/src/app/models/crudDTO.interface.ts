@@ -5,7 +5,8 @@ export interface CrudConfig {
     idKey: string;
     kpis: KpiConfig[];
     tableColumns: TableColumn[];
-    formFields: FormField[];
+    formFields: FormField[]; //CREAR
+    formFieldsEdit?: FormField[];
 }
 
 export interface TableColumn {
@@ -27,6 +28,8 @@ export interface FormField {
     type: 'text' | 'email' | 'password' | 'number' | 'select' | 'checkbox' | 'date' | 'image';
     required?: boolean;
     readonly?: boolean;
+    readonlyOnCreate?: boolean;
+    readonlyOnEdit?: boolean;
     options?: FormSelectOption[];
 }
 

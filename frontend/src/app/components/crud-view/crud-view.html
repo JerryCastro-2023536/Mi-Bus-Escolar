@@ -15,7 +15,7 @@
     }
 
     @if (formItem() !== undefined) {
-        <app-crud-form [fields]="config().formFields" [item]="formItem()" (save)="onSaveForm($event)"
+        <app-crud-form [fields]="formFields()" [item]="formItem()" (save)="onSaveForm($event)"
             (cancel)="onCancelForm()" [errors]="serverErrors()" [imageFolder]="config().apiEndpoint.replace('/', '')" />
     }
 
