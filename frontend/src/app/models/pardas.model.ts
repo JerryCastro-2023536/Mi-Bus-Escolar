@@ -1,70 +1,93 @@
 export const paradasConfig = {
-    title: "Paradas",
-    subtitle: "Gestión de paradas de las rutas",
-    apiEndpoint: "/paradas",
-    idKey: "id_parada",
+    title: 'Paradas',
+    subtitle: 'Gestiona las paradas de las rutas',
+    apiEndpoint: '/paradas',
+    idKey: 'id_parada',
 
     kpis: [
         {
-            title: "Total de paradas",
-            valueKey: "total",
-            subtitle: "Paradas registradas",
-            icon: "📍"
+            title: 'Total paradas',
+            valueKey: 'total',
+            subtitle: 'Paradas registradas',
+            icon: 'location_on'
         }
     ],
 
     tableColumns: [
         {
-            key: "id_parada",
-            label: "ID",
-            type: "number"
+            key: 'id_parada',
+            label: 'ID',
+            type: 'number'
         },
         {
-            key: "nombre",
-            label: "Nombre",
-            type: "text"
+            key: 'nombre',
+            label: 'Nombre',
+            type: 'text'
         },
         {
-            key: "direccion",
-            label: "Dirección",
-            type: "text"
+            key: 'direccion',
+            label: 'Dirección',
+            type: 'text'
         },
         {
-            key: "latitud",
-            label: "Latitud",
-            type: "number"
+            key: 'latitud',
+            label: 'Latitud',
+            type: 'number'
         },
         {
-            key: "longitud",
-            label: "Longitud",
-            type: "number"
+            key: 'longitud',
+            label: 'Longitud',
+            type: 'number'
         }
     ],
 
     formFields: [
         {
-            key: "nombre",
-            label: "Nombre de la parada",
-            type: "text",
+            key: 'nombre',
+            label: 'Nombre',
+            type: 'text',
             required: true
         },
         {
-            key: "direccion",
-            label: "Dirección",
-            type: "text",
+            key: 'direccion',
+            label: 'Dirección',
+            type: 'text',
             required: true
         },
         {
-            key: "latitud",
-            label: "Latitud",
-            type: "number",
-            required: false
+            key: 'latitud',
+            label: 'Latitud',
+            type: 'number'
         },
         {
-            key: "longitud",
-            label: "Longitud",
-            type: "number",
-            required: false
+            key: 'longitud',
+            label: 'Longitud',
+            type: 'number'
+        }
+    ],
+
+    formFieldsEdit: [
+        {
+            key: 'nombre',
+            label: 'Nombre',
+            type: 'text',
+            required: true
+        },
+        {
+            key: 'direccion',
+            label: 'Dirección',
+            type: 'text',
+            required: true
+        },
+        {
+            key: 'latitud',
+            label: 'Latitud',
+            type: 'number'
+        },
+        {
+            key: 'longitud',
+            label: 'Longitud',
+            type: 'number'
         }
     ]
 };
