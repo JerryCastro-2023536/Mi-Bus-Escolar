@@ -164,7 +164,7 @@
         </div>
       } @else {
         <div class="notif-cards-stack">
-          @for (notif of notificacionesFiltradas; track notif.id_notificacion) {
+          @for (notif of notificacionesFiltradas; track notif.id_notificaciones) {
             @let estilo = notif.tipo | notificacionEstilo;
             <div class="notif-card" [class.unread]="!notif.leida">
               
@@ -197,7 +197,7 @@
                 @if (!notif.leida) {
                   <button 
                     class="action-btn mark-read" 
-                    (click)="marcarComoLeida(notif.id_notificacion)" 
+                    (click)="marcarComoLeida(notif.id_notificaciones)" 
                     type="button"
                     title="Marcar como leída"
                   >
@@ -207,7 +207,7 @@
                 }
                 <button 
                   class="action-btn delete" 
-                  (click)="eliminar(notif.id_notificacion)" 
+                  (click)="eliminar(notif.id_notificaciones)" 
                   type="button"
                   title="Eliminar notificación"
                 >
