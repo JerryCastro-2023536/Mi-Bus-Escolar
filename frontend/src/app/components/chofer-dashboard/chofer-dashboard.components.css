@@ -24,7 +24,7 @@
   font-weight: bold;
 }
 .placeholder-map {
-  height: 600px;
+  height: 500px;
   border-radius: 12px;
   display: block;
   position: relative;
@@ -100,6 +100,26 @@
   color: #64748b;
   font-size: 0.875rem;
   margin-top: 0.5rem;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 0.3rem 0.8rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  background-color: #e2e8f0;
+  color: #475569;
+}
+
+.status-badge.bg-green {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.bg-blue {
+  background-color: #dbeafe;
+  color: #1e40af;
 }
 
 /* Botones */
@@ -127,85 +147,10 @@
   margin-top: 1rem;
 }
 
-/* Asistencia */
-.attendance-stats {
-  display: flex;
-  justify-content: space-between;
-  text-align: center;
-  margin: 1rem 0;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-.stat {
-  display: flex;
-  flex-direction: column;
-}
-.stat strong {
-  font-size: 1.25rem;
-  color: #0f172a;
-}
-.stat span {
-  font-size: 0.75rem;
-  color: #64748b;
-}
-.text-orange strong {
-  color: #f59e0b;
-}
-.text-red strong {
-  color: #ef4444;
-}
-
-/* Lista de Estudiantes */
-.student-row {
-  display: flex;
-  align-items: center;
-  padding: 0.75rem 0;
-  gap: 1rem;
-  border-bottom: 1px solid #f1f5f9;
-}
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #1e293b;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  font-weight: bold;
-}
-.student-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-.student-info strong {
-  font-size: 0.875rem;
-  color: #0f172a;
-}
-.student-info span {
-  font-size: 0.75rem;
-  color: #64748b;
-}
-
-/* Toggle Estados */
-.status-toggle {
-  border: none;
-  padding: 0.35rem 0.75rem;
-  border-radius: 16px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.bg-present {
-  background: #fef3c7;
-  color: #d97706;
-}
-.bg-absent {
-  background: #fee2e2;
-  color: #dc2626;
+.subIndice{
+  font-size: 20px;
+  color: #2a2d2e;
+  font: bold;
 }
 
 
