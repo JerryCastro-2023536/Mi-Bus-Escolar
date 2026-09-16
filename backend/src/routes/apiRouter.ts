@@ -19,11 +19,13 @@ import asignacionesRoutes from './asignaciones_rutas.routes';
 import notificacionesRoutes from './notificaciones.routes';
 import pagosRoutes from './pagos.routes';
 import paradasRoutes from './paradas.routes'
+import trazadoRutaRoutes from './trazadoruta.routes'
 
 const apiRouter = Router();
 
 apiRouter.use(anonymRoutes)
 apiRouter.use(verificarAutenticacion)
+apiRouter.use(trazadoRutaRoutes)
 
 apiRouter.use(usuarioRoutes);
 apiRouter.use(viajesRoutes);
@@ -46,5 +48,6 @@ apiRouter.use(asignacionesRoutes);
 apiRouter.use(notificacionesRoutes);
 apiRouter.use(pagosRoutes);
 apiRouter.use(paradasRoutes);
+
 
 export default apiRouter;
