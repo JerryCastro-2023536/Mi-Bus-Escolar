@@ -1,0 +1,150 @@
+<div class="dashboard-container">
+  
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">🚌</span>
+      <span class="brand-title">Mi Bus Escolar</span>
+    </div>
+
+    <nav class="nav-menu">
+      <button class="nav-btn active">
+        <span class="icon">📊</span>
+        <span>Panel Principal</span>
+      </button>
+      <button class="nav-btn">
+        <span class="icon">🗺️</span>
+        <span>Ver Ruta y Mapa</span>
+      </button>
+      <button class="nav-btn">
+        <span class="icon">📋</span>
+        <span>Tomar Asistencia</span>
+      </button>
+      <button class="nav-btn">
+        <span class="icon">🚍</span>
+        <span>Mi Vehículo</span>
+      </button>
+      <button class="nav-btn">
+        <span class="icon">⚠️</span>
+        <span>Incidencias</span>
+      </button>
+    </nav>
+
+    <div class="driver-mini-profile">
+      <div class="avatar">CH</div>
+      <div class="driver-info">
+        <p class="driver-name">Chofer Asignado</p>
+        <span class="driver-role">Unidad #12</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    
+    <header class="top-header">
+      <div>
+        <h1 class="page-title">Bienvenido al Centro de Control</h1>
+        <p class="page-subtitle">Gestión de la jornada de transporte escolar</p>
+      </div>
+      <div class="status-pill active">
+        <span class="dot"></span> Turno Activo: Mañana
+      </div>
+    </header>
+
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon bg-blue">🚍</div>
+        <div class="kpi-data">
+          <span class="kpi-label">Vehículo</span>
+          <strong class="kpi-value">Bus #12</strong>
+          <span class="kpi-sub">Placa: KTR-842</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon bg-green">📍</div>
+        <div class="kpi-data">
+          <span class="kpi-label">Ruta Asignada</span>
+          <strong class="kpi-value">Ruta #04</strong>
+          <span class="kpi-sub">Zona Norte - Col. San José</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon bg-purple">👥</div>
+        <div class="kpi-data">
+          <span class="kpi-label">Estudiantes</span>
+          <strong class="kpi-value">24 Alumnos</strong>
+          <span class="kpi-sub">A bordo / Registrados</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon bg-amber">⚡</div>
+        <div class="kpi-data">
+          <span class="kpi-label">Estado de Flujo</span>
+          <strong class="kpi-value">Asistencia Pendiente</strong>
+          <span class="kpi-sub">Paso 1 de 3</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="modules-grid">
+      
+      <article class="module-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon">🗺️</span>
+            <h3>Mapa y Trazado de Ruta</h3>
+          </div>
+        </div>
+        <p class="card-desc">Visualiza las paradas, la ruta sugerida y la navegación GPS en tiempo real.</p>
+        <div class="card-actions">
+            <a routerLink="/ruta-chofer">
+                <button class="btn btn-primary">Abrir Mapa de Ruta</button>
+            </a>
+        </div>
+      </article>
+
+      <article class="module-card highlight">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon">📋</span>
+            <h3>Lista de Estudiantes</h3>
+          </div>
+        </div>
+        <p class="card-desc">Lista de los estudiantes asignados al chofer.</p>
+        <div class="card-actions">
+          <button class="btn btn-accent">Ver Lista de Estudiantes</button>
+        </div>
+      </article>
+
+      <article class="module-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon">🔧</span>
+            <h3>Mis Vehiculos</h3>
+          </div>
+        </div>
+        <p class="card-desc">Información de los vehiculos asignados al chofer.</p>
+        <div class="card-actions">
+          <button class="btn btn-outline">Ver Vehiculos</button>
+        </div>
+      </article>
+
+      <article class="module-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="icon">⚠️</span>
+            <h3>Ver Reportes Generados</h3>
+          </div>
+        </div>
+        <p class="card-desc">Ver los reportes generados de incidentes que han pasado en el camino.</p>
+        <div class="card-actions">
+          <button class="btn btn-danger-outline">Ver Reportes</button>
+        </div>
+      </article>
+
+    </section>
+
+  </main>
+</div>
