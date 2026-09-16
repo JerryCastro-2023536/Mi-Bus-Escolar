@@ -2,8 +2,9 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoginService, UsuarioLoginDTO } from '../../services/login';
-import { RegisterService, UsuarioRegisterDTO } from '../../services/register';
+import { LoginService } from '../../services/login';
+import { UsuarioLoginDTO, UsuarioRegisterDTO } from "../../../../../backend/src/models/usuario"
+import { RegisterService} from '../../services/register';
 
 @Component({
   selector: 'app-login',
