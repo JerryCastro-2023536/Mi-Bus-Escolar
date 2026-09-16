@@ -1,0 +1,536 @@
+<div class="cuenta-layout">
+
+  <app-sidebar [user]="sidebarUser" />
+
+  <main class="cuenta-main-content">
+
+    <div class="cuenta-top-nav">
+      <a routerLink="/dashboard" class="btn-back-dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Volver al Dashboard</span>
+      </a>
+
+      <div class="nav-breadcrumbs">
+        <span class="crumb-parent">Mi Bus Escolar</span>
+        <i class="fa-solid fa-chevron-right crumb-sep"></i>
+        <span class="crumb-active">Mi Cuenta y Perfil</span>
+      </div>
+    </div>
+
+    <app-header 
+      [user]="sidebarUser"
+      title="Centro de Cuenta & Perfil"
+      subtitle="Gestiona tu información personal, credenciales de acceso y visualiza los permisos de tu rol."
+    />
+
+    @if (mensajeExito) {
+      <div class="alert-box success">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>{{ mensajeExito }}</span>
+        <button class="btn-close-alert" (click)="mensajeExito = ''" type="button">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    }
+
+    @if (mensajeError) {
+      <div class="alert-box error">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>{{ mensajeError }}</span>
+        <button class="btn-close-alert" (click)="mensajeError = ''" type="button">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    }
+
+    <div class="profile-hero-card">
+      <div class="hero-left-section">
+        <div class="profile-avatar-wrapper">
+          @if (usuario.foto_usuario) {
+            <img [src]="usuario.foto_usuario" alt="Foto de perfil" class="avatar-photo" (error)="usuario.foto_usuario = ''" />
+          } @else {
+            <div class="avatar-initial-badge">
+              {{ userInitial }}
+            </div>
+          }
+          
+          <div class="avatar-role-icon">
+            @switch (usuario.rol) {
+              @case ('ADMINISTRADOR') { <i class="fa-solid fa-shield-halved"></i> }
+              @case ('PROVEEDOR')     { <i class="fa-solid fa-building-shield"></i> }
+              @case ('CHOFER')        { <i class="fa-solid fa-id-badge"></i> }
+              @default                { <i class="fa-solid fa-graduation-cap"></i> }
+            }
+          </div>
+        </div>
+
+        <div class="profile-identity">
+          <div class="identity-top-row">
+            <h2 class="profile-full-name">{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+            
+            @switch (usuario.rol) {
+              @case ('ADMINISTRADOR') {
+                <span class="role-badge-pill admin">
+                  <i class="fa-solid fa-shield-halved"></i>
+                  <span>Administrador General</span>
+                </span>
+              }
+              @case ('PROVEEDOR') {
+                <span class="role-badge-pill proveedor">
+                  <i class="fa-solid fa-building-shield"></i>
+                  <span>Proveedor de Transporte</span>
+                </span>
+              }
+              @case ('CHOFER') {
+                <span class="role-badge-pill chofer">
+                  <i class="fa-solid fa-id-badge"></i>
+                  <span>Chofer Autorizado</span>
+                </span>
+              }
+              @default {
+                <span class="role-badge-pill usuario">
+                  <i class="fa-solid fa-graduation-cap"></i>
+                  <span>Tutor / Padre de Familia</span>
+                </span>
+              }
+            }
+          </div>
+
+          <p class="profile-email-text">
+            <i class="fa-regular fa-envelope"></i>
+            <span>{{ usuario.correo }}</span>
+          </p>
+
+          <div class="identity-chips">
+            <span class="chip-item">
+              <i class="fa-solid fa-phone"></i>
+              <span>{{ usuario.telefono || 'Sin teléfono' }}</span>
+            </span>
+            <span class="chip-item">
+              <i class="fa-solid fa-id-badge"></i>
+              <span>ID Usuario: #{{ usuario.id_usuario }}</span>
+            </span>
+            <span class="chip-item verification" [class.verified]="usuario.correo_verificado">
+              <i [class]="'fa-solid ' + (usuario.correo_verificado ? 'fa-circle-check' : 'fa-clock')"></i>
+              <span>{{ usuario.correo_verificado ? 'Correo Verificado' : 'Cuenta Activa' }}</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right-stats">
+        <div class="stat-pill">
+          <span class="stat-label">Estado de Cuenta</span>
+          <span class="stat-val status-online">
+            <span class="dot"></span> En Línea
+          </span>
+        </div>
+        <div class="stat-pill">
+          <span class="stat-label">Plataforma</span>
+          <span class="stat-val">Mi Bus Escolar</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cuenta-tabs-bar">
+      <button 
+        type="button" 
+        class="tab-item-btn" 
+        [class.active]="tabActiva === 'perfil'" 
+        (click)="tabActiva = 'perfil'"
+      >
+        <i class="fa-solid fa-user-pen"></i>
+        <span>Información Personal</span>
+      </button>
+
+      <button 
+        type="button" 
+        class="tab-item-btn" 
+        [class.active]="tabActiva === 'seguridad'" 
+        (click)="tabActiva = 'seguridad'"
+      >
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Seguridad & Contraseña</span>
+      </button>
+
+      <button 
+        type="button" 
+        class="tab-item-btn" 
+        [class.active]="tabActiva === 'rol'" 
+        (click)="tabActiva = 'rol'"
+      >
+        <i class="fa-solid fa-key"></i>
+        <span>Rol & Privilegios</span>
+      </button>
+    </div>
+
+    <div class="cuenta-tab-content">
+
+      @if (tabActiva === 'perfil') {
+        <div class="tab-pane-card animate-fade-in">
+          <div class="pane-header">
+            <div>
+              <h3 class="pane-title">Datos Personales</h3>
+              <p class="pane-subtitle">Actualiza tu nombre, correo electrónico de contacto y foto de perfil.</p>
+            </div>
+          </div>
+
+          <form (ngSubmit)="guardarPerfil()" class="profile-form">
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="input-nombre">Nombre <span class="req">*</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-user input-icon"></i>
+                  <input 
+                    type="text" 
+                    id="input-nombre" 
+                    [(ngModel)]="usuario.nombre" 
+                    name="nombre" 
+                    placeholder="Ej. Juan" 
+                    required 
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="input-apellido">Apellido <span class="req">*</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-user input-icon"></i>
+                  <input 
+                    type="text" 
+                    id="input-apellido" 
+                    [(ngModel)]="usuario.apellido" 
+                    name="apellido" 
+                    placeholder="Ej. Pérez" 
+                    required 
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="input-correo">Correo Electrónico <span class="req">*</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-envelope input-icon"></i>
+                  <input 
+                    type="email" 
+                    id="input-correo" 
+                    [(ngModel)]="usuario.correo" 
+                    name="correo" 
+                    placeholder="correo@ejemplo.com" 
+                    required 
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="input-telefono">Teléfono / Celular</label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-phone input-icon"></i>
+                  <input 
+                    type="tel" 
+                    id="input-telefono" 
+                    [(ngModel)]="usuario.telefono" 
+                    name="telefono" 
+                    placeholder="Ej. 55512345" 
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-foto">URL de la Foto de Perfil (Opcional)</label>
+              <div class="input-icon-wrap">
+                <i class="fa-solid fa-image input-icon"></i>
+                <input 
+                  type="url" 
+                  id="input-foto" 
+                  [(ngModel)]="usuario.foto_usuario" 
+                  name="foto_usuario" 
+                  placeholder="https://ejemplo.com/mi-foto.jpg" 
+                />
+              </div>
+              <span class="help-hint">Ingresa un enlace directo a una imagen (JPG o PNG) para personalizar tu avatar.</span>
+            </div>
+
+            <div class="form-actions-row">
+              <button type="submit" class="btn-primary-action" [disabled]="guardando">
+                @if (guardando) {
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                  <span>Guardando cambios...</span>
+                } @else {
+                  <i class="fa-solid fa-floppy-disk"></i>
+                  <span>Guardar Cambios</span>
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+
+      @if (tabActiva === 'seguridad') {
+        <div class="tab-pane-card animate-fade-in">
+          <div class="pane-header">
+            <div>
+              <h3 class="pane-title">Seguridad de la Cuenta</h3>
+              <p class="pane-subtitle">Cambia tu contraseña para mantener protegida tu cuenta en todo momento.</p>
+            </div>
+          </div>
+
+          <form (ngSubmit)="actualizarPassword()" class="security-form">
+            <div class="form-grid-2">
+              
+              <div class="form-group">
+                <label for="input-nueva-pass">Nueva Contraseña <span class="req">*</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-lock input-icon"></i>
+                  <input 
+                    [type]="mostrarPasswordNueva ? 'text' : 'password'" 
+                    id="input-nueva-pass" 
+                    [(ngModel)]="seguridad.nuevaPassword" 
+                    name="nuevaPassword" 
+                    placeholder="Mínimo 8 caracteres" 
+                    required 
+                  />
+                  <button 
+                    type="button" 
+                    class="btn-toggle-eye" 
+                    (click)="mostrarPasswordNueva = !mostrarPasswordNueva"
+                    [title]="mostrarPasswordNueva ? 'Ocultar' : 'Mostrar'"
+                  >
+                    <i [class]="'fa-solid ' + (mostrarPasswordNueva ? 'fa-eye-slash' : 'fa-eye')"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="input-conf-pass">Confirmar Nueva Contraseña <span class="req">*</span></label>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-lock input-icon"></i>
+                  <input 
+                    [type]="mostrarPasswordConfirmar ? 'text' : 'password'" 
+                    id="input-conf-pass" 
+                    [(ngModel)]="seguridad.confirmarPassword" 
+                    name="confirmarPassword" 
+                    placeholder="Repite tu nueva contraseña" 
+                    required 
+                  />
+                  <button 
+                    type="button" 
+                    class="btn-toggle-eye" 
+                    (click)="mostrarPasswordConfirmar = !mostrarPasswordConfirmar"
+                    [title]="mostrarPasswordConfirmar ? 'Ocultar' : 'Mostrar'"
+                  >
+                    <i [class]="'fa-solid ' + (mostrarPasswordConfirmar ? 'fa-eye-slash' : 'fa-eye')"></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="password-requirements-card">
+              <h5 class="req-title">Requisitos para tu contraseña:</h5>
+              <div class="req-list">
+                <div class="req-item" [class.valid]="tieneMinimo8">
+                  <i [class]="'fa-solid ' + (tieneMinimo8 ? 'fa-circle-check' : 'fa-circle')"></i>
+                  <span>Al menos 8 caracteres</span>
+                </div>
+                <div class="req-item" [class.valid]="tieneMayuscula">
+                  <i [class]="'fa-solid ' + (tieneMayuscula ? 'fa-circle-check' : 'fa-circle')"></i>
+                  <span>Al menos una letra mayúscula (A-Z)</span>
+                </div>
+                <div class="req-item" [class.valid]="tieneNumero">
+                  <i [class]="'fa-solid ' + (tieneNumero ? 'fa-circle-check' : 'fa-circle')"></i>
+                  <span>Al menos un número (0-9)</span>
+                </div>
+                <div class="req-item" [class.valid]="passwordsCoinciden">
+                  <i [class]="'fa-solid ' + (passwordsCoinciden ? 'fa-circle-check' : 'fa-circle')"></i>
+                  <span>Las contraseñas coinciden</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-actions-row">
+              <button 
+                type="submit" 
+                class="btn-primary-action" 
+                [disabled]="guardando || !tieneMinimo8 || !tieneMayuscula || !tieneNumero || !passwordsCoinciden"
+              >
+                @if (guardando) {
+                  <i class="fa-solid fa-spinner fa-spin"></i>
+                  <span>Actualizando contraseña...</span>
+                } @else {
+                  <i class="fa-solid fa-key"></i>
+                  <span>Actualizar Contraseña</span>
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+
+      @if (tabActiva === 'rol') {
+        <div class="tab-pane-card animate-fade-in">
+          <div class="pane-header">
+            <div>
+              <h3 class="pane-title">Rol Asignado & Privilegios</h3>
+              <p class="pane-subtitle">Conoce el nivel de acceso y las operaciones permitidas para tu cuenta.</p>
+            </div>
+          </div>
+
+          <div class="role-overview-card">
+
+            @switch (usuario.rol) {
+
+              @case ('ADMINISTRADOR') {
+                <div class="role-card-banner">
+                  <div class="role-big-icon-box admin">
+                    <i class="fa-solid fa-shield-halved"></i>
+                  </div>
+                  <div>
+                    <h4 class="role-card-title">Administrador General</h4>
+                    <p class="role-card-desc">Acceso total a la configuración del sistema, gestión de colegios, supervisión de flotas y auditoría financiera.</p>
+                  </div>
+                </div>
+
+                <div class="permissions-section">
+                  <h5 class="perm-title">Privilegios y Capacidades Habilitadas:</h5>
+                  <div class="perm-grid">
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Gestión total de usuarios y asignación de roles</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Aprobación de colegios afiliados y convenios</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Monitoreo global de viajes y rutas en tiempo real</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Reportes de facturación, cuotas y estados de cuenta</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Control y resolución de incidentes críticos</span>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @case ('PROVEEDOR') {
+                <div class="role-card-banner">
+                  <div class="role-big-icon-box proveedor">
+                    <i class="fa-solid fa-building-shield"></i>
+                  </div>
+                  <div>
+                    <h4 class="role-card-title">Proveedor de Transporte Escolar</h4>
+                    <p class="role-card-desc">Administración de flotilla de vehículos, asignación de unidades a colegios y vinculación de conductores.</p>
+                  </div>
+                </div>
+
+                <div class="permissions-section">
+                  <h5 class="perm-title">Privilegios y Capacidades Habilitadas:</h5>
+                  <div class="perm-grid">
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Registro y control técnico de vehículos y buses</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Gestión de choferes asignados a la empresa</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Asignación de unidades a rutas escolares</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Historial de viajes y rendimiento de la flota</span>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @case ('CHOFER') {
+                <div class="role-card-banner">
+                  <div class="role-big-icon-box chofer">
+                    <i class="fa-solid fa-id-badge"></i>
+                  </div>
+                  <div>
+                    <h4 class="role-card-title">Chofer Autorizado</h4>
+                    <p class="role-card-desc">Control operativo de rutas asignadas, pase de lista de abordaje y reporte de incidencias en tiempo real.</p>
+                  </div>
+                </div>
+
+                <div class="permissions-section">
+                  <h5 class="perm-title">Privilegios y Capacidades Habilitadas:</h5>
+                  <div class="perm-grid">
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Visualización de ruta asignada y paradas escolares</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Pase de lista y registro de abordaje de alumnos</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Transmisión de ubicación GPS en tiempo real</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Reporte de desvíos, tráfico e incidentes viales</span>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @default {
+                <div class="role-card-banner">
+                  <div class="role-big-icon-box usuario">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                  </div>
+                  <div>
+                    <h4 class="role-card-title">Tutor / Padre de Familia</h4>
+                    <p class="role-card-desc">Seguimiento seguro del transporte escolar de tus hijos, ubicación del bus en vivo y recepción de alertas.</p>
+                  </div>
+                </div>
+
+                <div class="permissions-section">
+                  <h5 class="perm-title">Privilegios y Capacidades Habilitadas:</h5>
+                  <div class="perm-grid">
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Seguimiento en mapa GPS en vivo del bus escolar</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Alertas inmediatas de abordaje y llegada a casa</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Notificación oportuna de inasistencias del estudiante</span>
+                    </div>
+                    <div class="perm-item">
+                      <div class="perm-check"><i class="fa-solid fa-check"></i></div>
+                      <span>Consulta de cuotas mensuales y comprobantes de pago</span>
+                    </div>
+                  </div>
+                </div>
+              }
+
+            }
+
+          </div>
+        </div>
+      }
+
+    </div>
+
+  </main>
+
+</div>
