@@ -297,9 +297,35 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 8px 12px;
+  padding: 8px 10px;
   overflow: hidden;
   white-space: nowrap;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.user-mini.user-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(2px);
+}
+
+.user-mini.user-link:hover .user-avatar {
+  box-shadow: 0 0 10px rgba(255, 209, 65, 0.5);
+}
+
+.user-mini.user-link:hover .user-gear-icon {
+  color: var(--sidebar-accent);
+  transform: rotate(45deg);
+}
+
+.user-gear-icon {
+  margin-left: auto;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.25s ease;
 }
 
 .sidebar-wrapper.collapsed .user-mini {
