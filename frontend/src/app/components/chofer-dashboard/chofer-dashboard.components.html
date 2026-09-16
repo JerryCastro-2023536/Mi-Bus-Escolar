@@ -18,20 +18,35 @@
         <span class="active-badge">CENTRO DE CONTROL ACTIVO</span>
       </div>
 
+      <!-- En la sección de ruta central, reemplazar los datos duros -->
       <div class="card route-card">
-        <h2>Ruta #04 - Zona Norte / Colegio San José</h2>
+        <!-- Muestra el nombre real de la ruta o un fallback si está cargando -->
+        <h2>{{ rutaInfo?.nombre || errorViaje || 'Buscando ruta programada...' }} ({{ tipoRutaActual === 'VUELTA' ? 'Ruta de Vuelta' : 'Ruta de Ida' }})</h2>
         <div class="route-metrics">
-          <span>Distancia: 14.2 km</span>
-          <span>Est. Llegada: 07:55 AM</span>
+          <span>Est. Inicio: {{ rutaInfo?.hora_inicio_estimada || '--:--' }}</span>
+          <span>Est. Llegada: {{ rutaInfo?.hora_fin_estimada || '--:--' }}</span>
+          <span class="status-badge" [ngClass]="{'bg-green': viajeActual?.estado === 'ACTIVO', 'bg-blue': viajeActual?.estado === 'FINALIZADO'}">
+            Estado: {{ viajeActual?.estado || 'SIN ASIGNAR' }}
+          </span>
         </div>
       </div>
 
       <div class="placeholder-map">
-            <app-mapa 
-              [rol]="'chofer'" 
-              [rutaDefinida]="rutaRutaAsignada"
-              (cambioUbicacion)="enviarUbicacionAlServidor($event)">
-            </app-mapa>
+        <!-- El componente mapa solo se renderiza si ya tenemos los puntos para no fallar -->
+        @if (rutaRutaAsignada.length > 0) {
+          <app-mapa 
+            [rol]="'chofer'" 
+            [rutaDefinida]="rutaRutaAsignada"
+            (cambioUbicacion)="enviarUbicacionAlServidor($event)">
+          </app-mapa>
+        } @else if (viajeActual?.estado === 'FINALIZADO') {
+          <div style="text-align:center; padding: 60px 20px;">
+            <h3 style="color: #10b981; font-size: 20px; margin-bottom: 8px;">¡Ruta Finalizada con Éxito!</h3>
+            <p style="color: #64748b;">Todos los abordajes han sido completados y la ruta quedó registrada en la base de datos.</p>
+          </div>
+        } @else {
+          <p style="text-align:center; padding: 50px;">Mapa sin trazado de Ruta</p>
+        }
       </div>
     </main>
 
@@ -39,21 +54,47 @@
     <aside class="right-panel">
       
       <!-- Flujo de Control -->
+      <!-- En el Panel Derecho de Flujo de Control -->
       <div class="card flow-control">
         <h3>Panel de control</h3>
-        <p>Ruta de ida</p>
-        <button class="btn btn-primary">Tomar Asistencia</button>
-        <button class="btn btn-secondary">Iniciar Ruta</button>
+        <p class="subIndice">Ruta de ida</p>
+        
+        <button class="btn btn-primary" [disabled]="viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'IDA'">
+          Tomar Asistencia
+        </button>
+        
+        <button 
+          class="btn btn-secondary" 
+          (click)="iniciarRuta('IDA')"
+          [disabled]="(viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'IDA') || (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'IDA') || (!viajeActual && !rutaInfo)">
+          {{ (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'IDA') ? 'Ruta en Progreso' : (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'IDA' ? 'Ruta Finalizada' : 'Iniciar Ruta') }}
+        </button>
+        
+        <button class="btn btn-secondary" (click)="registrarAbordaje()" [disabled]="viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'IDA'">
+          Abordaje
+        </button>
       </div>
 
       <div class="card flow-control">
-        <p>Ruta de vuelta</p>
-        <button class="btn btn-primary">Tomar Asistencia vuelta</button>
-        <button class="btn btn-secundary">Iniciar Ruta vuelta</button>
+        <p class="subIndice">Ruta de vuelta</p>
+        <button class="btn btn-primary" [disabled]="viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'VUELTA'">
+          Tomar Asistencia
+        </button>
+
+        <button 
+          class="btn btn-secondary" 
+          (click)="iniciarRuta('VUELTA')"
+          [disabled]="(viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'VUELTA') || (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'VUELTA') || (!viajeActual && !rutaInfo)">
+          {{ (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'VUELTA') ? 'Ruta en Progreso' : (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'VUELTA' ? 'Ruta Finalizada' : 'Iniciar Ruta') }}
+        </button>
+
+        <button class="btn btn-secondary" (click)="registrarDescenso()" [disabled]="viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'VUELTA'">
+          Descenso
+        </button>
       </div>
       
       <div class="card flow-control">
-        <p>Sección de Incidentes</p>
+        <p class="subIndice">Sección de Incidentes</p>
         <button
           class="btn btn-primary"
           (click)="mostrarModalReporte = true"
@@ -63,7 +104,7 @@
       </div>
 
       <div class="card flow-control">
-        <p>Flujo de Ruta</p>
+        <p class="subIndice">Flujo de Ruta</p>
         <h3>Estado de Flota Escolar Asignada</h3>
           <div class="fleet-cards">
             <div class="fleet-card">Bus #12 - En Servicio</div>
@@ -77,13 +118,10 @@
 
   @if (mostrarModalReporte) {
 
-    <!-- Fondo oscuro -->
     <div class="modal-overlay">
 
-      <!-- Modal -->
       <div class="modal-reporte">
 
-        <!-- Encabezado -->
         <div class="modal-header">
 
           <div>
@@ -104,8 +142,6 @@
 
         </div>
 
-
-        <!-- Formulario -->
         <form
           [formGroup]="reporteForm"
           (ngSubmit)="crearReporte()"
@@ -113,7 +149,6 @@
 
           <div class="form-container">
 
-            <!-- Título -->
             <div class="form-group">
 
               <label for="titulo">
@@ -144,7 +179,6 @@
             </div>
 
 
-            <!-- Descripción -->
             <div class="form-group">
 
               <label for="descripcion">
@@ -162,8 +196,6 @@
 
           </div>
 
-
-          <!-- Botones -->
           <div class="modal-actions">
 
             <button
