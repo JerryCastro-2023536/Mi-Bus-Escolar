@@ -87,17 +87,24 @@
 }
 
 .brand-icon-box {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
-  background: rgba(255, 209, 65, 0.15);
-  border: 1px solid rgba(255, 209, 65, 0.3);
-  color: var(--sidebar-accent);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
   flex-shrink: 0;
+  overflow: hidden;
+  padding: 2px;
+}
+
+.sidebar-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .brand-text {
