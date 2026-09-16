@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { agregarUsuario, buscarUsuarioById, editarUsuarioById, eliminarUsuarioById, listarUsuarios, login, register } from "../services/usuario.service";
+import { agregarUsuario, buscarUsuarioById, cambiarPassword, editarUsuarioById, eliminarUsuarioById, listarUsuarios, login, register } from "../services/usuario.service";
 import { Usuario, UsuarioRegisterDTO } from "../models/usuario";
 import { generarToken } from "../utils/jwt";
 
@@ -122,3 +122,20 @@ export const registerUsuario = async (req: Request, res: Response, next: NextFun
         next(error);
     }
 };
+
+export async function putUserPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id = Number(req.params.id);
+        const {newPassword, oldPassword} = req.body;
+
+        await cambiarPassword(id, newPassword, oldPassword);
+        return res.status(200).json({
+            success: true,
+            message: `Contraseña actualizada`,
+            data: []
+        });
+    } catch (error) {
+        console.log(error)
+        next(error);
+    }
+}
