@@ -1,6 +1,10 @@
-import { Component, computed, input, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, computed, inject, input, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { SidebarUser } from '../../models/sidebar.model';
+import { NotificacionesService, NotificacionItem } from '../../services/notificaciones.service';
+import { TiempoRelativoPipe } from '../pipes/tiempoRelativo.pipe';
+import { NotificacionEstiloPipe } from '../pipes/notificacionEstilo.pipe';
 
 interface RoleChip {
   icon: string;
@@ -10,7 +14,7 @@ interface RoleChip {
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, TiempoRelativoPipe, NotificacionEstiloPipe],
   templateUrl: './header.html',
   styleUrl: './header.css'
 })
@@ -18,6 +22,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   user = input<SidebarUser | null>(null);
   title = input<string | null>(null);
   subtitle = input<string | null>(null);
+
+  notifService = inject(NotificacionesService);
+
+  panelAbierto = false;
 
   currentTime = signal<string>('');
   private timeInterval: any;
@@ -40,6 +48,26 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.currentTime.set(
       now.toLocaleTimeString('es-GT', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })
     );
+  }
+
+  togglePanel(): void {
+    this.panelAbierto = !this.panelAbierto;
+  }
+
+  cerrarPanel(): void {
+    this.panelAbierto = false;
+  }
+
+  marcarLeida(id: number): void {
+    this.notifService.marcarComoLeida(id);
+  }
+
+  marcarTodas(): void {
+    this.notifService.marcarTodasComoLeidas();
+  }
+
+  eliminar(id: number): void {
+    this.notifService.eliminarNotificacion(id);
   }
 
   currentDate = computed(() => {
