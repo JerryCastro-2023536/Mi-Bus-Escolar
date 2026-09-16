@@ -1,10 +1,25 @@
 <div class="inbox-layout">
-
+  
   <app-sidebar [user]="sidebarUser" />
 
   <main class="inbox-main-content">
 
-    <app-header
+
+    <div class="inbox-top-nav-bar">
+      <a routerLink="/dashboard" class="btn-back-dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Volver al Dashboard</span>
+      </a>
+
+      <div class="nav-breadcrumbs">
+        <span class="crumb-parent">Mi Bus Escolar</span>
+        <i class="fa-solid fa-chevron-right crumb-sep"></i>
+        <span class="crumb-active">Bandeja de Notificaciones</span>
+      </div>
+    </div>
+
+
+    <app-header 
       [user]="sidebarUser"
       title="Bandeja de Notificaciones"
       subtitle="Centro de avisos, alertas de ruta, asistencias e incidencias según tu rol en el sistema."
@@ -42,18 +57,19 @@
       </div>
     </div>
 
+
     <div class="inbox-controls-card">
       <div class="controls-top-row">
 
         <div class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input
-            type="text"
-            [(ngModel)]="busqueda"
+          <input 
+            type="text" 
+            [(ngModel)]="busqueda" 
             placeholder="Buscar por título o contenido del aviso..."
           />
           @if (busqueda) {
-            <button class="btn-clear-search" (click)="busqueda = ''" type="button">
+            <button class="btn-clear-search" (click)="busqueda = ''" type="button" title="Limpiar búsqueda">
               <i class="fa-solid fa-xmark"></i>
             </button>
           }
@@ -66,9 +82,9 @@
       </div>
 
       <div class="filter-tabs">
-        <button
-          class="tab-btn"
-          [class.active]="filtroActual === 'TODAS'"
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'TODAS'" 
           (click)="cambiarFiltro('TODAS')"
           type="button"
         >
@@ -76,9 +92,9 @@
           <span class="tab-badge">{{ contarPorFiltro('TODAS') }}</span>
         </button>
 
-        <button
-          class="tab-btn"
-          [class.active]="filtroActual === 'NO_LEIDAS'"
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'NO_LEIDAS'" 
           (click)="cambiarFiltro('NO_LEIDAS')"
           type="button"
         >
@@ -86,9 +102,9 @@
           <span class="tab-badge warning">{{ contarPorFiltro('NO_LEIDAS') }}</span>
         </button>
 
-        <button
-          class="tab-btn"
-          [class.active]="filtroActual === 'INCIDENTE'"
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'INCIDENTE'" 
           (click)="cambiarFiltro('INCIDENTE')"
           type="button"
         >
@@ -97,9 +113,9 @@
           <span class="tab-badge">{{ contarPorFiltro('INCIDENTE') }}</span>
         </button>
 
-        <button
-          class="tab-btn"
-          [class.active]="filtroActual === 'ASISTENCIA'"
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'ASISTENCIA'" 
           (click)="cambiarFiltro('ASISTENCIA')"
           type="button"
         >
@@ -108,9 +124,9 @@
           <span class="tab-badge">{{ contarPorFiltro('ASISTENCIA') }}</span>
         </button>
 
-        <button
-          class="tab-btn"
-          [class.active]="filtroActual === 'INASISTENCIA'"
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'INASISTENCIA'" 
           (click)="cambiarFiltro('INASISTENCIA')"
           type="button"
         >
@@ -119,9 +135,9 @@
           <span class="tab-badge">{{ contarPorFiltro('INASISTENCIA') }}</span>
         </button>
 
-        <button
-          class="tab-btn"
-          [class.active]="filtroActual === 'OTRO'"
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'OTRO'" 
           (click)="cambiarFiltro('OTRO')"
           type="button"
         >
@@ -151,7 +167,7 @@
           @for (notif of notificacionesFiltradas; track notif.id_notificacion) {
             @let estilo = notif.tipo | notificacionEstilo;
             <div class="notif-card" [class.unread]="!notif.leida">
-
+              
               @if (!notif.leida) {
                 <div class="unread-stripe"></div>
               }
@@ -164,7 +180,7 @@
                 <div class="card-header-row">
                   <div class="title-and-badges">
                     <h4 class="card-title">{{ notif.titulo }}</h4>
-                    <span class="type-pill" [style.color]="estilo.color">
+                    <span class="type-pill" [style.color]="estilo.color" [style.backgroundColor]="estilo.bg">
                       {{ notif.tipo }}
                     </span>
                   </div>
@@ -179,9 +195,9 @@
 
               <div class="card-actions">
                 @if (!notif.leida) {
-                  <button
-                    class="action-btn mark-read"
-                    (click)="marcarComoLeida(notif.id_notificacion)"
+                  <button 
+                    class="action-btn mark-read" 
+                    (click)="marcarComoLeida(notif.id_notificacion)" 
                     type="button"
                     title="Marcar como leída"
                   >
@@ -189,9 +205,9 @@
                     <span>Leída</span>
                   </button>
                 }
-                <button
-                  class="action-btn delete"
-                  (click)="eliminar(notif.id_notificacion)"
+                <button 
+                  class="action-btn delete" 
+                  (click)="eliminar(notif.id_notificacion)" 
                   type="button"
                   title="Eliminar notificación"
                 >
