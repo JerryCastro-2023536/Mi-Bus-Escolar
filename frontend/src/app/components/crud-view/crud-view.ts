@@ -72,7 +72,10 @@ export class CrudViewComponent {
   constructor() {
     effect(() => {
       const cfg = this.config();
-      if (cfg) this.loadData(cfg);
+      if (cfg) {
+        this.loadData(cfg);
+        this.loadKpis(cfg);
+      }
     });
   }
 
@@ -87,6 +90,19 @@ export class CrudViewComponent {
       error: (err: HttpErrorResponse) => {
         this.loading.set(false);
         toastError(extractMessage(err, 'No se pudieron cargar los registros'));
+      }
+    });
+  }
+
+  loadKpis(cfg: CrudConfig) {
+    if (!cfg.kpis?.length) return;
+
+    this.crudService.getKpis(cfg.apiEndpoint).subscribe({
+      next: (res: ApiResponse<Record<string, number | string>>) => {
+        this.kpiData.set(res.data ?? {});
+      },
+      error: () => {
+        this.kpiData.set({});
       }
     });
   }
@@ -141,6 +157,7 @@ export class CrudViewComponent {
           this.items.update(list => list.filter(i => i !== item));
           this.selectedItem.set(null);
           toastSuccess(res.message ?? 'Registro eliminado');
+          this.loadKpis(cfg);   // ← nuevo
         },
         error: (err: HttpErrorResponse) => {
           toastError(extractMessage(err, 'No se pudo eliminar el registro. Intenta de nuevo.'));
@@ -168,6 +185,7 @@ export class CrudViewComponent {
           this.items.update(list => list.map(i => (i === editing ? { ...i, ...res.data } : i)));
           this.formItem.set(undefined);
           toastSuccess(res.message ?? 'Registro actualizado');
+          this.loadKpis(cfg);   // ← nuevo
         },
         error: (err: HttpErrorResponse) => this.handleBackendErrors(err, 'No se pudo actualizar el registro')
       });
@@ -177,6 +195,7 @@ export class CrudViewComponent {
           this.items.update(list => [...list, res.data]);
           this.formItem.set(undefined);
           toastSuccess(res.message ?? 'Registro creado');
+          this.loadKpis(cfg);   // ← nuevo
         },
         error: (err: HttpErrorResponse) => this.handleBackendErrors(err, 'No se pudo guardar el registro')
       });
