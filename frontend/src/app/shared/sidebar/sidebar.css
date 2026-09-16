@@ -1,0 +1,424 @@
+:host {
+  --sidebar-primary: #123249;
+  --sidebar-secondary: #1A456B;
+  --sidebar-accent: #FFD141;
+  --sidebar-accent-hover: #F59E0B;
+  --sidebar-text: #E2E8F0;
+  --sidebar-text-muted: #94A3B8;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+
+  --font-headline: 'Montserrat', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  display: block;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.sidebar-wrapper {
+  position: relative;
+  height: 100%;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 260px;
+  background: linear-gradient(180deg, #1A456B 0%, #123249 100%);
+  color: #fff;
+  transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.12);
+  border-right: 1px solid var(--sidebar-border);
+}
+
+.sidebar-wrapper.collapsed .sidebar {
+  width: 76px;
+}
+
+/* ---------- FLOATING EDGE TOGGLE BUTTON ---------- */
+
+.edge-toggle-btn {
+  position: absolute;
+  top: 26px;
+  right: -13px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--sidebar-accent);
+  color: #123249;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 110;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  font-size: 11px;
+  transition: all 0.2s ease;
+}
+
+.edge-toggle-btn:hover {
+  background: var(--sidebar-accent-hover);
+  transform: scale(1.15);
+}
+
+/* ---------- BRAND HEADER ---------- */
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 18px;
+  border-bottom: 1px solid var(--sidebar-border);
+  min-height: 78px;
+  box-sizing: border-box;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.brand-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 2px;
+}
+
+.sidebar-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  overflow: hidden;
+}
+
+.brand-name {
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 14.5px;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.brand-tagline {
+  font-size: 10.5px;
+  color: var(--sidebar-text-muted);
+}
+
+.header-toggle-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--sidebar-border);
+  color: var(--sidebar-text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.header-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+/* ---------- NAVIGATION ---------- */
+
+.sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 10px;
+}
+
+.nav-section {
+  margin-bottom: 14px;
+}
+
+.section-title {
+  display: block;
+  font-family: var(--font-headline);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 4px 10px 6px;
+  white-space: nowrap;
+}
+
+.section-divider {
+  height: 1px;
+  background: var(--sidebar-border);
+  margin: 10px 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  margin-bottom: 3px;
+  border-radius: 10px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+  position: relative;
+}
+
+.nav-icon-wrap {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-icon {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.75);
+  transition: color 0.18s ease;
+}
+
+.nav-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-arrow {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.25);
+  transition: transform 0.18s ease, color 0.18s ease;
+}
+
+/* Hover & Active States */
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
+.nav-item:hover .nav-icon {
+  color: var(--sidebar-accent);
+}
+
+.nav-item:hover .nav-arrow {
+  transform: translateX(2px);
+  color: var(--sidebar-accent);
+}
+
+.nav-item.active {
+  background: linear-gradient(135deg, var(--sidebar-accent) 0%, var(--sidebar-accent-hover) 100%);
+  color: #123249;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(255, 209, 65, 0.35);
+}
+
+.nav-item.active .nav-icon {
+  color: #123249;
+}
+
+.nav-item.active .nav-arrow {
+  color: #123249;
+}
+
+/* Collapsed Nav Alignments */
+.sidebar-wrapper.collapsed .nav-item {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.sidebar-wrapper.collapsed .sidebar-brand {
+  justify-content: center;
+  padding: 18px 0;
+}
+
+/* Tooltip on Collapsed State */
+.sidebar-wrapper.collapsed .nav-item:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 14px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #123249;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  z-index: 120;
+}
+
+/* ---------- FOOTER ---------- */
+
+.sidebar-footer {
+  padding: 14px 12px 16px;
+  border-top: 1px solid var(--sidebar-border);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.user-mini {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  overflow: hidden;
+  white-space: nowrap;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.user-mini.user-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateX(2px);
+}
+
+.user-mini.user-link:hover .user-avatar {
+  box-shadow: 0 0 10px rgba(255, 209, 65, 0.5);
+}
+
+.user-mini.user-link:hover .user-gear-icon {
+  color: var(--sidebar-accent);
+  transform: rotate(45deg);
+}
+
+.user-gear-icon {
+  margin-left: auto;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all 0.25s ease;
+}
+
+.sidebar-wrapper.collapsed .user-mini {
+  justify-content: center;
+  padding: 6px 0 10px;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sidebar-accent) 0%, var(--sidebar-accent-hover) 100%);
+  color: #123249;
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  overflow: hidden;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.user-role {
+  font-size: 11px;
+  color: var(--sidebar-accent);
+}
+
+.footer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  color: var(--sidebar-text-muted);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.action-btn i {
+  font-size: 14px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.18);
+  color: #FCA5A5;
+}
+
+.expand-footer-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--sidebar-accent);
+  justify-content: center;
+}
+
+.expand-footer-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.sidebar-wrapper.collapsed .action-btn {
+  justify-content: center;
+  padding: 8px 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar, .edge-toggle-btn, .nav-item, .action-btn {
+    transition: none !important;
+  }
+}

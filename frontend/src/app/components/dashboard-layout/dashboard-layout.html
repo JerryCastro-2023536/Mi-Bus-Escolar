@@ -1,0 +1,21 @@
+<div class="dashboard-shell">
+
+    <app-sidebar
+        [brand]="brand"
+        [sections]="sections"
+        [user]="sidebarUser"
+        (logout)="onLogout()"
+    />
+
+    <main class="dashboard-content">
+        <div class="dashboard">
+
+            <app-header [user]="sidebarUser" />
+
+            <!-- Contenido central en blanco -->
+            <div class="dashboard-blank-area"></div>
+
+        </div>
+    </main>
+
+</div>

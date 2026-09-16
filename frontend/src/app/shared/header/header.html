@@ -1,0 +1,149 @@
+<div class="dynamic-header-card">
+
+  <div class="header-glow"></div>
+  <div class="header-pattern"></div>
+
+  <div class="header-main-content">
+
+    <div class="header-info-col">
+      <div class="header-top-row">
+        <span class="greeting-pill">
+          <i [class]="'fa-solid ' + greetingInfo().icon"></i>
+          <span>{{ greetingInfo().desc }}</span>
+        </span>
+
+        @if (user()?.role) {
+          <span class="role-badge" [ngClass]="(user()?.role || '').toLowerCase()">
+            <i [class]="'fa-solid ' + roleIcon()"></i>
+            <span>{{ roleLabel() }}</span>
+          </span>
+        }
+      </div>
+
+      <h1 class="header-headline">{{ displayTitle() }}</h1>
+      <p class="header-description">{{ displaySubtitle() }}</p>
+
+      <div class="role-chips-row">
+        @for (chip of roleChips(); track chip.label) {
+          <div class="role-chip">
+            <i [class]="'fa-solid ' + chip.icon"></i>
+            <span>{{ chip.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+
+    <div class="header-widget-col">
+
+      <div class="header-top-actions-row">
+
+        <div class="notif-wrapper">
+          <button class="notif-btn" (click)="togglePanel()" [class.activo]="panelAbierto" type="button" title="Notificaciones">
+            <i class="fa-solid fa-bell"></i>
+            @if (notifService.noLeidasCount() > 0) {
+              <span class="notif-badge">{{ notifService.noLeidasCount() }}</span>
+            }
+          </button>
+          
+          @if (panelAbierto) {
+            <div class="notif-panel">
+              <div class="notif-panel-header">
+                <div class="notif-panel-title">
+                  <i class="fa-solid fa-bell"></i>
+                  <span>Notificaciones</span>
+                  @if (notifService.noLeidasCount() > 0) {
+                    <span class="notif-count-pill">{{ notifService.noLeidasCount() }} nuevas</span>
+                  }
+                </div>
+                <div class="notif-panel-actions">
+                  <button class="btn-marcar-todas" (click)="marcarTodas()" type="button" title="Marcar todas como leídas">
+                    <i class="fa-solid fa-check-double"></i>
+                  </button>
+                  <a routerLink="/notificaciones" class="btn-ver-todas" (click)="cerrarPanel()">
+                    Ver todas
+                  </a>
+                  <button class="btn-cerrar-panel" (click)="cerrarPanel()" type="button" title="Cerrar panel">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="notif-lista">
+                @if (notifService.notificaciones().length === 0) {
+                  <div class="notif-vacia">
+                    <i class="fa-regular fa-bell-slash"></i>
+                    <p>No tienes notificaciones</p>
+                  </div>
+                } @else {
+                  @for (notif of notifService.notificaciones(); track notif.id_notificaciones) {
+                    @let estilo = notif.tipo | notificacionEstilo;
+                    <div class="notif-item" [class.no-leida]="!notif.leida">
+                      <div class="notif-icono" [style.color]="estilo.color" [style.backgroundColor]="estilo.bg">
+                        <i [class]="'fa-solid fa-' + estilo.icon"></i>
+                      </div>
+                      <div class="notif-content">
+                        <p class="notif-titulo">{{ notif.titulo }}</p>
+                        <p class="notif-mensaje">{{ notif.mensaje }}</p>
+                        <span class="notif-tiempo">{{ notif.fecha_envio | tiempoRelativo }}</span>
+                      </div>
+                      <div class="notif-btns">
+                        @if (!notif.leida) {
+                          <button class="btn-leida" (click)="marcarLeida(notif.id_notificaciones)" type="button" title="Marcar como leída">
+                            <i class="fa-solid fa-check"></i>
+                          </button>
+                        }
+                        <button class="btn-eliminar" (click)="eliminar(notif.id_notificaciones)" type="button" title="Eliminar">
+                          <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (user(); as u) {
+          <div class="user-profile-deck">
+            <a routerLink="/cuenta" class="user-profile-info-link" title="Ver mi cuenta y perfil">
+              <div class="avatar-ring">
+                <div class="avatar-circle">{{ userInitial() }}</div>
+              </div>
+              <div class="profile-details">
+                <span class="profile-name">{{ u.name }}</span>
+                <span class="profile-role-tag">{{ roleLabel() }}</span>
+              </div>
+            </a>
+            
+            <button class="btn-header-logout" (click)="onLogout()" type="button" title="Cerrar sesión">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        }
+
+      </div>
+
+      <div class="live-status-box">
+        <div class="live-dot-wrap">
+          <span class="static-dot"></span>
+          <span class="status-text">EN LÍNEA</span>
+        </div>
+
+        <div class="clock-display">
+          <i class="fa-regular fa-clock"></i>
+          <span class="clock-time">{{ currentTime() }}</span>
+        </div>
+
+        <div class="calendar-display">
+          <i class="fa-regular fa-calendar-days"></i>
+          <span class="calendar-date">{{ currentDate() }}</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

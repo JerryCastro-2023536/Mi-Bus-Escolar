@@ -1,0 +1,46 @@
+:host {
+    --color-primary: #1A456B;
+    --color-primary-dark: #123249;
+    --color-tertiary: #5D737E;
+    --color-neutral: #F8F9FA;
+    --color-neutral-border: #E2E6EA;
+    --color-success-bg: #E4F5EC;
+    --color-success-fg: #1E7A46;
+    --color-error-fg: #B3261E;
+    --color-warning-bg: #FFF6E0;
+    --color-warning-fg: #8A6100;
+
+    --font-headline: 'Montserrat', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    display: block;
+    font-family: var(--font-body);
+    background: var(--color-neutral);
+    min-height: 100%;
+}
+
+.dashboard-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.dashboard-content {
+    flex: 1;
+    overflow-y: auto;
+    min-width: 0;
+}
+
+.dashboard { 
+    padding: 32px 40px; 
+}
+
+.dashboard-blank-area {
+    min-height: calc(100vh - 200px);
+    width: 100%;
+}
+
+@media (max-width: 900px) {
+    .dashboard { 
+        padding: 20px; 
+    }
+}
