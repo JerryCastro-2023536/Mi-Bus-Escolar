@@ -12,66 +12,8 @@
 
             <app-header [user]="sidebarUser" />
 
-            <section class="kpi-grid">
-                @for (kpi of kpis(); track kpi.label) {
-                    <div class="kpi-card">
-                        <div class="kpi-icon-wrap">
-                            <i [class]="'fa-solid fa-' + kpi.icon"></i>
-                        </div>
-                        <div class="kpi-body">
-                            <span class="kpi-value">{{ kpi.value }}</span>
-                            <span class="kpi-label">{{ kpi.label }}</span>
-                            @if (kpi.trend) {
-                                <span class="kpi-trend" [class.down]="kpi.trendUp === false">
-                                    {{ kpi.trend }}
-                                </span>
-                            }
-                        </div>
-                    </div>
-                }
-            </section>
-
-            <section class="dashboard-grid">
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <h2>Próximos viajes</h2>
-                        <a class="panel-link" routerLink="/viajes">Ver todos</a>
-                    </div>
-                    <div class="trip-list">
-                        @for (viaje of proximosViajes(); track viaje.ruta) {
-                            <div class="trip-row">
-                                <div class="trip-info">
-                                    <span class="trip-route">{{ viaje.ruta }}</span>
-                                    <span class="trip-driver">{{ viaje.chofer }}</span>
-                                </div>
-                                <span class="trip-time">{{ viaje.hora }}</span>
-                                <span class="badge" [ngClass]="viaje.estado.toLowerCase()">{{ viaje.estado }}</span>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-                <div class="panel">
-                    <div class="panel-header">
-                        <h2>Actividad reciente</h2>
-                    </div>
-                    <div class="activity-list">
-                        @for (item of actividad(); track item.texto) {
-                            <div class="activity-row">
-                                <div class="activity-icon">
-                                    <i [class]="'fa-solid fa-' + item.icon"></i>
-                                </div>
-                                <div class="activity-body">
-                                    <span class="activity-text">{{ item.texto }}</span>
-                                    <span class="activity-time">{{ item.tiempo }}</span>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-
-            </section>
+            <!-- Contenido central en blanco -->
+            <div class="dashboard-blank-area"></div>
 
         </div>
     </main>

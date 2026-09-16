@@ -30,159 +30,17 @@
     min-width: 0;
 }
 
-.dashboard { padding: 32px 40px; }
-
-
-/* ---------- KPIs ---------- */
-
-.kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 18px;
-    margin-bottom: 28px;
+.dashboard { 
+    padding: 32px 40px; 
 }
 
-.kpi-card {
-    display: flex;
-    gap: 14px;
-    background: #fff;
-    border: 1px solid var(--color-neutral-border);
-    border-radius: 14px;
-    padding: 20px;
+.dashboard-blank-area {
+    min-height: calc(100vh - 200px);
+    width: 100%;
 }
-
-.kpi-icon-wrap {
-    width: 42px;
-    height: 42px;
-    flex-shrink: 0;
-    border-radius: 10px;
-    background: rgba(26, 69, 107, 0.08);
-    color: var(--color-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-}
-
-.kpi-body { display: flex; flex-direction: column; }
-
-.kpi-value {
-    font-family: var(--font-headline);
-    font-weight: 700;
-    font-size: 22px;
-    color: var(--color-primary-dark);
-}
-
-.kpi-label { font-size: 12.5px; color: var(--color-tertiary); margin-top: 2px; }
-
-.kpi-trend {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--color-success-fg);
-    margin-top: 6px;
-}
-
-.kpi-trend.down { color: var(--color-error-fg); }
-
-/* ---------- PANELES ---------- */
-
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: 20px;
-}
-
-.panel {
-    background: #fff;
-    border: 1px solid var(--color-neutral-border);
-    border-radius: 14px;
-    padding: 22px;
-}
-
-.panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-}
-
-.panel-header h2 {
-    font-family: var(--font-headline);
-    font-size: 15.5px;
-    color: var(--color-primary-dark);
-    margin: 0;
-}
-
-.panel-link {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--color-primary);
-    text-decoration: none;
-}
-
-.panel-link:hover { text-decoration: underline; }
-
-/* ---------- PRÓXIMOS VIAJES ---------- */
-
-.trip-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 12px 0;
-    border-top: 1px solid var(--color-neutral-border);
-}
-
-.trip-row:first-child { border-top: none; padding-top: 0; }
-
-.trip-info { display: flex; flex-direction: column; }
-.trip-route { font-size: 13.5px; font-weight: 600; color: var(--color-primary-dark); }
-.trip-driver { font-size: 11.5px; color: var(--color-tertiary); }
-.trip-time { font-size: 12.5px; color: var(--color-tertiary); white-space: nowrap; }
-
-.badge {
-    font-size: 10.5px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    padding: 4px 9px;
-    border-radius: 20px;
-    white-space: nowrap;
-}
-
-.badge.programado { background: var(--color-warning-bg); color: var(--color-warning-fg); }
-.badge.activo { background: var(--color-success-bg); color: var(--color-success-fg); }
-.badge.finalizado { background: var(--color-neutral); color: var(--color-tertiary); }
-
-/* ---------- ACTIVIDAD RECIENTE ---------- */
-
-.activity-row {
-    display: flex;
-    gap: 12px;
-    padding: 12px 0;
-    border-top: 1px solid var(--color-neutral-border);
-}
-
-.activity-row:first-child { border-top: none; padding-top: 0; }
-
-.activity-icon {
-    width: 32px;
-    height: 32px;
-    flex-shrink: 0;
-    border-radius: 8px;
-    background: var(--color-neutral);
-    color: var(--color-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-}
-
-.activity-body { display: flex; flex-direction: column; }
-.activity-text { font-size: 12.5px; color: var(--color-primary-dark); line-height: 1.4; }
-.activity-time { font-size: 11px; color: var(--color-tertiary); margin-top: 2px; }
 
 @media (max-width: 900px) {
-    .dashboard { padding: 20px; }
-    .dashboard-grid { grid-template-columns: 1fr; }
+    .dashboard { 
+        padding: 20px; 
+    }
 }
