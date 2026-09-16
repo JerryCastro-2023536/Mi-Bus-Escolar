@@ -62,6 +62,11 @@
 
     <div *ngIf="!currentUser()" class="card auth-card">
 
+      <div class="auth-card-brand">
+        <img src="/logo-mi-bus-escolar.png" alt="Logo Mi Bus Escolar" class="card-brand-logo" />
+        <span class="card-brand-title">MI BUS ESCOLAR</span>
+      </div>
+
       <div class="tabs">
         <button type="button" [class.active]="isLoginMode()" (click)="toggleMode(true)">Iniciar sesión</button>
         <button type="button" [class.active]="!isLoginMode()" (click)="toggleMode(false)">Registrarse</button>
