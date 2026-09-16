@@ -1,8 +1,9 @@
 import { Component, computed, inject, input, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { SidebarUser } from '../../models/sidebar.model';
 import { NotificacionesService, NotificacionItem } from '../../services/notificaciones.service';
+import { LoginService } from '../../services/login';
 import { TiempoRelativoPipe } from '../pipes/tiempoRelativo.pipe';
 import { NotificacionEstiloPipe } from '../pipes/notificacionEstilo.pipe';
 
@@ -24,6 +25,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   subtitle = input<string | null>(null);
 
   notifService = inject(NotificacionesService);
+  loginService = inject(LoginService);
+  private router = inject(Router);
 
   panelAbierto = false;
 
@@ -68,6 +71,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   eliminar(id: number): void {
     this.notifService.eliminarNotificacion(id);
+  }
+
+  onLogout(): void {
+    this.loginService.logout();
+    this.router.navigate(['/login']);
   }
 
   currentDate = computed(() => {
