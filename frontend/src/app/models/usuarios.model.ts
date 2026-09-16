@@ -7,7 +7,7 @@ export const usuariosConfig: CrudConfig = {
     idKey: 'id_usuario',
     kpis: [
         { title: 'USUARIOS TOTALES', valueKey: 'total', icon: '' },
-        { title: 'ACTIVOS HOY', valueKey: 'activos', icon: '' },
+        { title: '%VERIFICADOS', valueKey: 'porcentajeVerificados', icon: '' },
     ],
 
     tableColumns: [
