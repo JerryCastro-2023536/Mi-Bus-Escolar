@@ -76,7 +76,7 @@
                     <p>No tienes notificaciones</p>
                   </div>
                 } @else {
-                  @for (notif of notifService.notificaciones(); track notif.id_notificacion) {
+                  @for (notif of notifService.notificaciones(); track notif.id_notificaciones) {
                     @let estilo = notif.tipo | notificacionEstilo;
                     <div class="notif-item" [class.no-leida]="!notif.leida">
                       <div class="notif-icono" [style.color]="estilo.color" [style.backgroundColor]="estilo.bg">
@@ -89,11 +89,11 @@
                       </div>
                       <div class="notif-btns">
                         @if (!notif.leida) {
-                          <button class="btn-leida" (click)="marcarLeida(notif.id_notificacion)" type="button" title="Marcar como leída">
+                          <button class="btn-leida" (click)="marcarLeida(notif.id_notificaciones)" type="button" title="Marcar como leída">
                             <i class="fa-solid fa-check"></i>
                           </button>
                         }
-                        <button class="btn-eliminar" (click)="eliminar(notif.id_notificacion)" type="button" title="Eliminar">
+                        <button class="btn-eliminar" (click)="eliminar(notif.id_notificaciones)" type="button" title="Eliminar">
                           <i class="fa-solid fa-trash-can"></i>
                         </button>
                       </div>
@@ -107,13 +107,15 @@
 
         @if (user(); as u) {
           <div class="user-profile-deck">
-            <div class="avatar-ring">
-              <div class="avatar-circle">{{ userInitial() }}</div>
-            </div>
-            <div class="profile-details">
-              <span class="profile-name">{{ u.name }}</span>
-              <span class="profile-role-tag">{{ roleLabel() }}</span>
-            </div>
+            <a routerLink="/cuenta" class="user-profile-info-link" title="Ver mi cuenta y perfil">
+              <div class="avatar-ring">
+                <div class="avatar-circle">{{ userInitial() }}</div>
+              </div>
+              <div class="profile-details">
+                <span class="profile-name">{{ u.name }}</span>
+                <span class="profile-role-tag">{{ roleLabel() }}</span>
+              </div>
+            </a>
             
             <button class="btn-header-logout" (click)="onLogout()" type="button" title="Cerrar sesión">
               <i class="fa-solid fa-right-from-bracket"></i>
