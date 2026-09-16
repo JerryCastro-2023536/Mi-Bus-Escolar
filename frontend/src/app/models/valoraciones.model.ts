@@ -1,64 +1,86 @@
 export const valoracionesConfig = {
-    title: "Valoraciones",
-    subtitle: "Gestión de valoraciones de proveedores",
-    apiEndpoint: "/valoraciones",
-    idKey: "id_valoracion",
+    title: 'Valoraciones',
+    subtitle: 'Gestiona las valoraciones de los proveedores',
+    apiEndpoint: '/valoraciones',
+    idKey: 'id_valoracion',
 
     kpis: [
         {
-            title: "Total de valoraciones",
-            valueKey: "total",
-            subtitle: "Valoraciones registradas",
-            icon: "⭐"
+            title: 'Total valoraciones',
+            valueKey: 'total',
+            subtitle: 'Valoraciones registradas',
+            icon: 'star'
         },
         {
-            title: "Calificación promedio",
-            valueKey: "promedio",
-            subtitle: "Promedio general",
-            icon: "📊"
+            title: 'Promedio',
+            valueKey: 'promedio',
+            subtitle: 'Calificación promedio',
+            icon: 'star_half'
         }
     ],
 
     tableColumns: [
         {
-            key: "id_valoracion",
-            label: "ID",
-            type: "number"
+            key: 'id_valoracion',
+            label: 'ID',
+            type: 'number'
         },
         {
-            key: "id_proveedor",
-            label: "Proveedor",
-            type: "number"
+            key: 'id_proveedor',
+            label: 'Proveedor',
+            type: 'number'
         },
         {
-            key: "comentario",
-            label: "Comentario",
-            type: "text"
+            key: 'comentario',
+            label: 'Comentario',
+            type: 'text'
         },
         {
-            key: "calificacion",
-            label: "Calificación",
-            type: "number"
+            key: 'calificacion',
+            label: 'Calificación',
+            type: 'number'
         }
     ],
 
     formFields: [
         {
-            key: "id_proveedor",
-            label: "Proveedor",
-            type: "number",
+            key: 'id_proveedor',
+            label: 'ID Proveedor',
+            type: 'number',
             required: true
         },
         {
-            key: "comentario",
-            label: "Comentario",
-            type: "text",
-            required: false
+            key: 'comentario',
+            label: 'Comentario',
+            type: 'text',
+            required: true
         },
         {
-            key: "calificacion",
-            label: "Calificación",
-            type: "number",
+            key: 'calificacion',
+            label: 'Calificación',
+            type: 'number',
+            required: true
+        }
+    ],
+
+    formFieldsEdit: [
+        {
+            key: 'id_proveedor',
+            label: 'ID Proveedor',
+            type: 'number',
+            required: true,
+            readonly: true
+        },
+        {
+            key: 'comentario',
+            label: 'Comentario',
+            type: 'text',
+            required: true
+        },
+        {
+            key: 'calificacion',
+            label: 'Calificación',
+            type: 'number',
             required: true
         }
     ]
