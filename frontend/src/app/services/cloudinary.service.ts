@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { CloudinaryUploadResponse } from '../models/CloudinaryUploadResponse';
+import { environment } from '../../environments/enviroment';
 
 @Injectable({ providedIn: 'root' })
 export class CloudinaryService {
