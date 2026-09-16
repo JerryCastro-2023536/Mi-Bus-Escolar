@@ -1,5 +1,4 @@
 <!-- NAVBAR -->
-<!-- NAVBAR -->
 <header class="navbar">
 
   <div class="container nav-container">
@@ -17,6 +16,9 @@
       <a href="#inicio">Inicio</a>
 
       <a href="#funciones">Funciones</a>
+
+      <!-- NUEVO -->
+      <a href="#servicios">Servicios</a>
 
       <a href="#como-funciona">
         Cómo funciona
@@ -76,24 +78,19 @@
         <a
           routerLink="/register"
           class="btn btn-primary btn-large">
-
           Comenzar ahora →
-
         </a>
 
         <a
           href="#como-funciona"
           class="btn btn-light btn-large">
-
           Conocer más
-
         </a>
 
       </div>
 
 
       <!-- ESTADÍSTICAS -->
-
       <div class="statistics">
 
         <div>
@@ -117,21 +114,13 @@
 
 
     <!-- TARJETA DEL MAPA -->
-
     <div class="map-card">
 
       <div class="map-header">
 
         <div>
-
-          <small>
-            Ruta en progreso
-          </small>
-
-          <strong>
-            Bus Escolar #24
-          </strong>
-
+          <small>Ruta en progreso</small>
+          <strong>Bus Escolar #24</strong>
         </div>
 
         <span class="live">
@@ -144,30 +133,16 @@
       <div class="map">
 
         <div class="road road-one"></div>
-
         <div class="road road-two"></div>
-
         <div class="road road-three"></div>
 
         <div class="route-line"></div>
 
+        <div class="stop stop-one">1</div>
+        <div class="stop stop-two">2</div>
+        <div class="stop stop-three">3</div>
 
-        <div class="stop stop-one">
-          1
-        </div>
-
-        <div class="stop stop-two">
-          2
-        </div>
-
-        <div class="stop stop-three">
-          3
-        </div>
-
-
-        <div class="bus">
-          🚌
-        </div>
+        <div class="bus">🚌</div>
 
       </div>
 
@@ -175,15 +150,8 @@
       <div class="arrival">
 
         <div>
-
-          <small>
-            Próxima parada
-          </small>
-
-          <strong>
-            Colegio Central
-          </strong>
-
+          <small>Próxima parada</small>
+          <strong>Colegio Central</strong>
         </div>
 
         <strong class="arrival-time">
@@ -227,9 +195,7 @@
 
     <div class="features">
 
-
       <!-- CARD 1 -->
-
       <article class="feature feature-main">
 
         <div class="feature-icon">
@@ -250,7 +216,6 @@
 
 
       <!-- CARD 2 -->
-
       <article class="feature">
 
         <div class="feature-icon yellow">
@@ -271,7 +236,6 @@
 
 
       <!-- CARD 3 -->
-
       <article class="feature">
 
         <div class="feature-icon">
@@ -292,7 +256,6 @@
 
 
       <!-- CARD 4 -->
-
       <article class="feature">
 
         <div class="feature-icon">
@@ -312,6 +275,427 @@
       </article>
 
     </div>
+
+  </div>
+
+</section>
+
+
+<!-- SERVICIOS DISPONIBLES -->
+<section
+  class="section services-section"
+  id="servicios">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <small>
+        SERVICIOS DISPONIBLES
+      </small>
+
+      <h2>
+        Encuentra el transporte
+        <span>ideal para ti.</span>
+      </h2>
+
+      <p>
+        Consulta servicios de transporte escolar,
+        compara precios, conoce sus rutas y revisa
+        las valoraciones de cada proveedor.
+      </p>
+
+    </div>
+
+
+    <!-- FILTROS -->
+    <div class="services-filters">
+
+      <div class="filter-group">
+
+        <label for="filtroNombre">
+          Buscar servicio
+        </label>
+
+        <input
+          id="filtroNombre"
+          type="text"
+          [(ngModel)]="filtroNombre"
+          (input)="filtrarServicios()"
+          placeholder="Ej. Transporte Zona 1"
+        />
+
+      </div>
+
+
+      <div class="filter-group">
+
+        <label for="precioMaximo">
+          Precio máximo mensual
+        </label>
+
+        <input
+          id="precioMaximo"
+          type="number"
+          [(ngModel)]="precioMaximo"
+          (input)="filtrarServicios()"
+          placeholder="Ej. 500"
+          min="0"
+        />
+
+      </div>
+
+
+      <button
+        type="button"
+        class="clear-filter"
+        (click)="limpiarFiltros()">
+        Limpiar filtros
+      </button>
+
+    </div>
+
+
+    <!-- CARGANDO -->
+    @if (cargando) {
+
+      <div class="services-message">
+
+        <div class="loader"></div>
+
+        <p>
+          Cargando servicios disponibles...
+        </p>
+
+      </div>
+
+    }
+
+
+    <!-- ERROR -->
+    @if (errorCarga && !cargando) {
+
+      <div class="services-message error-message">
+
+        <strong>
+          No fue posible cargar los servicios.
+        </strong>
+
+        <p>
+          Verifica que el servidor del backend
+          se encuentre funcionando.
+        </p>
+
+      </div>
+
+    }
+
+
+    <!-- LISTADO DE SERVICIOS -->
+    @if (!cargando && !errorCarga) {
+
+      @if (serviciosFiltrados.length > 0) {
+
+        <div class="services-grid">
+
+          @for (
+            servicio of serviciosFiltrados;
+            track servicio.id_servicio
+          ) {
+
+            <article class="service-card">
+
+
+              <!-- CABECERA DEL SERVICIO -->
+              <div class="service-card-header">
+
+                <div>
+
+                  <span class="service-status">
+                    Disponible
+                  </span>
+
+                  <h3>
+                    {{ servicio.nombre }}
+                  </h3>
+
+                </div>
+
+
+                <div class="service-price">
+
+                  <strong>
+                    Q{{ servicio.precio_mensual }}
+                  </strong>
+
+                  <small>
+                    / mes
+                  </small>
+
+                </div>
+
+              </div>
+
+
+              <!-- DESCRIPCIÓN -->
+              <p class="service-description">
+                {{ servicio.descripcion }}
+              </p>
+
+
+              <!-- PROMEDIO DE VALORACIONES -->
+              <div class="service-rating">
+
+                @if (servicio.valoraciones.length > 0) {
+
+                  <div class="rating-stars">
+
+                    @for (
+                      estrella of obtenerEstrellas(
+                        servicio.promedioValoraciones
+                      );
+                      track $index
+                    ) {
+                      <span>★</span>
+                    }
+
+                  </div>
+
+                  <strong>
+                    {{
+                      servicio.promedioValoraciones
+                        | number:'1.1-1'
+                    }}
+                  </strong>
+
+                  <small>
+                    ({{ servicio.valoraciones.length }}
+                    valoraciones)
+                  </small>
+
+                } @else {
+
+                  <small>
+                    Sin valoraciones todavía
+                  </small>
+
+                }
+
+              </div>
+
+
+              <!-- PROVEEDOR -->
+              <div class="service-block">
+
+                <div class="service-block-title">
+
+                  <span>🏢</span>
+
+                  <h4>
+                    Proveedor
+                  </h4>
+
+                </div>
+
+
+                @if (servicio.proveedor) {
+
+                  <div class="provider-info">
+
+                    <strong>
+                      {{ servicio.proveedor.nombre_negocio }}
+                    </strong>
+
+                    <p>
+                      {{ servicio.proveedor.direccion }}
+                    </p>
+
+                    <p>
+                      Tel:
+                      {{ servicio.proveedor.telefono_contacto }}
+                    </p>
+
+                  </div>
+
+                } @else {
+
+                  <p class="muted-text">
+                    Información del proveedor no disponible.
+                  </p>
+
+                }
+
+              </div>
+
+
+              <!-- RUTAS -->
+              <div class="service-block">
+
+                <div class="service-block-title">
+
+                  <span>🚌</span>
+
+                  <h4>
+                    Rutas disponibles
+                  </h4>
+
+                </div>
+
+
+                @if (servicio.rutas.length > 0) {
+
+                  <div class="routes-list">
+
+                    @for (
+                      ruta of servicio.rutas;
+                      track ruta.id_ruta
+                    ) {
+
+                      <div class="route-item">
+
+                        <div>
+
+                          <strong>
+                            {{ ruta.nombre }}
+                          </strong>
+
+                          <small>
+                            Horario estimado
+                          </small>
+
+                        </div>
+
+
+                        <div class="route-time">
+
+                          <span>
+                            {{ ruta.hora_inicio_estimada }}
+                          </span>
+
+                          <span>→</span>
+
+                          <span>
+                            {{ ruta.hora_fin_estimada }}
+                          </span>
+
+                        </div>
+
+                      </div>
+
+                    }
+
+                  </div>
+
+                } @else {
+
+                  <p class="muted-text">
+                    Este servicio todavía no tiene rutas disponibles.
+                  </p>
+
+                }
+
+              </div>
+
+
+              <!-- VALORACIONES -->
+              <div class="service-block">
+
+                <div class="service-block-title">
+
+                  <span>⭐</span>
+
+                  <h4>
+                    Valoraciones
+                  </h4>
+
+                </div>
+
+
+                @if (servicio.valoraciones.length > 0) {
+
+                  <div class="reviews-list">
+
+                    @for (
+                      valoracion of servicio.valoraciones;
+                      track valoracion.id_valoracion
+                    ) {
+
+                      <div class="review-item">
+
+                        <div class="review-rating">
+
+                          @for (
+                            estrella of obtenerEstrellas(
+                              valoracion.calificacion
+                            );
+                            track $index
+                          ) {
+                            <span>★</span>
+                          }
+
+                          <strong>
+                            {{ valoracion.calificacion }}/5
+                          </strong>
+
+                        </div>
+
+                        <p>
+                          {{ valoracion.comentario }}
+                        </p>
+
+                      </div>
+
+                    }
+
+                  </div>
+
+                } @else {
+
+                  <p class="muted-text">
+                    Aún no existen comentarios para este proveedor.
+                  </p>
+
+                }
+
+              </div>
+
+
+              <!-- CONTACTAR PROVEEDOR -->
+              @if (servicio.proveedor) {
+
+                <a
+                  class="contact-provider"
+                  [href]="'tel:' + servicio.proveedor.telefono_contacto">
+                  Contactar proveedor
+                </a>
+
+              }
+
+            </article>
+
+          }
+
+        </div>
+
+      } @else {
+
+        <!-- SIN RESULTADOS -->
+        <div class="services-message">
+
+          <strong>
+            No encontramos servicios
+          </strong>
+
+          <p>
+            Intenta cambiar el nombre o
+            el precio máximo del filtro.
+          </p>
+
+        </div>
+
+      }
+
+    }
 
   </div>
 
@@ -340,7 +724,6 @@
 
 
     <div class="steps">
-
 
       <div class="step">
 
@@ -513,9 +896,7 @@
     <a
       routerLink="/register"
       class="btn btn-yellow">
-
       Crear mi cuenta →
-
     </a>
 
   </div>
@@ -549,6 +930,11 @@
 
       <a href="#funciones">
         Funciones
+      </a>
+
+      <!-- NUEVO -->
+      <a href="#servicios">
+        Servicios
       </a>
 
       <a href="#como-funciona">
