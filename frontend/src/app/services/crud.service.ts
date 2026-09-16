@@ -1,8 +1,8 @@
 import { inject, Injectable } from "@angular/core";
 import { ApiResponse } from "../models/apiResponseDTO.interface";
-import { environment } from "../../environments/environment";
 import { Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
+import { environment } from "../../environments/enviroment";
 
 @Injectable({ providedIn: 'root' })
 export class CrudService {
@@ -28,4 +28,10 @@ export class CrudService {
     delete(endpoint: string, id: string | number): Observable<ApiResponse<void>> {
         return this.http.delete<ApiResponse<void>>(`${this.baseUrl}${endpoint}/${id}`);
     }
+
+    getKpis(endpoint: string): Observable<ApiResponse<Record<string, number | string>>> {
+    return this.http.get<ApiResponse<Record<string, number | string>>>(
+        `${this.baseUrl}/kpis${endpoint}`
+    );
+}
 }
