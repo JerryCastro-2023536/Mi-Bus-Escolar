@@ -106,7 +106,41 @@ export async function register(u: UsuarioRegisterDTO) {
         const values = [u.nombre, u.apellido, u.correo, hashedPassword, u.telefono, u.foto_usuario, userRol.USUARIO, false];
         const query = 'SELECT * FROM sp_usuarios_agregar($1, $2, $3, $4, $5, $6, $7, $8)';
         const res = await pool.query(query, values);
+
         return res.rows[0];
+    } catch (error) {
+        console.log(error);
+        errorThrower(error);
+    }
+}
+
+export async function cambiarPassword(id: number, newPassword: string, oldPassword: string){
+    try {
+        const newHashedPassword = await bcrypt.hash(newPassword, 10);
+
+        const res = await pool.query('SELECT * FROM sp_usuarios_buscar_por_id($1)', [id]);
+        if (!res.rows[0]) {
+            throw new NotFoundError(`El usuario con ID ${id} no fue encontrado.`);
+        }
+        const usuario = res.rows[0];
+
+        const passwordValida = await bcrypt.compare(oldPassword, usuario.password);
+        
+        if (!passwordValida) {
+            throw new ValidationError("Error al cambiar contraseña", [{
+                campo: "oldPassword",
+                mensaje: "La contraseña actual es inválida"
+            }]);
+        }
+        
+        const editRes = await pool.query(`SELECT * FROM sp_usuarios_editarPassword($1, $2)`, [newHashedPassword, id]);
+        const usuarioEditado = editRes.rows[0];
+        
+        if (usuarioEditado) {
+            delete usuarioEditado.password;
+        }
+
+        return usuarioEditado;
     } catch (error) {
         console.log(error);
         errorThrower(error);
