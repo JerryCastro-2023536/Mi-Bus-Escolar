@@ -2,7 +2,7 @@ import { Component, computed, inject, input, signal, OnInit, OnDestroy } from '@
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { SidebarUser } from '../../models/sidebar.model';
-import { NotificacionesService, NotificacionItem } from '../../services/notificaciones.service';
+import { NotificacionesService } from '../../services/notificaciones.service';
 import { LoginService } from '../../services/login';
 import { TiempoRelativoPipe } from '../pipes/tiempoRelativo.pipe';
 import { NotificacionEstiloPipe } from '../pipes/notificacionEstilo.pipe';
@@ -61,16 +61,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.panelAbierto = false;
   }
 
-  marcarLeida(id: number): void {
-    this.notifService.marcarComoLeida(id);
+  marcarLeida(id?: number): void {
+    if (id !== undefined) {
+      this.notifService.marcarComoLeida(id);
+    }
   }
 
   marcarTodas(): void {
     this.notifService.marcarTodasComoLeidas();
   }
 
-  eliminar(id: number): void {
-    this.notifService.eliminarNotificacion(id);
+  eliminar(id?: number): void {
+    if (id !== undefined) {
+      this.notifService.eliminarNotificacion(id);
+    }
   }
 
   onLogout(): void {
