@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { NotificacionesService, NotificacionItem } from '../../services/notificaciones.service';
+import { NotificacionesService } from '../../services/notificaciones.service';
+import { Notificaciones as NotificacionItem } from '../../../../../backend/src/models/Notificaciones';
 import { LoginService } from '../../services/login';
 import { HeaderComponent } from '../../shared/header/header';
 import { SidebarComponent } from '../../shared/sidebar/sidebar';
@@ -14,7 +14,7 @@ import { NotificacionEstiloPipe } from '../../shared/pipes/notificacionEstilo.pi
     selector: 'app-notificaciones',
     standalone: true,
     imports: [
-        CommonModule, FormsModule, RouterLink,
+        CommonModule, FormsModule,
         HeaderComponent, SidebarComponent,
         TiempoRelativoPipe, NotificacionEstiloPipe
     ],
@@ -70,15 +70,19 @@ export class Notificaciones {
         this.filtroActual = nuevoFiltro;
     }
 
-    marcarComoLeida(id: number): void {
-        this.notifService.marcarComoLeida(id);
+    marcarComoLeida(id?: number): void {
+        if (id !== undefined) {
+            this.notifService.marcarComoLeida(id);
+        }
     }
 
     marcarTodasComoLeidas(): void {
         this.notifService.marcarTodasComoLeidas();
     }
 
-    eliminar(id: number): void {
-        this.notifService.eliminarNotificacion(id);
+    eliminar(id?: number): void {
+        if (id !== undefined) {
+            this.notifService.eliminarNotificacion(id);
+        }
     }
 }
