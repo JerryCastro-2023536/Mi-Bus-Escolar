@@ -2,15 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthResponse } from './login';
-
-export interface UsuarioRegisterDTO {
-  nombre: string;
-  apellido: string;
-  correo: string;
-  password: string;
-  telefono: string;
-  foto_usuario?: string | null;
-}
+import { UsuarioRegisterDTO } from '../../../../backend/src/models/usuario';
 
 @Injectable({
   providedIn: 'root'
