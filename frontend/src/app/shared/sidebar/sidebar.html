@@ -70,7 +70,10 @@
 
     <div class="sidebar-footer">
       @if (user(); as u) {
-        <div class="user-mini" [title]="u.name + ' (' + (u.role || 'Usuario') + ')'">
+        <a 
+          routerLink="/cuenta" 
+          class="user-mini user-link" 
+          [title]="'Ver perfil y cuenta de ' + u.name">
           <div class="user-avatar">{{ u.name.charAt(0).toUpperCase() }}</div>
           @if (!collapsed()) {
             <div class="user-info">
@@ -79,8 +82,9 @@
                 <span class="user-role">{{ u.role }}</span>
               }
             </div>
+            <i class="fa-solid fa-gear user-gear-icon" title="Mi Cuenta"></i>
           }
-        </div>
+        </a>
       }
 
       <div class="footer-actions">
