@@ -1,145 +1,172 @@
 export const incidenciasConfig = {
-    title: "Incidencias",
-    subtitle: "Gestión de incidencias reportadas",
-    apiEndpoint: "/incidencias",
-    idKey: "id_incidencia",
+    title: 'Incidencias',
+    subtitle: 'Gestiona las incidencias reportadas durante los viajes',
+    apiEndpoint: '/incidencias',
+    idKey: 'id_incidencia',
 
     kpis: [
         {
-            title: "Total de incidencias",
-            valueKey: "total",
-            subtitle: "Incidencias registradas",
-            icon: "⚠️"
+            title: 'Total incidencias',
+            valueKey: 'total',
+            subtitle: 'Incidencias registradas',
+            icon: 'warning'
         },
         {
-            title: "Incidencias abiertas",
-            valueKey: "abiertas",
-            subtitle: "Incidencias pendientes",
-            icon: "🔓"
-        },
-        {
-            title: "Incidencias cerradas",
-            valueKey: "cerradas",
-            subtitle: "Incidencias solucionadas",
-            icon: "🔒"
+            title: 'Abiertas',
+            valueKey: 'abiertas',
+            subtitle: 'Incidencias pendientes',
+            icon: 'error'
         }
     ],
 
     tableColumns: [
         {
-            key: "id_incidencia",
-            label: "ID",
-            type: "number"
+            key: 'id_incidencia',
+            label: 'ID',
+            type: 'number'
         },
         {
-            key: "id_viaje",
-            label: "Viaje",
-            type: "number"
+            key: 'id_viaje',
+            label: 'Viaje',
+            type: 'number'
         },
         {
-            key: "id_ruta",
-            label: "Ruta",
-            type: "number"
+            key: 'id_ruta',
+            label: 'Ruta',
+            type: 'number'
         },
         {
-            key: "id_usuario_reporta",
-            label: "Usuario reporta",
-            type: "number"
+            key: 'id_usuario_reporta',
+            label: 'Usuario',
+            type: 'number'
         },
         {
-            key: "titulo",
-            label: "Título",
-            type: "text"
+            key: 'titulo',
+            label: 'Título',
+            type: 'text'
         },
         {
-            key: "descripcion",
-            label: "Descripción",
-            type: "text"
+            key: 'descripcion',
+            label: 'Descripción',
+            type: 'text'
         },
         {
-            key: "latitud",
-            label: "Latitud",
-            type: "number"
+            key: 'fecha_hora',
+            label: 'Fecha',
+            type: 'date'
         },
         {
-            key: "longitud",
-            label: "Longitud",
-            type: "number"
-        },
-        {
-            key: "fecha_hora",
-            label: "Fecha y hora",
-            type: "date"
-        },
-        {
-            key: "estado",
-            label: "Estado",
-            type: "badge"
+            key: 'estado',
+            label: 'Estado',
+            type: 'badge'
         }
     ],
 
     formFields: [
         {
-            key: "id_viaje",
-            label: "Viaje",
-            type: "number",
-            required: false
+            key: 'id_viaje',
+            label: 'ID Viaje',
+            type: 'number'
         },
         {
-            key: "id_ruta",
-            label: "Ruta",
-            type: "number",
+            key: 'id_ruta',
+            label: 'ID Ruta',
+            type: 'number',
             required: true
         },
         {
-            key: "id_usuario_reporta",
-            label: "Usuario que reporta",
-            type: "number",
-            required: false
+            key: 'id_usuario_reporta',
+            label: 'ID Usuario',
+            type: 'number'
         },
         {
-            key: "titulo",
-            label: "Título",
-            type: "text",
+            key: 'titulo',
+            label: 'Título',
+            type: 'text',
             required: true
         },
         {
-            key: "descripcion",
-            label: "Descripción",
-            type: "text",
-            required: false
+            key: 'descripcion',
+            label: 'Descripción',
+            type: 'text'
         },
         {
-            key: "latitud",
-            label: "Latitud",
-            type: "number",
-            required: false
+            key: 'latitud',
+            label: 'Latitud',
+            type: 'number'
         },
         {
-            key: "longitud",
-            label: "Longitud",
-            type: "number",
-            required: false
+            key: 'longitud',
+            label: 'Longitud',
+            type: 'number'
         },
         {
-            key: "fecha_hora",
-            label: "Fecha y hora",
-            type: "date",
-            required: true
-        },
-        {
-            key: "estado",
-            label: "Estado",
-            type: "select",
-            required: true,
+            key: 'estado',
+            label: 'Estado',
+            type: 'select',
             options: [
                 {
-                    value: "ABIERTA",
-                    label: "Abierta"
+                    value: 'ABIERTA',
+                    label: 'Abierta'
                 },
                 {
-                    value: "CERRADA",
-                    label: "Cerrada"
+                    value: 'CERRADA',
+                    label: 'Cerrada'
+                }
+            ]
+        }
+    ],
+
+    formFieldsEdit: [
+        {
+            key: 'id_viaje',
+            label: 'ID Viaje',
+            type: 'number'
+        },
+        {
+            key: 'id_ruta',
+            label: 'ID Ruta',
+            type: 'number',
+            required: true
+        },
+        {
+            key: 'id_usuario_reporta',
+            label: 'ID Usuario',
+            type: 'number'
+        },
+        {
+            key: 'titulo',
+            label: 'Título',
+            type: 'text',
+            required: true
+        },
+        {
+            key: 'descripcion',
+            label: 'Descripción',
+            type: 'text'
+        },
+        {
+            key: 'latitud',
+            label: 'Latitud',
+            type: 'number'
+        },
+        {
+            key: 'longitud',
+            label: 'Longitud',
+            type: 'number'
+        },
+        {
+            key: 'estado',
+            label: 'Estado',
+            type: 'select',
+            options: [
+                {
+                    value: 'ABIERTA',
+                    label: 'Abierta'
+                },
+                {
+                    value: 'CERRADA',
+                    label: 'Cerrada'
                 }
             ]
         }

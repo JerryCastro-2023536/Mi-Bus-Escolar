@@ -1,23 +1,24 @@
-import { CrudConfig } from "./crudDTO.interface";
-
-export const choferesCrudConfig: CrudConfig = {
+export const choferesConfig = {
     title: 'Choferes',
-    subtitle: 'Gestión y administración de los choferes del sistema',
+    subtitle: 'Gestiona los choferes registrados',
     apiEndpoint: '/choferes',
     idKey: 'id_chofer',
+
     kpis: [
         {
-            title: 'Total de Choferes',
-            valueKey: 'totalChoferes',
-            icon: 'users' 
+            title: 'Total choferes',
+            valueKey: 'total',
+            subtitle: 'Choferes registrados',
+            icon: 'person'
         },
         {
-            title: 'Choferes Activos',
-            valueKey: 'choferesActivos',
-            subtitle: 'En servicio',
-            icon: 'check-circle'
+            title: 'Choferes activos',
+            valueKey: 'activos',
+            subtitle: 'Choferes disponibles',
+            icon: 'check_circle'
         }
     ],
+
     tableColumns: [
         {
             key: 'id_chofer',
@@ -26,8 +27,8 @@ export const choferesCrudConfig: CrudConfig = {
         },
         {
             key: 'id_usuario',
-            label: 'ID Usuario',
-            type: 'text'
+            label: 'Usuario',
+            type: 'number'
         },
         {
             key: 'telefono_contacto',
@@ -37,19 +38,20 @@ export const choferesCrudConfig: CrudConfig = {
         {
             key: 'estado',
             label: 'Estado',
-            type: 'badge' 
+            type: 'badge'
         }
     ],
+
     formFields: [
         {
             key: 'id_usuario',
-            label: 'ID de Usuario',
+            label: 'ID Usuario',
             type: 'number',
             required: true
         },
         {
             key: 'telefono_contacto',
-            label: 'Teléfono de Contacto',
+            label: 'Teléfono de contacto',
             type: 'text',
             required: true
         },
@@ -59,8 +61,45 @@ export const choferesCrudConfig: CrudConfig = {
             type: 'select',
             required: true,
             options: [
-                { value: 'ACTIVO', label: 'Activo' },
-                { value: 'INACTIVO', label: 'Inactivo' }
+                {
+                    value: 'ACTIVO',
+                    label: 'Activo'
+                },
+                {
+                    value: 'INACTIVO',
+                    label: 'Inactivo'
+                }
+            ]
+        }
+    ],
+
+    formFieldsEdit: [
+        {
+            key: 'id_usuario',
+            label: 'ID Usuario',
+            type: 'number',
+            required: true
+        },
+        {
+            key: 'telefono_contacto',
+            label: 'Teléfono de contacto',
+            type: 'text',
+            required: true
+        },
+        {
+            key: 'estado',
+            label: 'Estado',
+            type: 'select',
+            required: true,
+            options: [
+                {
+                    value: 'ACTIVO',
+                    label: 'Activo'
+                },
+                {
+                    value: 'INACTIVO',
+                    label: 'Inactivo'
+                }
             ]
         }
     ]

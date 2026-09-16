@@ -1,43 +1,33 @@
-export const rutasConfig = {
-    title: 'Rutas',
-    subtitle: 'Gestiona las rutas del servicio de transporte',
-    apiEndpoint: '/rutas',
-    idKey: 'id_ruta',
+export const serviciosConfig = {
+    title: 'Servicios',
+    subtitle: 'Gestiona los servicios de transporte disponibles',
+    apiEndpoint: '/servicios',
+    idKey: 'id_servicio',
 
     kpis: [
         {
-            title: 'Total rutas',
+            title: 'Total servicios',
             valueKey: 'total',
-            subtitle: 'Rutas registradas',
-            icon: 'route'
+            subtitle: 'Servicios registrados',
+            icon: 'directions_bus'
         },
         {
-            title: 'Rutas activas',
-            valueKey: 'activas',
-            subtitle: 'Rutas disponibles',
+            title: 'Servicios activos',
+            valueKey: 'activos',
+            subtitle: 'Servicios disponibles',
             icon: 'check_circle'
         }
     ],
 
     tableColumns: [
         {
-            key: 'id_ruta',
+            key: 'id_servicio',
             label: 'ID',
             type: 'number'
         },
         {
-            key: 'id_servicio',
-            label: 'Servicio',
-            type: 'number'
-        },
-        {
-            key: 'id_vehiculo',
-            label: 'Vehículo',
-            type: 'number'
-        },
-        {
-            key: 'id_chofer',
-            label: 'Chofer',
+            key: 'id_proveedor',
+            label: 'Proveedor',
             type: 'number'
         },
         {
@@ -46,38 +36,33 @@ export const rutasConfig = {
             type: 'text'
         },
         {
-            key: 'hora_inicio_estimada',
-            label: 'Hora inicio',
+            key: 'descripcion',
+            label: 'Descripción',
             type: 'text'
         },
         {
-            key: 'hora_fin_estimada',
-            label: 'Hora fin',
-            type: 'text'
+            key: 'precio_mensual',
+            label: 'Precio mensual',
+            type: 'number'
         },
         {
             key: 'estado',
             label: 'Estado',
             type: 'badge'
+        },
+        {
+            key: 'fecha_creacion',
+            label: 'Fecha de creación',
+            type: 'date'
         }
     ],
 
     formFields: [
         {
-            key: 'id_servicio',
-            label: 'ID Servicio',
+            key: 'id_proveedor',
+            label: 'ID Proveedor',
             type: 'number',
             required: true
-        },
-        {
-            key: 'id_vehiculo',
-            label: 'ID Vehículo',
-            type: 'number'
-        },
-        {
-            key: 'id_chofer',
-            label: 'ID Chofer',
-            type: 'number'
         },
         {
             key: 'nombre',
@@ -86,14 +71,16 @@ export const rutasConfig = {
             required: true
         },
         {
-            key: 'hora_inicio_estimada',
-            label: 'Hora de inicio',
-            type: 'text'
+            key: 'descripcion',
+            label: 'Descripción',
+            type: 'text',
+            required: true
         },
         {
-            key: 'hora_fin_estimada',
-            label: 'Hora de finalización',
-            type: 'text'
+            key: 'precio_mensual',
+            label: 'Precio mensual',
+            type: 'number',
+            required: true
         },
         {
             key: 'estado',
@@ -110,25 +97,21 @@ export const rutasConfig = {
                     label: 'Inactivo'
                 }
             ]
+        },
+        {
+            key: 'fecha_creacion',
+            label: 'Fecha de creación',
+            type: 'date',
+            required: true
         }
     ],
 
     formFieldsEdit: [
         {
-            key: 'id_servicio',
-            label: 'ID Servicio',
+            key: 'id_proveedor',
+            label: 'ID Proveedor',
             type: 'number',
             required: true
-        },
-        {
-            key: 'id_vehiculo',
-            label: 'ID Vehículo',
-            type: 'number'
-        },
-        {
-            key: 'id_chofer',
-            label: 'ID Chofer',
-            type: 'number'
         },
         {
             key: 'nombre',
@@ -137,14 +120,16 @@ export const rutasConfig = {
             required: true
         },
         {
-            key: 'hora_inicio_estimada',
-            label: 'Hora de inicio',
-            type: 'text'
+            key: 'descripcion',
+            label: 'Descripción',
+            type: 'text',
+            required: true
         },
         {
-            key: 'hora_fin_estimada',
-            label: 'Hora de finalización',
-            type: 'text'
+            key: 'precio_mensual',
+            label: 'Precio mensual',
+            type: 'number',
+            required: true
         },
         {
             key: 'estado',
@@ -161,6 +146,12 @@ export const rutasConfig = {
                     label: 'Inactivo'
                 }
             ]
+        },
+        {
+            key: 'fecha_creacion',
+            label: 'Fecha de creación',
+            type: 'date',
+            required: true
         }
     ]
 };

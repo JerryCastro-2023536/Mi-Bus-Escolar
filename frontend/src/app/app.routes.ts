@@ -1,8 +1,7 @@
 import { usuariosConfig } from './models/usuarios.model';
 import { Routes } from '@angular/router';
 import { CrudViewComponent } from './components/crud-view/crud-view';
-import { authInterceptor } from './core/interceptor/auth.interceptor';
-import { choferesCrudConfig } from './models/choferes.model';
+import { choferesConfig } from './models/choferes.model';
 import { asistenciasConfig } from './models/asistencias.model';
 import { colegiosConfig } from './models/colegios.model';
 import { estudiantesConfig } from './models/estudiantes.model';
@@ -21,7 +20,7 @@ export const routes: Routes = [
     {
         path: 'choferes',
         component: CrudViewComponent,
-        data: { config: choferesCrudConfig }
+        data: { config: choferesConfig }
     },
     {
         path: 'asistencias',
