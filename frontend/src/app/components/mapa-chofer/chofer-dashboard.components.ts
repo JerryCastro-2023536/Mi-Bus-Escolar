@@ -32,6 +32,7 @@ export class ChoferDashboardComponents implements OnInit {
   tipoRutaActual: 'IDA' | 'VUELTA' = 'IDA';
   ubicacionActualChofer: PuntoRuta | null = null;
 
+
   constructor() {
     this.reporteForm = this.fb.group({
       titulo: ['', [Validators.required, Validators.maxLength(40)]],
@@ -44,16 +45,18 @@ export class ChoferDashboardComponents implements OnInit {
       return;
     }
 
-    localStorage.setItem("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImplcnJ5QGdtYWlsLmNvbSIsInJvbCI6IlVTVUFSSU8iLCJpYXQiOjE3ODk1NjUxMDgsImV4cCI6MTc4OTU5MzkwOH0._ut7xdbELf9cCY5sFtwa7O-UjgzxMYGdEnZWbGPf3lM");
+    localStorage.setItem("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImplcnJ5QGdtYWlsLmNvbSIsInJvbCI6IlVTVUFSSU8iLCJpYXQiOjE3ODk2MDQ4ODksImV4cCI6MTc4OTYzMzY4OX0._5bQPd6eOMi2Pk3GLn3MXq7TiUidfgT2Ivu4Ci58gLc");
     this.cargarViajeDelDia();
   }
 
   cargarViajeDelDia(): void {
+    this.errorViaje = '';
+
     this.viajesService.obtenerViajeDia(this.idChoferActual).subscribe({
       next: (data) => {
         if (data) {
           this.rutaInfo = data;
-          
+
           if (data.estado === 'ACTIVO' && data.id_viaje) {
             this.viajeActual = data;
           } else {
@@ -63,14 +66,18 @@ export class ChoferDashboardComponents implements OnInit {
           if (this.rutaInfo.id_ruta) {
             this.cargarTrazadoMapa(this.rutaInfo.id_ruta);
           }
+        } else {
+          this.rutaInfo = null;
+          this.viajeActual = null;
+          this.errorViaje = 'No hay una ruta asignada para este chofer.';
         }
+
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        this.errorViaje = err.status === 404
-          ? 'No hay una ruta asignada para este chofer.'
-          : 'No se pudo cargar la ruta. Verifica la conexión con el servidor.';
-        console.error('Error cargando la ruta del chofer', err);
+      error: () => {
+        this.rutaInfo = null;
+        this.viajeActual = null;
+        this.errorViaje = 'No hay una ruta asignada para este chofer.';
         this.cdr.detectChanges();
       }
     });
