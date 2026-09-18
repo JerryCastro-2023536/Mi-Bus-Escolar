@@ -1,0 +1,517 @@
+-- ============================================
+-- KPIs: usuarios
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_usuarios_kpis()
+RETURNS TABLE (
+    total                   INTEGER,
+    "porcentajeVerificados" DOUBLE PRECISION
+)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        ROUND(
+            COALESCE(
+                COUNT(*) FILTER (WHERE correo_verificado)::numeric * 100
+                / NULLIF(COUNT(*), 0), 0
+            ), 1
+        )::float8 AS "porcentajeVerificados"
+    FROM usuarios;
+$$;
+ 
+-- ============================================
+-- KPIs: asignaciones_ruta
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_asignaciones_ruta_kpis()
+RETURNS TABLE (total INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT COUNT(*)::int AS total FROM asignaciones_ruta;
+$$;
+ 
+-- ============================================
+-- KPIs: asistencias
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_asistencias_kpis()
+RETURNS TABLE (total INTEGER, presentes INTEGER, ausentes INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE estado_abordaje = 'PRESENTE')::int AS presentes,
+        COUNT(*) FILTER (WHERE estado_abordaje = 'AUSENTE')::int AS ausentes
+    FROM asistencias;
+$$;
+ 
+-- ============================================
+-- KPIs: choferes
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_choferes_kpis()
+RETURNS TABLE (total INTEGER, activos INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE estado = 'ACTIVO')::int AS activos
+    FROM choferes;
+$$;
+ 
+-- ============================================
+-- KPIs: colegios
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_colegios_kpis()
+RETURNS TABLE (total INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT COUNT(*)::int AS total FROM colegios;
+$$;
+ 
+-- ============================================
+-- KPIs: estudiantes
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_estudiantes_kpis()
+RETURNS TABLE (total INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT COUNT(*)::int AS total FROM estudiantes;
+$$;
+ 
+-- ============================================
+-- KPIs: incidencias
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_incidencias_kpis()
+RETURNS TABLE (total INTEGER, abiertas INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE estado = 'ABIERTA')::int AS abiertas
+    FROM incidencias;
+$$;
+ 
+-- ============================================
+-- KPIs: notificaciones
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_notificaciones_kpis()
+RETURNS TABLE (total INTEGER, "noLeidas" INTEGER, leidas INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE leida = false)::int AS "noLeidas",
+        COUNT(*) FILTER (WHERE leida = true)::int AS leidas
+    FROM notificaciones;
+$$;
+ 
+-- ============================================
+-- KPIs: pagos
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_pagos_kpis()
+RETURNS TABLE (total INTEGER, pendientes INTEGER, verificados INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE estado = 'PENDIENTE')::int AS pendientes,
+        COUNT(*) FILTER (WHERE estado = 'VERIFICADO')::int AS verificados
+    FROM pagos;
+$$;
+ 
+-- ============================================
+-- KPIs: paradas
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_paradas_kpis()
+RETURNS TABLE (total INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT COUNT(*)::int AS total FROM paradas;
+$$;
+ 
+-- ============================================
+-- KPIs: proveedores
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_proveedores_kpis()
+RETURNS TABLE (total INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT COUNT(*)::int AS total FROM proveedores;
+$$;
+ 
+-- ============================================
+-- KPIs: ruta_parada
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_ruta_parada_kpis()
+RETURNS TABLE (total INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT COUNT(*)::int AS total FROM ruta_parada;
+$$;
+ 
+-- ============================================
+-- KPIs: rutas
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_rutas_kpis()
+RETURNS TABLE (total INTEGER, activas INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE estado = 'ACTIVO')::int AS activas
+    FROM rutas;
+$$;
+ 
+-- ============================================
+-- KPIs: servicios
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_servicios_kpis()
+RETURNS TABLE (total INTEGER, activos INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE estado = 'ACTIVO')::int AS activos
+    FROM servicios;
+$$;
+ 
+-- ============================================
+-- KPIs: ubicaciones_bus
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_ubicaciones_bus_kpis()
+RETURNS TABLE (total INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT COUNT(*)::int AS total FROM ubicaciones_bus;
+$$;
+ 
+-- ============================================
+-- KPIs: valoraciones
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_valoraciones_kpis()
+RETURNS TABLE (total INTEGER, promedio DOUBLE PRECISION)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        ROUND(COALESCE(AVG(calificacion), 0)::numeric, 1)::float8 AS promedio
+    FROM valoraciones;
+$$;
+ 
+-- ============================================
+-- KPIs: vehiculos
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_vehiculos_kpis()
+RETURNS TABLE (total INTEGER, activos INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE estado = 'ACTIVO')::int AS activos
+    FROM vehiculos;
+$$;
+ 
+-- ============================================
+-- KPIs: viajes
+-- ============================================
+CREATE OR REPLACE FUNCTION sp_viajes_kpis()
+RETURNS TABLE (total INTEGER, activos INTEGER)
+LANGUAGE sql STABLE AS $$
+    SELECT
+        COUNT(*)::int AS total,
+        COUNT(*) FILTER (WHERE estado = 'EN_CURSO')::int AS activos
+    FROM viajes;
+$$;
+ 
+-- ============================================================
+--  ASISTENCIA ESCOLAR 
+-- ============================================================
+-- ---------- 1) MIS RUTAS + ESTADO DE HOY (chofer) ----------
+CREATE OR REPLACE FUNCTION sp_asistencias_mis_rutas(p_id_usuario INTEGER)
+RETURNS TABLE (
+    id_ruta              INTEGER,
+    nombre               TEXT,
+    hora_inicio_estimada TIME,
+    hora_fin_estimada    TIME,
+    total_estudiantes    INTEGER,
+    id_viaje_hoy         INTEGER,
+    reporte_completo     BOOLEAN,
+    presentes            INTEGER,
+    ausentes             INTEGER
+)
+LANGUAGE plpgsql STABLE
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        r.id_ruta,
+        r.nombre,
+        r.hora_inicio_estimada,
+        r.hora_fin_estimada,
+        COALESCE(t.total, 0),
+        v.id_viaje,
+        (v.id_viaje IS NOT NULL
+         AND (COALESCE(t.total, 0) = 0 OR COALESCE(t.pendientes, 0) = 0)),
+        COALESCE(t.presentes, 0),
+        COALESCE(t.ausentes, 0)
+    FROM choferes c
+    JOIN rutas r
+        ON r.id_chofer = c.id_chofer
+    -- Viaje de hoy de la ruta (el de mayor id, si hay varios)
+    LEFT JOIN LATERAL (
+        SELECT id_viaje
+        FROM viajes
+        WHERE id_ruta = r.id_ruta
+          AND fecha_viaje = CURRENT_DATE
+        ORDER BY id_viaje DESC
+        LIMIT 1
+    ) v ON true
+    LEFT JOIN LATERAL (
+        SELECT
+            (SELECT COUNT(*)
+             FROM asignaciones_ruta ar
+             WHERE ar.id_ruta = r.id_ruta) AS total,
+            COUNT(*) FILTER (WHERE a.estado_abordaje = 'PENDIENTE') AS pendientes,
+            COUNT(*) FILTER (WHERE a.estado_abordaje = 'PRESENTE')  AS presentes,
+            COUNT(*) FILTER (WHERE a.estado_abordaje IN
+                ('AUSENTE', 'NO ASISTE', 'NO ASISTIRA'))           AS ausentes
+        FROM asistencias a
+        WHERE a.id_viaje = v.id_viaje
+        GROUP BY a.id_viaje
+    ) t ON true
+    WHERE c.id_usuario = p_id_usuario
+      AND r.estado = 'ACTIVO'
+    ORDER BY r.hora_inicio_estimada NULLS LAST, r.nombre;
+END;
+$$;
+ 
+-- ---------- 2) ESTUDIANTES ASIGNADOS A UNA RUTA ----------
+-- Incluye sus paradas de recogida/descenso (útil para mostrar la parada en el checklist)
+CREATE OR REPLACE FUNCTION sp_asistencias_estudiantes_ruta(p_id_ruta INTEGER)
+RETURNS TABLE (
+    id_estudiante      INTEGER,
+    nombre             TEXT,
+    apellido           TEXT,
+    grado              TEXT,
+    foto_estudiante    TEXT,
+    id_parada_recogida INTEGER,
+    id_parada_descenso INTEGER
+)
+LANGUAGE sql STABLE
+AS $$
+    SELECT e.id_estudiante, e.nombre, e.apellido, e.grado, e.foto_estudiante,
+           ar.id_parada_recogida, ar.id_parada_descenso
+    FROM asignaciones_ruta ar
+    JOIN estudiantes e ON e.id_estudiante = ar.id_estudiante
+    WHERE ar.id_ruta = p_id_ruta
+    ORDER BY e.apellido, e.nombre;
+$$;
+ 
+-- ---------- 3) VIAJE DE HOY (lo crea y pre-arma los PENDIENTE) ----------
+-- Al crearlo, copia chofer y vehículo de la ruta (para trazabilidad del viaje)
+CREATE OR REPLACE FUNCTION sp_asistencias_viaje_hoy(p_id_ruta INTEGER)
+RETURNS TABLE (
+    id_viaje    INTEGER,
+    id_ruta     INTEGER,
+    id_chofer   INTEGER,
+    id_vehiculo INTEGER,
+    fecha_viaje DATE,
+    hora_inicio TIME,
+    hora_fin    TIME,
+    estado      TEXT
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_id_viaje INTEGER;
+BEGIN
+    SELECT id_viaje INTO v_id_viaje
+    FROM viajes
+    WHERE id_ruta = p_id_ruta
+      AND fecha_viaje = CURRENT_DATE
+    ORDER BY id_viaje DESC
+    LIMIT 1;
+ 
+    IF v_id_viaje IS NULL THEN
+        INSERT INTO viajes (id_ruta, id_chofer, id_vehiculo, fecha_viaje, estado)
+        SELECT r.id_ruta, r.id_chofer, r.id_vehiculo, CURRENT_DATE, 'PROGRAMADO'
+        FROM rutas r
+        WHERE r.id_ruta = p_id_ruta
+        RETURNING id_viaje INTO v_id_viaje;
+ 
+        -- Pre-arma el checklist: un PENDIENTE por cada estudiante asignado
+        -- (usa el constraint uq_asistencia_viaje_estudiante de tu tabla)
+        INSERT INTO asistencias (id_viaje, id_estudiante, estado_abordaje, estado_descenso)
+        SELECT v_id_viaje, ar.id_estudiante, 'PENDIENTE', 'PENDIENTE'
+        FROM asignaciones_ruta ar
+        WHERE ar.id_ruta = p_id_ruta
+        ON CONFLICT (id_viaje, id_estudiante) DO NOTHING;
+    END IF;
+ 
+    RETURN QUERY
+        SELECT id_viaje, id_ruta, id_chofer, id_vehiculo,
+               fecha_viaje, hora_inicio, hora_fin, estado
+        FROM viajes
+        WHERE id_viaje = v_id_viaje;
+END;
+$$;
+ 
+-- ---------- 4) ESTADOS DE HOY POR ESTUDIANTE (precargar checklist) ----------
+CREATE OR REPLACE FUNCTION sp_asistencias_estados_viaje(p_id_viaje INTEGER)
+RETURNS TABLE (
+    id_estudiante   INTEGER,
+    estado_abordaje TEXT,
+    hora_abordaje   TIMESTAMP
+)
+LANGUAGE sql STABLE
+AS $$
+    SELECT a.id_estudiante, a.estado_abordaje, a.hora_abordaje
+    FROM asistencias a
+    WHERE a.id_viaje = p_id_viaje
+    ORDER BY a.id_estudiante;
+$$;
+ 
+-- ---------- 5) ENVIAR REPORTE (transacción: asistencias + notificaciones) ----------
+-- p_asistencias: JSONB array
+--   [ { "id_estudiante": 12, "estado_abordaje": "PRESENTE" }, ... ]
+CREATE OR REPLACE FUNCTION sp_asistencias_enviar_reporte(
+    p_id_usuario  INTEGER,
+    p_id_viaje    INTEGER,
+    p_asistencias JSONB
+)
+RETURNS TABLE (
+    presentes       INTEGER,
+    ausentes        INTEGER,
+    notificaciones  INTEGER
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_id_ruta   INTEGER;
+    v_presentes INTEGER := 0;
+    v_ausentes  INTEGER := 0;
+    v_notis     INTEGER := 0;
+    v_id_asist  INTEGER;
+    v_noti      RECORD;
+    v_est       RECORD;
+    a           RECORD;
+BEGIN
+    -- 1) Validaciones
+    IF NOT EXISTS (
+        SELECT 1
+        FROM viajes
+        WHERE id_viaje = p_id_viaje
+          AND fecha_viaje = CURRENT_DATE
+    ) THEN
+        RAISE EXCEPTION 'El viaje no existe o no corresponde a hoy';
+    END IF;
+ 
+    SELECT id_ruta INTO v_id_ruta
+    FROM viajes
+    WHERE id_viaje = p_id_viaje;
+ 
+    IF NOT EXISTS (
+        SELECT 1
+        FROM rutas r
+        JOIN choferes c ON c.id_chofer = r.id_chofer
+        WHERE r.id_ruta = v_id_ruta
+          AND c.id_usuario = p_id_usuario
+    ) THEN
+        RAISE EXCEPTION 'La ruta no pertenece a este chofer';
+    END IF;
+ 
+    -- 2) Actualiza cada estado (solo PRESENTE / AUSENTE)
+    FOR a IN
+        SELECT (item ->> 'id_estudiante')::INTEGER AS id_estudiante,
+               (item ->> 'estado_abordaje')        AS estado_abordaje
+        FROM jsonb_array_elements(p_asistencias) AS item
+        WHERE (item ->> 'estado_abordaje') IN ('PRESENTE', 'AUSENTE')
+    LOOP
+        UPDATE asistencias
+        SET estado_abordaje = a.estado_abordaje,
+            hora_abordaje   = NOW()
+        WHERE id_viaje = p_id_viaje
+          AND id_estudiante = a.id_estudiante;
+ 
+        IF NOT FOUND THEN
+            RAISE EXCEPTION 'El estudiante % no está asignado a este viaje',
+                a.id_estudiante;
+        END IF;
+ 
+        SELECT id_asistencia INTO v_id_asist
+        FROM asistencias
+        WHERE id_viaje = p_id_viaje
+          AND id_estudiante = a.id_estudiante;
+ 
+        IF a.estado_abordaje = 'PRESENTE' THEN
+            v_presentes := v_presentes + 1;
+        ELSE
+            v_ausentes := v_ausentes + 1;
+ 
+            -- Idempotencia: si reenvía, no duplica notificaciones
+            DELETE FROM notificaciones
+            WHERE id_asistencia = v_id_asist
+              AND tipo = 'INASISTENCIA';
+ 
+            -- Notificación al tutor (vía tu sp_notificaciones_agregar)
+            SELECT nombre, apellido, id_usuario_tutor
+            INTO v_est
+            FROM estudiantes
+            WHERE id_estudiante = a.id_estudiante;
+ 
+            IF v_est.id_usuario_tutor IS NOT NULL THEN
+                SELECT * INTO v_noti
+                FROM sp_notificaciones_agregar(
+                    v_est.id_usuario_tutor,       -- $1 id_usuario
+                    NULL,                         -- $2 id_incidencia
+                    v_id_asist,                   -- $3 id_asistencia
+                    'INASISTENCIA',               -- $4 tipo
+                    'Inasistencia de estudiante', -- $5 titulo
+                    'Su hijo ' || v_est.nombre || ' ' || v_est.apellido ||
+                    ' no asistió hoy al servicio de transporte.', -- $6 mensaje
+                    false,                        -- $7 leida
+                    NOW()                         -- $8 fecha_envio
+                );
+ 
+                IF FOUND THEN
+                    v_notis := v_notis + 1;
+                END IF;
+            END IF;
+        END IF;
+    END LOOP;
+ 
+    -- 3) Resumen
+    RETURN QUERY SELECT v_presentes, v_ausentes, v_notis;
+END;
+$$;
+ 
+-- ---------- 6) NOTIFICACIONES DEL USUARIO LOGUEADO ----------
+-- (variante por usuario de tu sp_notificaciones_listar, que lista todas)
+CREATE OR REPLACE FUNCTION sp_notificaciones_listar_usuario(p_id_usuario INTEGER)
+RETURNS TABLE (
+    id_notificacion INTEGER,
+    tipo            TEXT,
+    titulo          TEXT,
+    mensaje         TEXT,
+    leida           BOOLEAN,
+    fecha_envio     TIMESTAMP
+)
+LANGUAGE sql STABLE
+AS $$
+    SELECT id_notificacion, tipo, titulo, mensaje, leida, fecha_envio
+    FROM notificaciones
+    WHERE id_usuario = p_id_usuario
+    ORDER BY fecha_envio DESC;
+$$;
+ 
+CREATE OR REPLACE FUNCTION sp_notificaciones_no_leidas(p_id_usuario INTEGER)
+RETURNS TABLE (cant INTEGER)
+LANGUAGE sql STABLE
+AS $$
+    SELECT COUNT(*)::INTEGER
+    FROM notificaciones
+    WHERE id_usuario = p_id_usuario
+    AND leida = false;
+$$;
+ 
+-- Solo su dueño puede marcarla como leída
+CREATE OR REPLACE FUNCTION sp_notificaciones_marcar_leida(
+    p_id_notificacion INTEGER,
+    p_id_usuario      INTEGER
+)
+RETURNS TABLE (ok BOOLEAN)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_filas INTEGER;
+BEGIN
+    UPDATE notificaciones
+    SET leida = true
+    WHERE id_notificacion = p_id_notificacion
+      AND id_usuario = p_id_usuario;
+    GET DIAGNOSTICS v_filas = ROW_COUNT;
+    RETURN QUERY SELECT (v_filas > 0);
+END;
+$$;
+ 

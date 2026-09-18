@@ -1,16 +1,23 @@
-//Nombre Archivos App/core/interceptors/AuthInterceptor
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpInterceptorFn } from '@angular/common/http';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const platformId = inject(PLATFORM_ID);
+    
     if (!isPlatformBrowser(platformId)) {
         return next(req);
     }
 
-    const token = localStorage.getItem('token');
+    if (req.url.includes('cloudinary.com')) {
+        return next(req);
+    }
 
+    if (!req.url.includes('/api')) {
+        return next(req);
+    }
+
+    const token = localStorage.getItem('auth_token');
     if (!token) {
         return next(req);
     }

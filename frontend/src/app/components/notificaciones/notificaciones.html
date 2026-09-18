@@ -1,0 +1,217 @@
+<div class="inbox-layout">
+  
+  <main class="inbox-main-content">
+
+
+    <div class="inbox-top-nav-bar">
+      <a routerLink="/dashboard" class="btn-back-dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Volver al Dashboard</span>
+      </a>
+
+      <div class="nav-breadcrumbs">
+        <span class="crumb-parent">Mi Bus Escolar</span>
+        <i class="fa-solid fa-chevron-right crumb-sep"></i>
+        <span class="crumb-active">Bandeja de Notificaciones</span>
+      </div>
+    </div>
+
+    <div class="inbox-kpis-grid">
+      <div class="kpi-card total">
+        <div class="kpi-icon-box">
+          <i class="fa-solid fa-inbox"></i>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Total Notificaciones</span>
+          <span class="kpi-val">{{ contarPorFiltro('TODAS') }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card no-leidas">
+        <div class="kpi-icon-box">
+          <i class="fa-solid fa-bell"></i>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Pendientes por Leer</span>
+          <span class="kpi-val">{{ contarPorFiltro('NO_LEIDAS') }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card rol-info">
+        <div class="kpi-icon-box">
+          <i class="fa-solid fa-user-shield"></i>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Canal del Rol</span>
+          <span class="kpi-val-text">{{ sidebarUser?.role || 'USUARIO' }}</span>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="inbox-controls-card">
+      <div class="controls-top-row">
+
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input 
+            type="text" 
+            [(ngModel)]="busqueda" 
+            placeholder="Buscar por título o contenido del aviso..."
+          />
+          @if (busqueda) {
+            <button class="btn-clear-search" (click)="busqueda = ''" type="button" title="Limpiar búsqueda">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          }
+        </div>
+
+        <button class="btn-marcar-todas-global" (click)="marcarTodasComoLeidas()" type="button">
+          <i class="fa-solid fa-check-double"></i>
+          <span>Marcar todas como leídas</span>
+        </button>
+      </div>
+
+      <div class="filter-tabs">
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'TODAS'" 
+          (click)="cambiarFiltro('TODAS')"
+          type="button"
+        >
+          <span>Todas</span>
+          <span class="tab-badge">{{ contarPorFiltro('TODAS') }}</span>
+        </button>
+
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'NO_LEIDAS'" 
+          (click)="cambiarFiltro('NO_LEIDAS')"
+          type="button"
+        >
+          <span>No Leídas</span>
+          <span class="tab-badge warning">{{ contarPorFiltro('NO_LEIDAS') }}</span>
+        </button>
+
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'INCIDENTE'" 
+          (click)="cambiarFiltro('INCIDENTE')"
+          type="button"
+        >
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>Incidentes</span>
+          <span class="tab-badge">{{ contarPorFiltro('INCIDENTE') }}</span>
+        </button>
+
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'ASISTENCIA'" 
+          (click)="cambiarFiltro('ASISTENCIA')"
+          type="button"
+        >
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Asistencias</span>
+          <span class="tab-badge">{{ contarPorFiltro('ASISTENCIA') }}</span>
+        </button>
+
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'INASISTENCIA'" 
+          (click)="cambiarFiltro('INASISTENCIA')"
+          type="button"
+        >
+          <i class="fa-solid fa-circle-xmark"></i>
+          <span>Inasistencias</span>
+          <span class="tab-badge">{{ contarPorFiltro('INASISTENCIA') }}</span>
+        </button>
+
+        <button 
+          class="tab-btn" 
+          [class.active]="filtroActual === 'OTRO'" 
+          (click)="cambiarFiltro('OTRO')"
+          type="button"
+        >
+          <i class="fa-solid fa-bell"></i>
+          <span>Otros</span>
+          <span class="tab-badge">{{ contarPorFiltro('OTRO') }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="inbox-list-container">
+      @if (notificacionesFiltradas.length === 0) {
+        <div class="empty-inbox-state">
+          <div class="empty-icon-circle">
+            <i class="fa-regular fa-bell-slash"></i>
+          </div>
+          <h3>No hay notificaciones aquí</h3>
+          <p>No se encontraron avisos con los filtros o términos de búsqueda seleccionados.</p>
+          @if (busqueda || filtroActual !== 'TODAS') {
+            <button class="btn-reset-filtros" (click)="busqueda = ''; filtroActual = 'TODAS'" type="button">
+              Ver todas las notificaciones
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="notif-cards-stack">
+          @for (notif of notificacionesFiltradas; track notif.id_notificaciones) {
+            @let estilo = notif.tipo | notificacionEstilo;
+            <div class="notif-card" [class.unread]="!notif.leida">
+              
+              @if (!notif.leida) {
+                <div class="unread-stripe"></div>
+              }
+
+              <div class="card-icon-box" [style.backgroundColor]="estilo.bg" [style.color]="estilo.color">
+                <i [class]="'fa-solid fa-' + estilo.icon"></i>
+              </div>
+
+              <div class="card-body">
+                <div class="card-header-row">
+                  <div class="title-and-badges">
+                    <h4 class="card-title">{{ notif.titulo }}</h4>
+                    <span class="type-pill" [style.color]="estilo.color" [style.backgroundColor]="estilo.bg">
+                      {{ notif.tipo }}
+                    </span>
+                  </div>
+                  <span class="card-time">
+                    <i class="fa-regular fa-clock"></i>
+                    {{ notif.fecha_envio | tiempoRelativo }}
+                  </span>
+                </div>
+
+                <p class="card-text">{{ notif.mensaje }}</p>
+              </div>
+
+              <div class="card-actions">
+                @if (!notif.leida) {
+                  <button 
+                    class="action-btn mark-read" 
+                    (click)="marcarComoLeida(notif.id_notificaciones)" 
+                    type="button"
+                    title="Marcar como leída"
+                  >
+                    <i class="fa-solid fa-check"></i>
+                    <span>Leída</span>
+                  </button>
+                }
+                <button 
+                  class="action-btn delete" 
+                  (click)="eliminar(notif.id_notificaciones)" 
+                  type="button"
+                  title="Eliminar notificación"
+                >
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </main>
+
+</div>

@@ -1,0 +1,17 @@
+<div class="dashboard-shell">
+
+    <app-sidebar [brand]="brand" [sections]="sections" [user]="sidebarUser()" (logout)="onLogout() " />
+
+    <main class="dashboard-content">
+        <div class="dashboard">
+
+            @if (!hideHeader()) {
+            <app-header [user]="sidebarUser()" [title]="pageTitle()" [subtitle]="pageSubtitle()" />
+            }
+
+            <router-outlet></router-outlet>
+
+        </div>
+    </main>
+
+</div>
