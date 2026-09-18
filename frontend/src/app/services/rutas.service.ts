@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError, timeout } from 'rxjs/operators';
 import { PuntoRuta } from '../models/mapas.type';
 import { Incidencias } from '../models/incidencias';
 
@@ -10,11 +11,17 @@ export class rutasService {
   private apiUrl = 'http://localhost:3000/api';
 
   obtenerViajeDia(idChofer: number): Observable<any> {
-    return this.http.get(`${this.apiUrl}/viajes/hoy/${idChofer}`);
+    return this.http.get(`${this.apiUrl}/viajes/hoy/${idChofer}`).pipe(
+      timeout(8000),
+      catchError(() => of(null))
+    );
   }
 
   obtenerTrazadoRuta(idRuta: number): Observable<PuntoRuta[]> {
-    return this.http.get<PuntoRuta[]>(`${this.apiUrl}/rutas/${idRuta}/paradas`);
+    return this.http.get<PuntoRuta[]>(`${this.apiUrl}/rutas/${idRuta}/paradas`).pipe(
+      timeout(8000),
+      catchError(() => of([]))
+    );
   }
 
   iniciarRutaViaje(idChoferOViaje: number): Observable<any> {
