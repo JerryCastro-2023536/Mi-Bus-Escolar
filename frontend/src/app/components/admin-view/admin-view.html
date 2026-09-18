@@ -1,134 +1,108 @@
-<div class="admin-shell">
+<div class="admin-catalog">
 
-  <app-sidebar
-    [brand]="brand"
-    [sections]="sections"
-    [user]="sidebarUser"
-    (logout)="onLogout()"
-  />
+  <div class="admin-top-toolbar">
+    <div class="toolbar-title">
+      <h2>Gestión de Entidades y Servicios</h2>
+      <p>Selecciona un módulo para consultar registros o realizar operaciones administrativas.</p>
+    </div>
 
-  <main class="admin-main">
-    <div class="admin-container">
+    <div class="toolbar-actions">
+      <a class="action-btn-outline" routerLink="/proveedores">
+        <i class="fa-solid fa-building-circle-check"></i>
+        <span>Proveedores</span>
+      </a>
+      <a class="action-btn-outline" routerLink="/colegios">
+        <i class="fa-solid fa-school"></i>
+        <span>Colegios</span>
+      </a>
+    </div>
+  </div>
 
-      <app-header [user]="sidebarUser" />
+  <section class="catalog-header-bar">
+    <div class="search-input-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input
+        type="text"
+        placeholder="Buscar entidad (ej. usuarios, rutas, vehículos, pagos...)"
+        [(ngModel)]="searchQuery"
+      />
+      @if (searchQuery) {
+        <button class="clear-btn" (click)="clearSearch()" title="Limpiar búsqueda">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      }
+    </div>
 
-      <div class="admin-top-toolbar">
-        <div class="toolbar-title">
-          <h2>Gestión de Entidades y Servicios</h2>
-          <p>Selecciona un módulo para consultar registros o realizar operaciones administrativas.</p>
-        </div>
+    <div class="category-tabs">
+      <button type="button" [class.active]="selectedCategory === 'ALL'" (click)="setCategory('ALL')">
+        Todos ({{ totalEntitiesCount }})
+      </button>
+      <button type="button" [class.active]="selectedCategory === 'Identidad'" (click)="setCategory('Identidad')">
+        Identidad
+      </button>
+      <button type="button" [class.active]="selectedCategory === 'Flota'" (click)="setCategory('Flota')">
+        Flota
+      </button>
+      <button type="button" [class.active]="selectedCategory === 'Operación'" (click)="setCategory('Operación')">
+        Operación
+      </button>
+      <button type="button" [class.active]="selectedCategory === 'Comunicación'" (click)="setCategory('Comunicación')">
+        Comunicación & Pagos
+      </button>
+    </div>
+  </section>
 
-        <div class="toolbar-actions">
-          <a class="action-btn-outline" routerLink="/proveedores">
-            <i class="fa-solid fa-building-circle-check"></i>
-            <span>Proveedores</span>
-          </a>
-          <a class="action-btn-outline" routerLink="/colegios">
-            <i class="fa-solid fa-school"></i>
-            <span>Colegios</span>
-          </a>
-        </div>
+  @if (filteredSections.length === 0) {
+    <div class="empty-results-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <h4>No se encontraron servicios</h4>
+      <p>
+        @if (searchQuery) {
+          No hay módulos que coincidan con "{{ searchQuery }}".
+        } @else {
+          No hay módulos en esta categoría.
+        }
+      </p>
+      <button (click)="clearSearch(); setCategory('ALL')">Ver todos los módulos</button>
+    </div>
+  }
+
+  @for (section of filteredSections; track section.title ?? $index) {
+    <section class="entity-category-section">
+
+      <div class="category-header">
+        <h4>{{ section.title }}</h4>
+        <span class="category-count">{{ section.items.length }}</span>
       </div>
 
-      <section class="catalog-header-bar">
-        <div class="search-input-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input 
-            type="text" 
-            placeholder="Buscar entidad (ej. usuarios, rutas, vehículos, pagos...)" 
-            [(ngModel)]="searchQuery"
-          />
-          @if (searchQuery) {
-            <button class="clear-btn" (click)="clearSearch()" title="Limpiar búsqueda">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          }
-        </div>
+      <div class="entity-cards-grid">
+        @for (item of section.items; track item.route) {
+          <div [class]="'entity-card ' + getCardTheme(section.title)">
 
-        <div class="category-tabs">
-          <button 
-            type="button" 
-            [class.active]="selectedCategory === 'ALL'" 
-            (click)="setCategory('ALL')">
-            Todos ({{ totalEntitiesCount }})
-          </button>
-          <button 
-            type="button" 
-            [class.active]="selectedCategory === 'Identidad'" 
-            (click)="setCategory('Identidad')">
-            Identidad
-          </button>
-          <button 
-            type="button" 
-            [class.active]="selectedCategory === 'Flota'" 
-            (click)="setCategory('Flota')">
-            Flota
-          </button>
-          <button 
-            type="button" 
-            [class.active]="selectedCategory === 'Operación'" 
-            (click)="setCategory('Operación')">
-            Operación
-          </button>
-          <button 
-            type="button" 
-            [class.active]="selectedCategory === 'Comunicación'" 
-            (click)="setCategory('Comunicación')">
-            Comunicación & Pagos
-          </button>
-        </div>
-      </section>
-
-      @if (filteredSections.length === 0) {
-        <div class="empty-results-box">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <h4>No se encontraron servicios</h4>
-          <p>No hay módulos que coincidan con "{{ searchQuery }}".</p>
-          <button (click)="clearSearch(); setCategory('ALL')">Ver todos los módulos</button>
-        </div>
-      }
-
-      @for (section of filteredSections; track section.title ?? $index) {
-        <section class="entity-category-section">
-          
-          <div class="category-header">
-            <h4>{{ section.title }}</h4>
-            <span class="category-count">{{ section.items.length }}</span>
-          </div>
-
-          <div class="entity-cards-grid">
-            @for (item of section.items; track item.route) {
-              <div [class]="'entity-card ' + getCardTheme(section.title)">
-                
-                <div class="card-top">
-                  <div class="entity-icon-box">
-                    <i [class]="'fa-solid fa-' + item.icon"></i>
-                  </div>
-                  <span class="entity-badge">
-                    {{ section.title }}
-                  </span>
-                </div>
-
-                <div class="card-middle">
-                  <h5 class="entity-name">{{ item.label }}</h5>
-                  <p class="entity-desc">{{ item.description }}</p>
-                </div>
-
-                <div class="card-bottom">
-                  <a [routerLink]="item.route" class="card-action-link">
-                    <span>Acceder</span>
-                    <i class="fa-solid fa-chevron-right"></i>
-                  </a>
-                </div>
-
+            <div class="card-top">
+              <div class="entity-icon-box">
+                <i [class]="'fa-solid fa-' + item.icon"></i>
               </div>
-            }
+              <span class="entity-badge">{{ section.title }}</span>
+            </div>
+
+            <div class="card-middle">
+              <h5 class="entity-name">{{ item.label }}</h5>
+              <p class="entity-desc">{{ item.description }}</p>
+            </div>
+
+            <div class="card-bottom">
+              <a [routerLink]="item.route" class="card-action-link">
+                <span>Acceder</span>
+                <i class="fa-solid fa-chevron-right"></i>
+              </a>
+            </div>
+
           </div>
+        }
+      </div>
 
-        </section>
-      }
-
-    </div>
-  </main>
+    </section>
+  }
 
 </div>
