@@ -1,7 +1,5 @@
 <div class="cuenta-layout">
 
-  <app-sidebar [user]="sidebarUser" />
-
   <main class="cuenta-main-content">
 
     <div class="cuenta-top-nav">
@@ -16,12 +14,6 @@
         <span class="crumb-active">Mi Cuenta y Perfil</span>
       </div>
     </div>
-
-    <app-header 
-      [user]="sidebarUser"
-      title="Centro de Cuenta & Perfil"
-      subtitle="Gestiona tu información personal, credenciales de acceso y visualiza los permisos de tu rol."
-    />
 
     @if (mensajeExito) {
       <div class="alert-box success">

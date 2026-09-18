@@ -4,8 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
 import { LoginService } from '../../services/login';
 import { UsuarioService } from '../../services/usuario.service';
-import { HeaderComponent } from '../../shared/header/header';
-import { SidebarComponent } from '../../shared/sidebar/sidebar';
 import { SidebarUser } from '../../models/sidebar.model';
 import { Usuario } from '../../../../../backend/src/models/usuario';
 import { userRol } from '../../../../../backend/src/enums/userRol';
@@ -13,7 +11,7 @@ import { userRol } from '../../../../../backend/src/enums/userRol';
 @Component({
   selector: 'app-cuenta-view',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, HeaderComponent, SidebarComponent],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './cuenta-view.html',
   styleUrl: './cuenta-view.css'
 })
