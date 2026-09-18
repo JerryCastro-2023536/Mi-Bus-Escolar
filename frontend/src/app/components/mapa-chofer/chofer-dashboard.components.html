@@ -20,8 +20,12 @@
 
       <!-- En la sección de ruta central, reemplazar los datos duros -->
       <div class="card route-card">
-        <!-- Muestra el nombre real de la ruta o un fallback si está cargando -->
-        <h2>{{ rutaInfo?.nombre || errorViaje || 'Buscando ruta programada...' }} ({{ tipoRutaActual === 'VUELTA' ? 'Ruta de Vuelta' : 'Ruta de Ida' }})</h2>
+        <h2>
+          {{ rutaInfo?.nombre || errorViaje || 'No hay una ruta asignada para este chofer.' }}
+          @if (rutaInfo?.nombre) {
+            <span>({{ tipoRutaActual === 'VUELTA' ? 'Ruta de Vuelta' : 'Ruta de Ida' }})</span>
+          }
+        </h2>
         <div class="route-metrics">
           <span>Est. Inicio: {{ rutaInfo?.hora_inicio_estimada || '--:--' }}</span>
           <span>Est. Llegada: {{ rutaInfo?.hora_fin_estimada || '--:--' }}</span>
@@ -32,7 +36,6 @@
       </div>
 
       <div class="placeholder-map">
-        <!-- El componente mapa solo se renderiza si ya tenemos los puntos para no fallar -->
         @if (rutaRutaAsignada.length > 0) {
           <app-mapa 
             [rol]="'chofer'" 
@@ -45,7 +48,9 @@
             <p style="color: #64748b;">Todos los abordajes han sido completados y la ruta quedó registrada en la base de datos.</p>
           </div>
         } @else {
-          <p style="text-align:center; padding: 50px;">Mapa sin trazado de Ruta</p>
+          <p style="text-align:center; padding: 50px; color: #64748b; font-weight: 600;">
+            {{ errorViaje || 'No hay una ruta asignada para este chofer.' }}
+          </p>
         }
       </div>
     </main>
@@ -66,7 +71,7 @@
         <button 
           class="btn btn-secondary" 
           (click)="iniciarRuta('IDA')"
-          [disabled]="(viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'IDA') || (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'IDA') || (!viajeActual && !rutaInfo)">
+          [disabled]="!rutaInfo || (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'IDA') || (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'IDA')">
           {{ (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'IDA') ? 'Ruta en Progreso' : (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'IDA' ? 'Ruta Finalizada' : 'Iniciar Ruta') }}
         </button>
         
@@ -84,7 +89,7 @@
         <button 
           class="btn btn-secondary" 
           (click)="iniciarRuta('VUELTA')"
-          [disabled]="(viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'VUELTA') || (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'VUELTA') || (!viajeActual && !rutaInfo)">
+          [disabled]="!rutaInfo || (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'VUELTA') || (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'VUELTA')">
           {{ (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'VUELTA') ? 'Ruta en Progreso' : (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'VUELTA' ? 'Ruta Finalizada' : 'Iniciar Ruta') }}
         </button>
 
