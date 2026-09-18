@@ -20,12 +20,14 @@ import notificacionesRoutes from './notificaciones.routes';
 import pagosRoutes from './pagos.routes';
 import paradasRoutes from './paradas.routes'
 import trazadoRutaRoutes from './trazadoruta.routes'
+import choferDashboardRoutes from './choferDashboard.routes'
 
 const apiRouter = Router();
 
 apiRouter.use(anonymRoutes)
 apiRouter.use(verificarAutenticacion)
 apiRouter.use(trazadoRutaRoutes)
+apiRouter.use(choferDashboardRoutes)
 
 apiRouter.use(usuarioRoutes);
 apiRouter.use(viajesRoutes);
