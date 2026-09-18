@@ -153,3 +153,32 @@
 .swal2-popup.swal2-toast.swal2-icon-error .swal2-timer-progress-bar {
     background: #DC2626;
 }
+
+:root {
+    --color-primary: #1A456B;
+    --color-primary-dark: #123249;
+    --color-primary-light: #2A5A85;
+    --color-tertiary: #64748B;
+    --color-neutral: #F8FAFC;
+    --color-neutral-border: #E2E8F0;
+    --color-text-main: #0F172A;
+    --color-text-muted: #64748B;
+    --color-success-bg: #E4F5EC;
+    --color-success-fg: #1E7A46;
+    --color-error-fg: #B3261E;
+    --color-warning-bg: #FFF6E0;
+    --color-warning-fg: #8A6100;
+
+    --font-headline: 'Montserrat', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
