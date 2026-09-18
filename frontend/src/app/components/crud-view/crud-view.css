@@ -1,0 +1,52 @@
+.crud-view {
+    --color-primary: #1A456B;
+    --color-primary-dark: #123553;
+    --color-secondary: #FFD141;
+    --color-tertiary: #5D737E;
+    --color-neutral: #F8F9FA;
+    --color-border: #E5E7EB;
+    --color-ink: #111827;
+    --color-danger: #DC2626;
+    --color-success: #16A34A;
+    --font-headline: 'Montserrat', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --radius-card: 16px;
+    --radius-btn: 10px;
+    --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 10px 28px rgba(15, 23, 42, 0.05);
+
+    font-family: var(--font-body);
+    color: var(--color-ink);
+    background: var(--color-neutral);
+    padding: 28px;
+    max-width: 1240px;
+    margin: 0 auto;
+    border-radius: 20px;
+}
+
+.crud-view h1,
+.crud-view h2,
+.crud-view h3 {
+    font-family: var(--font-headline);
+}
+
+.status-text {
+    text-align: center;
+    color: var(--color-tertiary);
+    padding: 48px 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    animation: statusPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes statusPulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.45;
+    }
+}
+

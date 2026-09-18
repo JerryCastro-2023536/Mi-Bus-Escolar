@@ -59,3 +59,13 @@ export const loginUserSchema = createUserSchema.omit({
 })
 
 export const updateUserSchema = createUserSchema;
+
+export const cambiarPasswordSchema = z.object({
+    oldPassword: zUtils.requiredString("contraseña actual"),
+    
+    newPassword: zUtils.requiredString("nueva contraseña")
+        .min(8, "La nueva contraseña debe tener al menos 8 caracteres")
+        .max(255, "La nueva contraseña no puede exceder los 255 caracteres")
+        .regex(/[A-Z]/, "La nueva contraseña debe contener al menos una letra mayúscula")
+        .regex(/[0-9]/, "La nueva contraseña debe contener al menos un número"),
+});
