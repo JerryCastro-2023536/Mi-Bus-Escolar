@@ -20,4 +20,5 @@ export interface SidebarBrand {
 export interface SidebarUser {
     name: string;
     role?: string;
+    foto?: string;
 }

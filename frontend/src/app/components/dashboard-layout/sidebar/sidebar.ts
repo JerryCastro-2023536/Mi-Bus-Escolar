@@ -15,7 +15,7 @@ export class SidebarComponent implements OnInit {
 
     brand = input<SidebarBrand>({ name: 'Mi Bus Escolar', tagline: 'Transporte Seguro', icon: 'bus' });
     sections = input<SidebarSection[]>([]);
-    user = input<SidebarUser | null>(null);
+    user = input<{ name: string; role: string; foto?: string } | null>(null);
 
     storageKey = input<string>('sidebar-collapsed');
     logout = output<void>();

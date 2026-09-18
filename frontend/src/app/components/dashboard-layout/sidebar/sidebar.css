@@ -316,6 +316,13 @@
   box-shadow: 0 0 10px rgba(255, 209, 65, 0.5);
 }
 
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 .user-mini.user-link:hover .user-gear-icon {
   color: var(--sidebar-accent);
   transform: rotate(45deg);
