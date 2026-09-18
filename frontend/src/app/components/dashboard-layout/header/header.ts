@@ -1,11 +1,11 @@
 import { Component, computed, inject, input, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { SidebarUser } from '../../models/sidebar.model';
-import { NotificacionesService } from '../../services/notificaciones.service';
-import { LoginService } from '../../services/login';
-import { TiempoRelativoPipe } from '../pipes/tiempoRelativo.pipe';
-import { NotificacionEstiloPipe } from '../pipes/notificacionEstilo.pipe';
+import { SidebarUser } from '../../../models/sidebar.model';
+import { NotificacionesService } from '../../../services/notificaciones.service';
+import { LoginService } from '../../../services/login';
+import { TiempoRelativoPipe } from '../../../shared/pipes/tiempoRelativo.pipe';
+import { NotificacionEstiloPipe } from '../../../shared/pipes/notificacionEstilo.pipe';
 
 interface RoleChip {
   icon: string;

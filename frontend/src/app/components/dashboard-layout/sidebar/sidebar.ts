@@ -1,7 +1,7 @@
 import { Component, OnInit, PLATFORM_ID, inject, input, output, signal } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { SidebarBrand, SidebarSection, SidebarUser } from '../../models/sidebar.model';
+import { SidebarBrand, SidebarSection, SidebarUser } from '../../../models/sidebar.model';
 
 @Component({
     selector: 'app-sidebar',
