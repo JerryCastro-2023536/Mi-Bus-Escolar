@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { NavigationEnd, Router, RouterOutlet, ActivatedRouteSnapshot } from '@angular/router';
 import { SidebarComponent } from './sidebar/sidebar';
 import { HeaderComponent } from './header/header';
@@ -43,10 +43,12 @@ export class DashboardComponent {
     brand = miBusEscolarBrand;
     sections = miBusEscolarSidebarConfig;
 
-    get sidebarUser() {
-        const u = this.loginService.getUser();
-        return u ? { name: u.nombre ?? u.name ?? 'Usuario', role: u.rol } : null;
-    }
+    sidebarUser = computed(() => {
+        const u = this.loginService.user();
+        return u
+            ? { name: u.nombre ?? u.name ?? 'Usuario', role: u.rol, foto: u.foto_usuario }
+            : null;
+    });
 
     onLogout(): void {
         this.loginService.logout();
