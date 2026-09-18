@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { NotificacionesService } from '../../services/notificaciones.service';
 import { Notificaciones as NotificacionItem } from '../../../../../backend/src/models/Notificaciones';
 import { LoginService } from '../../services/login';
-import { HeaderComponent } from '../../shared/header/header';
-import { SidebarComponent } from '../../shared/sidebar/sidebar';
+import { HeaderComponent } from '../dashboard-layout/header/header';
+import { SidebarComponent } from '../dashboard-layout/sidebar/sidebar';
 import { SidebarUser } from '../../models/sidebar.model';
 import { TiempoRelativoPipe } from '../../shared/pipes/tiempoRelativo.pipe';
 import { NotificacionEstiloPipe } from '../../shared/pipes/notificacionEstilo.pipe';
@@ -14,9 +14,7 @@ import { NotificacionEstiloPipe } from '../../shared/pipes/notificacionEstilo.pi
     selector: 'app-notificaciones',
     standalone: true,
     imports: [
-        CommonModule, FormsModule,
-        HeaderComponent, SidebarComponent,
-        TiempoRelativoPipe, NotificacionEstiloPipe
+        CommonModule, FormsModule,TiempoRelativoPipe, NotificacionEstiloPipe
     ],
     templateUrl: './notificaciones.html',
     styleUrl: './notificaciones.css'
