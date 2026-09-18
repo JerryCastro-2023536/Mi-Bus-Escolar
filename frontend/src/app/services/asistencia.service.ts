@@ -9,7 +9,7 @@ import {
     ReporteResultadoDTO,
     NotificacionDTO,
 } from '../models/asistenciasDTO.interface';
-import { environment } from '../../environments/enviroment';
+import { environment } from '../../environments/environment';
 import { ApiResponse } from '../models/apiResponseDTO.interface';
 
 @Injectable({ providedIn: 'root' })
