@@ -20,7 +20,7 @@ interface RoleChip {
   styleUrl: './header.css'
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  user = input<SidebarUser | null>(null);
+  user = input<{ name: string; role: string; foto?: string } | null>(null);
   title = input<string | undefined>(undefined);
   subtitle = input<string | undefined>(undefined);
 
