@@ -514,4 +514,18 @@ BEGIN
     RETURN QUERY SELECT (v_filas > 0);
 END;
 $$;
+
+-- Actualizar Password
+CREATE OR REPLACE FUNCTION sp_usuarios_editarPassword(
+    p_password VARCHAR,
+    p_id_usuario INT
+)
+RETURNS SETOF usuarios AS $$
+BEGIN
+    RETURN QUERY
+    UPDATE usuarios 
+    SET password = p_password WHERE id_usuario = p_id_usuario
+    RETURNING *;
+END;
+$$ LANGUAGE plpgsql;
  
