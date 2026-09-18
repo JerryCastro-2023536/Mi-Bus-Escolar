@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { LoginService } from '../../services/login';
 import { UsuarioLoginDTO, UsuarioRegisterDTO } from "../../../../../backend/src/models/usuario"
 import { RegisterService} from '../../services/register';
+import { CloudinaryService } from '../../services/cloudinary.service';
 
 @Component({
   selector: 'app-login',
@@ -16,6 +17,7 @@ import { RegisterService} from '../../services/register';
 export class Login implements OnInit {
   private loginService = inject(LoginService);
   private registerService = inject(RegisterService);
+  private cloudinaryService = inject(CloudinaryService);
   private router = inject(Router);
 
   isLoginMode = signal(true);
@@ -26,6 +28,8 @@ export class Login implements OnInit {
 
   currentUser = signal<any>(null);
   currentToken = signal<string | null>(null);
+  uploadingPhoto = signal(false);
+  draggingImage = false;
 
   loginForm: UsuarioLoginDTO = {
     correo: '',
@@ -53,6 +57,54 @@ export class Login implements OnInit {
   toggleMode(mode: boolean): void {
     this.isLoginMode.set(mode);
     this.clearMessages();
+  }
+
+  onRegisterPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) this.uploadRegisterPhoto(file);
+    input.value = '';
+  }
+
+  onRegisterPhotoDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.draggingImage = true;
+  }
+
+  onRegisterPhotoDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    if (event.clientX <= rect.left || event.clientX >= rect.right ||
+        event.clientY <= rect.top || event.clientY >= rect.bottom) {
+      this.draggingImage = false;
+    }
+  }
+
+  onRegisterPhotoDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.draggingImage = false;
+    const file = event.dataTransfer?.files?.[0];
+    if (file) this.uploadRegisterPhoto(file);
+  }
+
+  private uploadRegisterPhoto(file: File): void {
+    this.uploadingPhoto.set(true);
+    this.cloudinaryService.upload(file, 'usuarios').subscribe({
+      next: (url) => {
+        this.registerForm.foto_usuario = url;
+        this.uploadingPhoto.set(false);
+      },
+      error: () => {
+        this.uploadingPhoto.set(false);
+        this.errorMessage.set('No se pudo subir la imagen. Intenta de nuevo.');
+      }
+    });
+  }
+
+  removeRegisterPhoto(): void {
+    this.registerForm.foto_usuario = null;
   }
 
   clearMessages(): void {

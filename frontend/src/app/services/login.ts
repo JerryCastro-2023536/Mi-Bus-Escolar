@@ -1,5 +1,5 @@
 import { environment } from './../../environments/enviroment';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -20,6 +20,16 @@ export interface AuthResponse {
 export class LoginService {
   private http = inject(HttpClient);
   private apiUrl = environment.API_URL;
+
+  // Signal reactivo con el usuario actual, inicializado desde localStorage
+  private userSignal = signal<any>(this.readUserFromStorage());
+  user = this.userSignal.asReadonly();
+
+  private readUserFromStorage(): any {
+    if (typeof window === 'undefined') return null;
+    const u = localStorage.getItem('auth_user');
+    return u ? JSON.parse(u) : null;
+  }
 
   login(data: UsuarioLoginDTO): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data);
@@ -42,14 +52,23 @@ export class LoginService {
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_user', JSON.stringify(user));
     }
+    this.userSignal.set(user);
   }
 
   getUser(): any {
+    return this.userSignal();
+  }
+
+  updateFotoUsuario(url: string): void {
+    const current = this.userSignal();
+    if (!current) return;
+
+    const updated = { ...current, foto_usuario: url };
+    this.userSignal.set(updated);
+
     if (typeof window !== 'undefined') {
-      const u = localStorage.getItem('auth_user');
-      return u ? JSON.parse(u) : null;
+      localStorage.setItem('auth_user', JSON.stringify(updated));
     }
-    return null;
   }
 
   getAuthHeaders(): HttpHeaders {
@@ -65,5 +84,6 @@ export class LoginService {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_user');
     }
+    this.userSignal.set(null);
   }
 }

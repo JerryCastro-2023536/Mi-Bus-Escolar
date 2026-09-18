@@ -284,18 +284,28 @@
         </div>
 
         <div class="form-group">
-          <label for="reg-foto">URL foto de usuario (opcional)</label>
-          <div class="input-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="9" cy="10.5" r="1.6" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 16l4.5-4 3 2.6 3-3.4 4.5 4.8" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
-            <input
-              type="url"
-              id="reg-foto"
-              name="foto_usuario"
-              [(ngModel)]="registerForm.foto_usuario"
-              placeholder="https://ejemplo.com/foto.jpg"
-              [attr.aria-invalid]="fieldError('foto_usuario') ? true : null"
-              [attr.aria-describedby]="fieldError('foto_usuario') ? 'reg-foto-error' : null">
+          <label for="reg-foto">Foto de usuario (opcional)</label>
+          @if (registerForm.foto_usuario) {
+          <div class="register-image-preview">
+            <img [src]="registerForm.foto_usuario" alt="Vista previa de la foto" />
+            <button type="button" class="register-image-remove" (click)="removeRegisterPhoto()" title="Eliminar foto">✕</button>
           </div>
+          } @else {
+          <div class="register-dropzone" [class.drag-active]="draggingImage"
+            (dragover)="onRegisterPhotoDragOver($event)"
+            (dragleave)="onRegisterPhotoDragLeave($event)"
+            (drop)="onRegisterPhotoDrop($event)">
+            @if (uploadingPhoto()) {
+            <span class="register-image-spinner"></span>
+            <span>Subiendo...</span>
+            } @else {
+            <span class="register-dropzone-icon">+</span>
+            <span>Arrastra una imagen aquí o haz clic para buscarla</span>
+            }
+            <input type="file" accept="image/*" id="reg-foto" class="register-file-input"
+              [disabled]="uploadingPhoto()" (change)="onRegisterPhotoSelected($event)" />
+          </div>
+          }
 
           <span *ngIf="fieldError('foto_usuario')" id="reg-foto-error" class="field-error" role="alert">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -303,8 +313,8 @@
           </span>
         </div>
 
-        <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
-          {{ isLoading() ? 'Registrando...' : 'Crear cuenta' }}
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading() || uploadingPhoto()">
+          {{ isLoading() ? 'Registrando...' : uploadingPhoto() ? 'Subiendo foto...' : 'Crear cuenta' }}
         </button>
 
       </form>
