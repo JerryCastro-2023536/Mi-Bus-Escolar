@@ -12,7 +12,7 @@ export interface UsuarioDTO{
     fecha_actualizacion?: Date;
 }
 
-enum userRol {
+export enum userRol {
     ADMINISTRADOR = 'ADMINISTRADOR',
     PROVEEDOR = 'PROVEEDOR',
     CHOFER = 'CHOFER',
