@@ -1,66 +1,50 @@
-import { usuariosConfig } from './models/usuarios.model';
+import { crudRoutes } from './shared/crud.routes';
 import { Routes } from '@angular/router';
-import { CrudViewComponent } from './components/crud-view/crud-view';
-import { choferesConfig } from './models/choferes.model';
-import { asistenciasConfig } from './models/asistencias.model';
-import { colegiosConfig } from './models/colegios.model';
-import { estudiantesConfig } from './models/estudiantes.model';
-import { incidenciasConfig } from './models/incidencias.model';
-import { paradasConfig } from './models/pardas.model';
-import { rutasConfig } from './models/rutas.model';
-import { valoracionesConfig } from './models/valoraciones.model';
-import { vehiculosConfig } from './models/vehiculos.model';
+import { authGuard, guestGuard } from './core/guards/auth.guard';
+
 
 export const routes: Routes = [
+    { path: '', redirectTo: 'login', pathMatch: 'full' },
+
     {
-        path: 'usuarios',
-        component: CrudViewComponent,
-        data: { config: usuariosConfig }
+        path: 'login',
+        title: 'Iniciar sesión | MiBusEscolar',
+        canActivate: [guestGuard],
+        loadComponent: () => import('./components/login/login').then(m => m.Login),
     },
+
     {
-        path: 'choferes',
-        component: CrudViewComponent,
-        data: { config: choferesConfig }
+        path: '',
+        canActivate: [authGuard],
+        loadComponent: () => import('./components/dashboard-layout/dashboard-layout').then(m => m.DashboardComponent),
+        children: [
+            {
+                path: 'dashboard',
+                title: 'Administrador | MiBusEscolar',
+                loadComponent: () => import('./components/admin-view/admin-view').then(m => m.AdminView),
+            },
+            {
+                path: 'cuenta',
+                title: 'Mi Cuenta | MiBusEscolar',
+                loadComponent: () => import('./components/cuenta-view/cuenta-view').then(m => m.CuentaView),
+                data: {
+                    title: 'Centro de Cuenta & Perfil',
+                    subtitle: 'Gestiona tu información personal, credenciales de acceso y visualiza los permisos de tu rol.'
+                }
+            },
+            {
+                path: 'notificaciones',
+                title: 'Notificaciones | MiBusEscolar',
+                loadComponent: () => import('./components/notificaciones/notificaciones').then(m => m.Notificaciones),
+                data: {
+                    title: 'Bandeja de Notificaciones',
+                    subtitle: 'Centro de avisos, alertas de ruta, asistencias e incidencias según tu rol en el sistema.'
+                }
+            },
+
+            ...crudRoutes,
+        ],
     },
-    {
-        path: 'asistencias',
-        component: CrudViewComponent,
-        data: { config: asistenciasConfig }
-    },
-    {
-        path: 'colegios',
-        component: CrudViewComponent,
-        data: { config: colegiosConfig }
-    },
-    {
-        path: 'estudiantes',
-        component: CrudViewComponent,
-        data: { config: estudiantesConfig }
-    },
-    {
-        path: 'incidencias',
-        component: CrudViewComponent,
-        data: { config: incidenciasConfig }
-    },
-    {
-        path: 'paradas',
-        component: CrudViewComponent,
-        data: { config: paradasConfig }
-    },
-    {
-        path: 'rutas',
-        component: CrudViewComponent,
-        data: { config: rutasConfig }
-    },
-    {
-        path: 'valoraciones',
-        component: CrudViewComponent,
-        data: { config: valoracionesConfig }
-    },
-    {
-        path: 'vehiculos',
-        component: CrudViewComponent,
-        data: { config: vehiculosConfig }
-    },
-    { path: '', redirectTo: 'usuarios', pathMatch: 'full' }
+
+    { path: '**', redirectTo: 'login' },
 ];
