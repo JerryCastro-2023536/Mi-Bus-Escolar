@@ -41,6 +41,15 @@ export const routes: Routes = [
                     subtitle: 'Centro de avisos, alertas de ruta, asistencias e incidencias según tu rol en el sistema.'
                 }
             },
+            {
+                path: 'pagosUser',
+                title: 'Mis Pagos | MiBusEscolar',
+                loadComponent: () => import('./components/pagos-view/pagos-view').then(m => m.PagosView),
+                data: {
+                    title: 'Mis Pagos',
+                    subtitle: 'Consulta y realiza los pagos del transporte escolar de tus hijos.'
+                }
+            },
 
             ...crudRoutes,
         ],
