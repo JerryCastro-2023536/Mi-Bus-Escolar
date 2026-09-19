@@ -1,7 +1,7 @@
 import { crudRoutes } from './shared/crud.routes';
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
-
+import { roleGuard, dashboardRedirectGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -18,11 +18,38 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () => import('./components/dashboard-layout/dashboard-layout').then(m => m.DashboardComponent),
         children: [
+            // /dashboard → redirige al dashboard del rol del usuario
+            { path: 'dashboard', canActivate: [dashboardRedirectGuard], children: [] },
+
             {
-                path: 'dashboard',
+                path: 'dashboard/admin',
                 title: 'Administrador | MiBusEscolar',
+                canActivate: [roleGuard],
+                data: { roles: ['ADMINISTRADOR'] },
                 loadComponent: () => import('./components/admin-view/admin-view').then(m => m.AdminView),
             },
+            /*{
+                path: 'dashboard/proveedor',
+                title: 'Proveedor | MiBusEscolar',
+                canActivate: [roleGuard],
+                data: { roles: ['PROVEEDOR'] },
+                loadComponent: () => import('../app/components/').then(m => m.ProveedorView),
+            },
+            {
+                path: 'dashboard/chofer',
+                title: 'Chofer | MiBusEscolar',
+                canActivate: [roleGuard],
+                data: { roles: ['CHOFER'] },
+                loadComponent: () => import('./components/chofer-view/chofer-view').then(m => m.ChoferView),
+            },*/
+            {
+                path: 'dashboard/usuario',
+                title: 'Mi Panel | MiBusEscolar',
+                canActivate: [roleGuard],
+                data: { roles: ['USUARIO'] },
+                loadComponent: () => import('../app/components/pagos-view/pagos-view').then(m => m.PagosView),
+            },
+
             {
                 path: 'cuenta',
                 title: 'Mi Cuenta | MiBusEscolar',
@@ -44,8 +71,10 @@ export const routes: Routes = [
             {
                 path: 'pagosUser',
                 title: 'Mis Pagos | MiBusEscolar',
+                canActivate: [roleGuard],
                 loadComponent: () => import('./components/pagos-view/pagos-view').then(m => m.PagosView),
                 data: {
+                    roles: ['USUARIO'],
                     title: 'Mis Pagos',
                     subtitle: 'Consulta y realiza los pagos del transporte escolar de tus hijos.'
                 }
