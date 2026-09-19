@@ -13,7 +13,7 @@ const PORT = process.env.APP_PORT;
 
 const corsOptions: CorsOptions = {
     origin: process.env.ANGULAR_PORT,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', "PATCH", 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 200
 };
