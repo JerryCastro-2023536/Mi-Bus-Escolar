@@ -3,9 +3,9 @@ import { NavigationEnd, Router, RouterOutlet, ActivatedRouteSnapshot } from '@an
 import { SidebarComponent } from './sidebar/sidebar';
 import { HeaderComponent } from './header/header';
 import { LoginService } from '../../services/login';
-import { miBusEscolarBrand, miBusEscolarSidebarConfig } from '../../config/sidebar-nav.config';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
+import { getSidebarSections, miBusEscolarBrand } from '../../config/role.config';
 
 function getDeepestRouteData(router: Router): Record<string, any> {
     let node: ActivatedRouteSnapshot = router.routerState.snapshot.root;
@@ -41,7 +41,7 @@ export class DashboardComponent {
     pageSubtitle = () => this.routeData()['subtitle'] as string | undefined;
 
     brand = miBusEscolarBrand;
-    sections = miBusEscolarSidebarConfig;
+    sections = computed(() => getSidebarSections(this.loginService.user()?.rol));
 
     sidebarUser = computed(() => {
         const u = this.loginService.user();
