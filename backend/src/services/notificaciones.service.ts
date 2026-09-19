@@ -3,9 +3,12 @@ import { NotFoundError } from "../errors/notFound.error";
 import { Notificaciones } from "../models/Notificaciones";
 import { errorThrower } from "../utils/middleware/errorThrower";
 
-export async function listarNotificaciones() {
+export async function listarNotificaciones(idUsuario: number) {
     try {
-        const resultado = await pool.query("SELECT * FROM sp_notificaciones_listar()");
+        const resultado = await pool.query(
+            "SELECT * FROM sp_notificaciones_listar_usuario($1)",
+            [idUsuario]
+        );
         return resultado.rows;
     } catch (error) {
         errorThrower(error);
