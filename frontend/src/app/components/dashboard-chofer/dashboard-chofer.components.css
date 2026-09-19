@@ -194,6 +194,22 @@
   flex-direction: column;
 }
 
+.route-select-block {
+  width: 100%;
+}
+
+.route-select {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: #fff;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0.2rem;
+}
+
 .kpi-label {
   font-size: 0.75rem;
   color: var(--tertiary);
@@ -289,7 +305,12 @@
   border: none;
 }
 
-.primary-btn:hover {
+.primary-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.primary-btn:hover:not(:disabled) {
   background: var(--primary-hover);
 }
 
