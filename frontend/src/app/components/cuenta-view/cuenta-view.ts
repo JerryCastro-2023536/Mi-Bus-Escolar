@@ -41,6 +41,7 @@ export class CuentaView implements OnInit {
 
   mostrarPasswordNueva = false;
   mostrarPasswordConfirmar = false;
+  mostrarPasswordActual = false;
 
   subiendoFoto = signal(false);
   draggingImage = false;

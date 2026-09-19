@@ -4,7 +4,16 @@ import { listarNotificaciones, agregarNotificacion, buscarNotificacionById, edit
 
 export async function getNotificaciones(req: Request, res: Response, next: NextFunction){
     try{
-        const datos = await listarNotificaciones();
+        const idUsuario = Number(req.query.id_usuario);
+
+        if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "El parámetro id_usuario es requerido y debe ser un entero positivo"
+            });
+        }
+
+        const datos = await listarNotificaciones(idUsuario);
         return res.status(200).json({
             success: true,
             message: "Notificaciones cargadas",
@@ -67,7 +76,7 @@ export async function deleteNotificacion(req: Request, res: Response, next: Next
         const resultado = await eliminarNotificacionById(id);
          
         return res.status(200).json({
-            sucess: true,
+            success: true,
             message: "Notificacion eliminada",
             data: resultado
         })

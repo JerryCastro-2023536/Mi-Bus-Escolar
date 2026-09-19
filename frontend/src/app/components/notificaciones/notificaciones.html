@@ -155,9 +155,9 @@
         </div>
       } @else {
         <div class="notif-cards-stack">
-          @for (notif of notificacionesFiltradas; track (notif.id_notificaciones ?? notif.id_notificaciones)) {
+          @for (notif of notificacionesFiltradas; track notif.id_notificaciones) {
             @let estilo = notif.tipo | notificacionEstilo;
-            @let notifId = notif.id_notificaciones ?? notif.id_notificaciones;
+            @let notifId = notif.id_notificaciones;
             <div class="notif-card" [class.unread]="!notif.leida">
               
               @if (!notif.leida) {
