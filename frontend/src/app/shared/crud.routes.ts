@@ -8,8 +8,16 @@ import { paradasConfig } from './../models/pardas.model';
 import { rutasConfig } from './../models/rutas.model';
 import { valoracionesConfig } from './../models/valoraciones.model';
 import { vehiculosConfig } from './../models/vehiculos.model';
+import { proveedoresConfig } from '../models/proveedores.model';
+import { serviciosConfig } from '../models/servicios.model';
+import { rutaParadaConfig } from '../models/rutaParada.model';
+import { asignacionesRutaConfig } from '../models/Asignaciones_Rutas.model';
+import { viajesConfig } from '../models/viajes.model';
+import { ubicacionesBusConfig } from '../models/ubicacionesBus.model';
+import { pagosConfig } from '../models/pago.model';
 import { Routes } from '@angular/router';
 import { CrudViewComponent } from './../components/crud-view/crud-view';
+import { notificacionesConfig } from '../models/notificaciones.model';
 
 const loadCrudView = () =>
     import('./../components/crud-view/crud-view').then(m => m.CrudViewComponent);
@@ -25,4 +33,12 @@ export const crudRoutes: Routes = [
     { path: 'rutas', component: CrudViewComponent, data: { config: rutasConfig, hideHeader: true } },
     { path: 'valoraciones', component: CrudViewComponent, data: { config: valoracionesConfig, hideHeader: true } },
     { path: 'vehiculos', component: CrudViewComponent, data: { config: vehiculosConfig, hideHeader: true } },
+    { path: 'proveedores', component: CrudViewComponent, data: { config: proveedoresConfig, hideHeader: true } },
+    { path: 'servicios', component: CrudViewComponent, data: { config: serviciosConfig, hideHeader: true } },
+    { path: 'ruta-parada', component: CrudViewComponent, data: { config: rutaParadaConfig, hideHeader: true } },
+    { path: 'asignaciones-ruta', component: CrudViewComponent, data: { config: asignacionesRutaConfig, hideHeader: true } },
+    { path: 'viajes', component: CrudViewComponent, data: { config: viajesConfig, hideHeader: true } },
+    { path: 'ubicaciones-bus', component: CrudViewComponent, data: { config: ubicacionesBusConfig, hideHeader: true } },
+    { path: 'pagos', component: CrudViewComponent, data: { config: pagosConfig, hideHeader: true } },
+    { path: 'notificacionesCrud', component: CrudViewComponent, data: { config: notificacionesConfig, hideHeader: true } }
 ];
