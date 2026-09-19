@@ -12,6 +12,20 @@ export interface UsuarioDTO{
     fecha_actualizacion?: Date;
 }
 
+export interface UsuarioLoginDTO{
+    correo: string;
+    password: string;
+}
+
+export interface UsuarioRegisterDTO{
+    nombre: string;
+    apellido: string;
+    correo: string;
+    password: string;
+    telefono: string;
+    foto_usuario: string | null;
+}
+
 export enum userRol {
     ADMINISTRADOR = 'ADMINISTRADOR',
     PROVEEDOR = 'PROVEEDOR',

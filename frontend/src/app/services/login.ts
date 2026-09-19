@@ -3,7 +3,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { UsuarioLoginDTO } from '../../../../backend/src/models/usuario';
+import { UsuarioLoginDTO } from '../models/usuarioDTO.interface';
 
 export interface AuthResponse {
   success: boolean;
