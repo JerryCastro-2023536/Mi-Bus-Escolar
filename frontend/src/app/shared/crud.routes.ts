@@ -18,27 +18,28 @@ import { pagosConfig } from '../models/pago.model';
 import { Routes } from '@angular/router';
 import { CrudViewComponent } from './../components/crud-view/crud-view';
 import { notificacionesConfig } from '../models/notificaciones.model';
+import { roleGuard } from '../core/guards/role.guard';
 
 const loadCrudView = () =>
     import('./../components/crud-view/crud-view').then(m => m.CrudViewComponent);
 
 export const crudRoutes: Routes = [
-    { path: 'usuarios', component: CrudViewComponent, data: { config: usuariosConfig, hideHeader: true } },
-    { path: 'choferes', component: CrudViewComponent, data: { config: choferesConfig, hideHeader: true } },
-    { path: 'asistencias', component: CrudViewComponent, data: { config: asistenciasConfig, hideHeader: true } },
-    { path: 'colegios', component: CrudViewComponent, data: { config: colegiosConfig, hideHeader: true } },
-    { path: 'estudiantes', component: CrudViewComponent, data: { config: estudiantesConfig, hideHeader: true } },
-    { path: 'incidencias', component: CrudViewComponent, data: { config: incidenciasConfig, hideHeader: true } },
-    { path: 'paradas', component: CrudViewComponent, data: { config: paradasConfig, hideHeader: true } },
-    { path: 'rutas', component: CrudViewComponent, data: { config: rutasConfig, hideHeader: true } },
-    { path: 'valoraciones', component: CrudViewComponent, data: { config: valoracionesConfig, hideHeader: true } },
-    { path: 'vehiculos', component: CrudViewComponent, data: { config: vehiculosConfig, hideHeader: true } },
-    { path: 'proveedores', component: CrudViewComponent, data: { config: proveedoresConfig, hideHeader: true } },
-    { path: 'servicios', component: CrudViewComponent, data: { config: serviciosConfig, hideHeader: true } },
-    { path: 'ruta-parada', component: CrudViewComponent, data: { config: rutaParadaConfig, hideHeader: true } },
-    { path: 'asignaciones-ruta', component: CrudViewComponent, data: { config: asignacionesRutaConfig, hideHeader: true } },
-    { path: 'viajes', component: CrudViewComponent, data: { config: viajesConfig, hideHeader: true } },
-    { path: 'ubicaciones-bus', component: CrudViewComponent, data: { config: ubicacionesBusConfig, hideHeader: true } },
-    { path: 'pagos', component: CrudViewComponent, data: { config: pagosConfig, hideHeader: true } },
-    { path: 'notificacionesCrud', component: CrudViewComponent, data: { config: notificacionesConfig, hideHeader: true } }
+    { path: 'usuarios', component: CrudViewComponent, canActivate: [roleGuard], data: { config: usuariosConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'choferes', component: CrudViewComponent, canActivate: [roleGuard], data: { config: choferesConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'asistencias', component: CrudViewComponent, canActivate: [roleGuard], data: { config: asistenciasConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'colegios', component: CrudViewComponent, canActivate: [roleGuard], data: { config: colegiosConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'estudiantes', component: CrudViewComponent, canActivate: [roleGuard], data: { config: estudiantesConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'incidencias', component: CrudViewComponent, canActivate: [roleGuard], data: { config: incidenciasConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'paradas', component: CrudViewComponent, canActivate: [roleGuard], data: { config: paradasConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'rutas', component: CrudViewComponent, canActivate: [roleGuard], data: { config: rutasConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'valoraciones', component: CrudViewComponent, canActivate: [roleGuard], data: { config: valoracionesConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'vehiculos', component: CrudViewComponent, canActivate: [roleGuard], data: { config: vehiculosConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'proveedores', component: CrudViewComponent, canActivate: [roleGuard], data: { config: proveedoresConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'servicios', component: CrudViewComponent, canActivate: [roleGuard], data: { config: serviciosConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'ruta-parada', component: CrudViewComponent, canActivate: [roleGuard], data: { config: rutaParadaConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'asignaciones-ruta', component: CrudViewComponent, canActivate: [roleGuard], data: { config: asignacionesRutaConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'viajes', component: CrudViewComponent, canActivate: [roleGuard], data: { config: viajesConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'ubicaciones-bus', component: CrudViewComponent, canActivate: [roleGuard], data: { config: ubicacionesBusConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'pagos', component: CrudViewComponent, canActivate: [roleGuard], data: { config: pagosConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } },
+    { path: 'notificacionesCrud', component: CrudViewComponent, canActivate: [roleGuard], data: { config: notificacionesConfig, hideHeader: true, roles: ['ADMINISTRADOR'] } }
 ];
