@@ -80,6 +80,7 @@ export const asistenciasConfig = {
             key: 'estado_abordaje',
             label: 'Estado de abordaje',
             type: 'select',
+            required: true,
             options: [
                 {
                     value: 'PENDIENTE',
@@ -98,12 +99,13 @@ export const asistenciasConfig = {
         {
             key: 'hora_abordaje',
             label: 'Hora de abordaje',
-            type: 'text'
+            type: 'time'
         },
         {
             key: 'estado_descenso',
             label: 'Estado de descenso',
             type: 'select',
+            required: true,
             options: [
                 {
                     value: 'PENDIENTE',
@@ -122,7 +124,7 @@ export const asistenciasConfig = {
         {
             key: 'hora_descenso',
             label: 'Hora de descenso',
-            type: 'text'
+            type: 'time'
         }
     ]
 };

@@ -3,7 +3,7 @@
 export const asignacionRutaConfig = {
     title: "Asignaciones de Ruta",
     subtitle: "Gestión de estudiantes asignados a rutas y paradas",
-    apiEndpoint: "/asignaciones-ruta",
+    apiEndpoint: "/asignaciones",
     idKey: "id_asignacion",
 
     kpis: [

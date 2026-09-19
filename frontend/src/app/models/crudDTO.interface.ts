@@ -12,7 +12,7 @@ export interface CrudConfig {
 export interface TableColumn {
     key: string;
     label: string;
-    type: 'text' | 'badge' | 'date' | 'number' | 'image';
+    type: 'text' | 'badge' | 'date' | 'time' | 'datetime' | 'number' | 'image';
 }
 
 export interface KpiConfig {
@@ -25,7 +25,7 @@ export interface KpiConfig {
 export interface FormField {
     key: string;
     label: string;
-    type: 'text' | 'email' | 'password' | 'number' | 'select' | 'checkbox' | 'date' | 'image';
+    type: 'text' | 'email' | 'password' | 'number' | 'select' | 'checkbox' | 'date' | 'time' | 'datetime-local' | 'image';
     required?: boolean;
     readonly?: boolean;
     readonlyOnCreate?: boolean;

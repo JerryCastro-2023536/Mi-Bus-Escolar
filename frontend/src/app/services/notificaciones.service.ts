@@ -8,7 +8,7 @@ import { ApiResponse } from '../models/apiResponseDTO.interface';
 @Injectable({ providedIn: 'root' })
 export class NotificacionesService {
     private crud = inject(CrudService);
-    private endpoint = '/notificaciones';
+    private endpoint = '/notificaciones'; // CrudService ya agrega API_URL
 
     notificaciones = signal<NotificacionesDTO[]>([]);
     cargando = signal(false);
