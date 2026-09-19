@@ -3,11 +3,25 @@ import { NotFoundError } from "../errors/notFound.error";
 import { Notificaciones } from "../models/Notificaciones";
 import { errorThrower } from "../utils/middleware/errorThrower";
 
-export async function listarNotificaciones(idUsuario: number) {
+export async function listarNotificaciones(idUsuario?: number, correo?: string) {
     try {
+        let idUsuarioFiltrado = idUsuario;
+
+        if (!idUsuarioFiltrado && correo) {
+            const usuario = await pool.query(
+                "SELECT id_usuario FROM usuarios WHERE correo = $1",
+                [correo]
+            );
+            idUsuarioFiltrado = usuario.rows[0]?.id_usuario;
+        }
+
+        if (!idUsuarioFiltrado) {
+            throw new NotFoundError("No se pudo identificar al usuario autenticado.");
+        }
+
         const resultado = await pool.query(
             "SELECT * FROM sp_notificaciones_listar_usuario($1)",
-            [idUsuario]
+            [idUsuarioFiltrado]
         );
         return resultado.rows;
     } catch (error) {
