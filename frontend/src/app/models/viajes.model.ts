@@ -25,8 +25,8 @@ export const viajesConfig = {
         { key: 'id_chofer', label: 'Chofer', type: 'number' },
         { key: 'id_vehiculo', label: 'Vehículo', type: 'number' },
         { key: 'fecha_viaje', label: 'Fecha del viaje', type: 'date' },
-        { key: 'hora_inicio', label: 'Hora de inicio', type: 'date' },
-        { key: 'hora_fin', label: 'Hora de finalización', type: 'date' },
+        { key: 'hora_inicio', label: 'Hora de inicio', type: 'time' },
+        { key: 'hora_fin', label: 'Hora de finalización', type: 'time' },
         { key: 'estado', label: 'Estado', type: 'badge' }
     ],
 
@@ -55,12 +55,12 @@ export const viajesConfig = {
         {
             key: 'hora_inicio',
             label: 'Hora de inicio',
-            type: 'date'
+            type: 'time'
         },
         {
             key: 'hora_fin',
             label: 'Hora de finalización',
-            type: 'date'
+            type: 'time'
         },
         {
             key: 'estado',
@@ -68,10 +68,9 @@ export const viajesConfig = {
             type: 'select',
             required: true,
             options: [
-                { value: 'PENDIENTE', label: 'Pendiente' },
-                { value: 'EN_CURSO', label: 'En curso' },
+                { value: 'PROGRAMADO', label: 'Programado' },
+                { value: 'ACTIVO', label: 'Activo' },
                 { value: 'FINALIZADO', label: 'Finalizado' },
-                { value: 'CANCELADO', label: 'Cancelado' }
             ]
         }
     ],
@@ -101,12 +100,12 @@ export const viajesConfig = {
         {
             key: 'hora_inicio',
             label: 'Hora de inicio',
-            type: 'date'
+            type: 'time'
         },
         {
             key: 'hora_fin',
             label: 'Hora de finalización',
-            type: 'date'
+            type: 'time'
         },
         {
             key: 'estado',
@@ -114,10 +113,9 @@ export const viajesConfig = {
             type: 'select',
             required: true,
             options: [
-                { value: 'PENDIENTE', label: 'Pendiente' },
-                { value: 'EN_CURSO', label: 'En curso' },
+                { value: 'PROGRAMADO', label: 'Programado' },
+                { value: 'ACTIVO', label: 'Activo' },
                 { value: 'FINALIZADO', label: 'Finalizado' },
-                { value: 'CANCELADO', label: 'Cancelado' }
             ]
         }
     ]

@@ -42,7 +42,7 @@ export const rutaParadaConfig = {
         {
             key: 'hora_estimada',
             label: 'Hora estimada',
-            type: 'date'
+            type: 'time'
         }
     ],
 
@@ -73,7 +73,7 @@ export const rutaParadaConfig = {
         {
             key: 'hora_estimada',
             label: 'Hora estimada',
-            type: 'date'
+            type: 'time'
         }
     ],
 
@@ -104,7 +104,7 @@ export const rutaParadaConfig = {
         {
             key: 'hora_estimada',
             label: 'Hora estimada',
-            type: 'date'
+            type: 'time'
         }
     ]
 };

@@ -23,7 +23,7 @@ import {
 const router = Router();
 
 router.get("/kpis/usuarios", getKpisUsuarios);
-router.get("/kpis/asignaciones-ruta", getKpisAsignacionesRuta);
+router.get("/kpis/asignaciones", getKpisAsignacionesRuta);
 router.get("/kpis/asistencias", getKpisAsistencias);
 router.get("/kpis/choferes", getKpisChoferes);
 router.get("/kpis/colegios", getKpisColegios);

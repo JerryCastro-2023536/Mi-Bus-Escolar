@@ -34,10 +34,24 @@ export class FormComponent {
       const current = this.item();
       const initial: Record<string, any> = {};
       for (const field of this.fields()) {
-        initial[field.key] = current ? current[field.key] : (field.type === 'checkbox' ? false : '');
+        initial[field.key] = current
+          ? this.formatInputValue(current[field.key], field.type)
+          : (field.type === 'checkbox' ? false : '');
       }
       this.model = initial;
     });
+  }
+
+  private formatInputValue(value: any, type: FormField['type']): any {
+    if (!value || (type !== 'date' && type !== 'time' && type !== 'datetime-local')) return value;
+
+    if (type === 'date') return String(value).slice(0, 10);
+    if (type === 'time') return String(value).slice(0, 5);
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    const pad = (part: number) => String(part).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
   }
 
   get isEditMode(): boolean {

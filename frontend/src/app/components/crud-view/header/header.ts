@@ -16,7 +16,6 @@ export class HeaderComponent {
   subtitle = input<string>('');
   kpis = input<KpiConfig[]>([]);
 
-  /** Diccionario con los valores reales de los KPIs (EN DESARROLLO) */
   kpiData = input<Record<string, number | string>>({});
 
   search = output<string>();
