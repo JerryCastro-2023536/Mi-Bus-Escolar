@@ -20,7 +20,7 @@ export const notificacionSchema = z.object({
 
 	titulo: zUtils.requiredString("titulo")
 		.min(1, "El título no puede estar vacío")
-        .max(12, "El numero de caracteres maximo es 12"),
+        .max(200, "El numero de caracteres maximo es 200"),
 
 	mensaje: zUtils.requiredString("mensaje")
 		.min(1, "El mensaje no puede estar vacío"),
