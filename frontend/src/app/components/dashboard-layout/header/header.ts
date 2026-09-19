@@ -1,7 +1,6 @@
-import { Component, computed, inject, input, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, computed, inject, input, signal, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { SidebarUser } from '../../../models/sidebar.model';
 import { NotificacionesService } from '../../../services/notificaciones.service';
 import { LoginService } from '../../../services/login';
 import { TiempoRelativoPipe } from '../../../shared/pipes/tiempoRelativo.pipe';
@@ -59,6 +58,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   cerrarPanel(): void {
     this.panelAbierto = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.panelAbierto) return;
+    const target = event.target as HTMLElement;
+    const clickedInside = target?.closest('.notif-wrapper');
+    if (!clickedInside) {
+      this.panelAbierto = false;
+    }
   }
 
   marcarLeida(id?: number): void {

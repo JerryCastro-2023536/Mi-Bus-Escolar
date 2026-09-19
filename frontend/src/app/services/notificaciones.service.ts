@@ -22,7 +22,6 @@ export class NotificacionesService {
         this.cargar();
     }
 
-    // PUT con el objeto completo, sin el id_notificaciones que agregamos en cargar()
     private putLeida(n: NotificacionesDTO): Observable<ApiResponse<NotificacionesDTO>> {
         const { id_notificaciones, ...resto } = n as any;
         return this.crud.update<NotificacionesDTO>(this.endpoint, id_notificaciones, {
@@ -65,7 +64,7 @@ export class NotificacionesService {
         const actual = this.notificaciones().find(n => n.id_notificaciones === id);
         if (!actual || actual.leida) return;
 
-        this.setLeida([id], true); // optimista
+        this.setLeida([id], true); 
 
         const revertir = () => {
             this.setLeida([id], false);
