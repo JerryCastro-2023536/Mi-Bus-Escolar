@@ -32,12 +32,14 @@ export const paradasConfig = {
         {
             key: 'latitud',
             label: 'Latitud',
-            type: 'number'
+            type: 'number',
+            required: true
         },
         {
             key: 'longitud',
             label: 'Longitud',
-            type: 'number'
+            type: 'number',
+            required: true
         }
     ],
 
@@ -57,12 +59,14 @@ export const paradasConfig = {
         {
             key: 'latitud',
             label: 'Latitud',
-            type: 'number'
+            type: 'number',
+            required: true
         },
         {
             key: 'longitud',
             label: 'Longitud',
-            type: 'number'
+            type: 'number',
+            required: true
         }
     ],
 
