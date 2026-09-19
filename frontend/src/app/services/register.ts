@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthResponse } from './login';
 import { UsuarioRegisterDTO } from '../../../../backend/src/models/usuario';
-import { environment } from '../../environments/enviroment';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
