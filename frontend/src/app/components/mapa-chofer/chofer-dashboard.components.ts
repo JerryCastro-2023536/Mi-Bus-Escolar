@@ -44,8 +44,6 @@ export class ChoferDashboardComponents implements OnInit {
     if (!isPlatformBrowser(this.platformId)) {
       return;
     }
-
-    localStorage.setItem("token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImplcnJ5QGdtYWlsLmNvbSIsInJvbCI6IlVTVUFSSU8iLCJpYXQiOjE3ODk2MDQ4ODksImV4cCI6MTc4OTYzMzY4OX0._5bQPd6eOMi2Pk3GLn3MXq7TiUidfgT2Ivu4Ci58gLc");
     this.cargarViajeDelDia();
   }
 
