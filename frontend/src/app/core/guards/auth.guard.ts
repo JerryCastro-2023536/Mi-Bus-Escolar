@@ -1,6 +1,7 @@
 import { LoginService } from './../../services/login';
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { getDashboardRoute } from '../../config/role.config';
 
 export const authGuard: CanActivateFn = (_route, state) => {
   const loginService = inject(LoginService);
@@ -16,6 +17,7 @@ export const authGuard: CanActivateFn = (_route, state) => {
 export const guestGuard: CanActivateFn = () => {
   const loginService = inject(LoginService);
   const router = inject(Router);
+  const user = loginService.getUser();
 
-  return loginService.getUser() ? router.createUrlTree(['/dashboard']) : true;
+  return user ? router.createUrlTree([getDashboardRoute(user.rol)]) : true;
 };
