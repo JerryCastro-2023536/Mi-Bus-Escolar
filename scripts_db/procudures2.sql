@@ -528,4 +528,234 @@ BEGIN
     RETURNING *;
 END;
 $$ LANGUAGE plpgsql;
- 
+
+-- ============================================================
+-- SP 1: Estudiantes asignados a un tutor (usuario)
+-- ============================================================
+CREATE OR REPLACE FUNCTION sp_estudiantes_por_tutor(p_id_usuario_tutor INTEGER)
+RETURNS TABLE (
+    id_estudiante INTEGER,
+    nombre VARCHAR,
+    apellido VARCHAR,
+    fecha_nacimiento DATE,
+    foto_estudiante TEXT,
+    grado VARCHAR,
+    id_colegio INTEGER,
+    nombre_colegio VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        e.id_estudiante,
+        e.nombre,
+        e.apellido,
+        e.fecha_nacimiento,
+        e.foto_estudiante,
+        e.grado,
+        c.id_colegio,
+        c.nombre
+    FROM Estudiantes e
+    LEFT JOIN Colegios c ON e.id_colegio = c.id_colegio
+    WHERE e.id_usuario_tutor = p_id_usuario_tutor
+    ORDER BY e.nombre;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- ============================================================
+-- SP 2: 10 meses (actual + 9 siguientes) con estado de pago
+-- ============================================================
+CREATE OR REPLACE FUNCTION sp_pagos_meses_pendientes(p_id_estudiante INTEGER)
+RETURNS TABLE (
+    id_servicio INTEGER,
+    nombre_servicio VARCHAR,
+    precio_mensual DECIMAL,
+    periodo_mes INTEGER,
+    periodo_anio INTEGER,
+    id_pago INTEGER,
+    estado VARCHAR,
+    monto DECIMAL,
+    metodo_pago VARCHAR,
+    referencia_pago VARCHAR,
+    foto_comprobante TEXT,
+    fecha_pago_limite DATE,
+    fecha_verificacion DATE
+) AS $$
+DECLARE
+    v_id_servicio INTEGER;
+BEGIN
+    -- Servicio vigente del estudiante (vía su asignación de ruta más reciente)
+    SELECT s.id_servicio INTO v_id_servicio
+    FROM Asignaciones_Ruta ar
+    JOIN Rutas r ON ar.id_ruta = r.id_ruta
+    JOIN Servicios s ON r.id_servicio = s.id_servicio
+    WHERE ar.id_estudiante = p_id_estudiante
+    ORDER BY ar.id_asignacion DESC
+    LIMIT 1;
+
+    IF v_id_servicio IS NULL THEN
+        RETURN;
+    END IF;
+
+    RETURN QUERY
+    SELECT
+        s.id_servicio,
+        s.nombre,
+        s.precio_mensual,
+        meses.mes::INTEGER,
+        meses.anio::INTEGER,
+        p.id_pago,
+        COALESCE(p.estado, 'PENDIENTE')::VARCHAR,
+        p.monto,
+        p.metodo_pago,
+        p.referencia_pago,
+        p.foto_comprobante,
+        p.fecha_pago_limite,
+        p.fecha_verificacion
+    FROM Servicios s
+    CROSS JOIN LATERAL (
+        SELECT
+            EXTRACT(MONTH FROM d)::INTEGER AS mes,
+            EXTRACT(YEAR FROM d)::INTEGER AS anio
+        FROM generate_series(
+            date_trunc('month', CURRENT_DATE),
+            date_trunc('month', CURRENT_DATE) + INTERVAL '9 months',
+            INTERVAL '1 month'
+        ) AS d
+    ) meses
+    LEFT JOIN Pagos p
+        ON p.id_estudiante = p_id_estudiante
+        AND p.id_servicio = s.id_servicio
+        AND p.periodo_mes = meses.mes
+        AND p.periodo_anio = meses.anio
+    WHERE s.id_servicio = v_id_servicio
+    ORDER BY meses.anio, meses.mes;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- ============================================================
+-- SP 3: Detalle de un pago específico (pagado o no)
+-- ============================================================
+CREATE OR REPLACE FUNCTION sp_pagos_detalle(
+    p_id_estudiante INTEGER,
+    p_id_servicio INTEGER,
+    p_periodo_mes INTEGER,
+    p_periodo_anio INTEGER
+)
+RETURNS TABLE (
+    id_pago INTEGER,
+    id_estudiante INTEGER,
+    id_servicio INTEGER,
+    nombre_servicio VARCHAR,
+    precio_mensual DECIMAL,
+    periodo_mes INTEGER,
+    periodo_anio INTEGER,
+    monto DECIMAL,
+    metodo_pago VARCHAR,
+    referencia_pago VARCHAR,
+    foto_comprobante TEXT,
+    estado VARCHAR,
+    fecha_pago_limite DATE,
+    fecha_verificacion DATE,
+    verificado_por INTEGER,
+    observaciones VARCHAR
+) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        p.id_pago, p.id_estudiante, p.id_servicio, s.nombre, s.precio_mensual,
+        p.periodo_mes, p.periodo_anio, p.monto, p.metodo_pago, p.referencia_pago,
+        p.foto_comprobante, p.estado, p.fecha_pago_limite, p.fecha_verificacion,
+        p.verificado_por, p.observaciones
+    FROM Pagos p
+    JOIN Servicios s ON p.id_servicio = s.id_servicio
+    WHERE p.id_estudiante = p_id_estudiante
+      AND p.id_servicio = p_id_servicio
+      AND p.periodo_mes = p_periodo_mes
+      AND p.periodo_anio = p_periodo_anio;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- ============================================================
+-- SP 4: Registrar un pago (se marca PAGADO al momento de crearse)
+-- ============================================================
+CREATE OR REPLACE FUNCTION sp_pagos_registrar(
+    p_id_estudiante INTEGER,
+    p_id_servicio INTEGER,
+    p_periodo_mes INTEGER,
+    p_periodo_anio INTEGER,
+    p_monto DECIMAL,
+    p_metodo_pago VARCHAR,
+    p_referencia_pago VARCHAR,
+    p_foto_comprobante TEXT
+)
+RETURNS TABLE (
+    id_pago INTEGER,
+    id_estudiante INTEGER,
+    id_servicio INTEGER,
+    periodo_mes INTEGER,
+    periodo_anio INTEGER,
+    monto DECIMAL,
+    metodo_pago VARCHAR,
+    referencia_pago VARCHAR,
+    foto_comprobante TEXT,
+    estado VARCHAR,
+    fecha_verificacion DATE
+) AS $$
+BEGIN
+    RETURN QUERY
+    INSERT INTO Pagos (
+        id_estudiante, id_servicio, periodo_mes, periodo_anio,
+        monto, metodo_pago, referencia_pago, foto_comprobante,
+        estado, fecha_verificacion
+    )
+    VALUES (
+        p_id_estudiante, p_id_servicio, p_periodo_mes, p_periodo_anio,
+        p_monto, p_metodo_pago, p_referencia_pago, p_foto_comprobante,
+        'PAGADO', CURRENT_DATE
+    )
+    RETURNING
+        Pagos.id_pago, Pagos.id_estudiante, Pagos.id_servicio,
+        Pagos.periodo_mes, Pagos.periodo_anio, Pagos.monto,
+        Pagos.metodo_pago, Pagos.referencia_pago, Pagos.foto_comprobante,
+        Pagos.estado, Pagos.fecha_verificacion;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- ============================================================
+-- SP 5: Usuario (proveedor) responsable de un servicio, para notificar
+-- ============================================================
+CREATE OR REPLACE FUNCTION sp_proveedor_usuario_por_servicio(p_id_servicio INTEGER)
+RETURNS TABLE (id_usuario INTEGER) AS $$
+BEGIN
+    RETURN QUERY
+    SELECT pr.id_usuario
+    FROM Servicios s
+    JOIN Proveedores pr ON s.id_proveedor = pr.id_proveedor
+    WHERE s.id_servicio = p_id_servicio;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- ============================================================
+-- SP 6: Agregar notificación (genérico, reutilizable)
+-- ============================================================
+CREATE OR REPLACE FUNCTION sp_notificaciones_agregarPago(
+    p_id_usuario INTEGER,
+    p_id_incidencia INTEGER,
+    p_id_asistencia INTEGER,
+    p_tipo VARCHAR,
+    p_titulo VARCHAR,
+    p_mensaje TEXT
+)
+RETURNS TABLE (id_notificacion INTEGER) AS $$
+BEGIN
+    RETURN QUERY
+    INSERT INTO Notificaciones (id_usuario, id_incidencia, id_asistencia, tipo, titulo, mensaje)
+    VALUES (p_id_usuario, p_id_incidencia, p_id_asistencia, p_tipo, p_titulo, p_mensaje)
+    RETURNING Notificaciones.id_notificacion;
+END;
+$$ LANGUAGE plpgsql;
