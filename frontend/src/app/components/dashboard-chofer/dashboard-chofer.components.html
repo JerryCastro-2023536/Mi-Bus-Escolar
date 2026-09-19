@@ -1,41 +1,4 @@
 <div class="dashboard-container">
-  <aside class="sidebar">
-    <div class="brand">
-      <span class="brand-icon">🚌</span>
-      <span class="brand-title">Mi Bus Escolar</span>
-    </div>
-
-    <nav class="nav-menu">
-      <button class="nav-btn active">
-        <span class="icon">📊</span>
-        <span>Panel Principal</span>
-      </button>
-      <button class="nav-btn">
-        <span class="icon">🗺️</span>
-        <span>Ver Ruta y Mapa</span>
-      </button>
-      <button class="nav-btn">
-        <span class="icon">📋</span>
-        <span>Tomar Asistencia</span>
-      </button>
-      <button class="nav-btn">
-        <span class="icon">🚍</span>
-        <span>Mi Vehículo</span>
-      </button>
-      <button class="nav-btn">
-        <span class="icon">⚠️</span>
-        <span>Incidencias</span>
-      </button>
-    </nav>
-
-    <div class="driver-mini-profile">
-      <div class="avatar">CH</div>
-      <div class="driver-info">
-        <p class="driver-name">Chofer Asignado</p>
-        <span class="driver-role">Unidad #12</span>
-      </div>
-    </div>
-  </aside>
 
   <main class="main-content">
     <header class="top-header">
@@ -50,38 +13,47 @@
 
     <section class="kpi-grid">
       <div class="kpi-card">
-        <div class="kpi-icon bg-blue">🚍</div>
+        <div class="kpi-icon bg-blue"><i class="bi bi-bus-front-fill"></i></div>
         <div class="kpi-data">
           <span class="kpi-label">Vehículo</span>
-          <strong class="kpi-value">Bus #12</strong>
-          <span class="kpi-sub">Placa: KTR-842</span>
+          <strong class="kpi-value">{{ vehiculoActual?.nombre || 'Bus #12' }}</strong>
+          <span class="kpi-sub">Placa: {{ vehiculoActual?.placa || 'KTR-842' }}</span>
         </div>
       </div>
 
       <div class="kpi-card">
-        <div class="kpi-icon bg-green">📍</div>
-        <div class="kpi-data">
+        <div class="kpi-icon bg-green"><i class="bi bi-geo-alt-fill"></i></div>
+        <div class="kpi-data route-select-block">
           <span class="kpi-label">Ruta Asignada</span>
-          <strong class="kpi-value">Ruta #04</strong>
-          <span class="kpi-sub">Zona Norte - Col. San José</span>
+          <select class="route-select" [(ngModel)]="selectedRutaId" (change)="onRutaSeleccionada()">
+            <option [ngValue]="null" disabled>Selecciona una ruta</option>
+            @for (ruta of rutasAsignadas; track ruta.id_ruta) {
+              <option [ngValue]="ruta.id_ruta">
+                {{ ruta.nombre }}
+              </option>
+            }
+          </select>
+          <span class="kpi-sub">
+            {{ rutaSeleccionada ? rutaSeleccionada.zona : 'Primero selecciona la ruta del chofer' }}
+          </span>
         </div>
       </div>
 
       <div class="kpi-card">
-        <div class="kpi-icon bg-purple">👥</div>
+        <div class="kpi-icon bg-purple"><i class="bi bi-people-fill"></i></div>
         <div class="kpi-data">
           <span class="kpi-label">Estudiantes</span>
-          <strong class="kpi-value">24 Alumnos</strong>
+          <strong class="kpi-value">{{ estudiantesCount }} Alumnos</strong>
           <span class="kpi-sub">A bordo / Registrados</span>
         </div>
       </div>
 
       <div class="kpi-card">
-        <div class="kpi-icon bg-amber">⚡</div>
+        <div class="kpi-icon bg-amber"><i class="bi bi-lightning-charge-fill"></i></div>
         <div class="kpi-data">
           <span class="kpi-label">Estado de Flujo</span>
-          <strong class="kpi-value">Asistencia Pendiente</strong>
-          <span class="kpi-sub">Paso 1 de 3</span>
+          <strong class="kpi-value">{{ flujoTitulo }}</strong>
+          <span class="kpi-sub">{{ flujoDescripcion }}</span>
         </div>
       </div>
     </section>
@@ -90,20 +62,20 @@
       <article class="info-card route-card">
         <div class="card-header">
           <div class="card-title">
-            <span class="card-icon">📍</span>
+            <span class="card-icon"><i class="bi bi-geo-alt-fill"></i></span>
             <h3>Mapa y Trazado de Ruta</h3>
           </div>
         </div>
         <p class="card-desc">Visualiza las paradas, la ruta sugerida y la navegación GPS en tiempo real.</p>
-        <a routerLink="/ruta-chofer">
-          <button class="primary-btn" type="button">Abrir Mapa de Ruta</button>
-        </a>
+        <button class="primary-btn" type="button" [disabled]="!selectedRutaId" (click)="irARuta()">
+          {{ selectedRutaId ? 'Ir a la Ruta' : 'Selecciona una ruta' }}
+        </button>
       </article>
 
       <article class="info-card students-card">
         <div class="card-header">
           <div class="card-title">
-            <span class="card-icon">👥</span>
+            <span class="card-icon"><i class="bi bi-people-fill"></i></span>
             <h3>Lista de Estudiantes</h3>
           </div>
         </div>
@@ -137,7 +109,7 @@
       <article class="info-card vehicles-card">
         <div class="card-header">
           <div class="card-title">
-            <span class="card-icon">🚍</span>
+            <span class="card-icon"><i class="bi bi-bus-front-fill"></i></span>
             <h3>Mis Vehículos</h3>
           </div>
         </div>
@@ -173,7 +145,7 @@
       <article class="info-card reports-card">
         <div class="card-header">
           <div class="card-title">
-            <span class="card-icon">⚠️</span>
+            <span class="card-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
             <h3>Ver Reportes Generados</h3>
           </div>
         </div>
@@ -191,12 +163,22 @@
               <span>Estado</span>
             </div>
 
+            @if (!reportes.length) {
+              <div class="table-row reports-row">
+                <span>—</span>
+                <span>No hay reportes generados</span>
+                <span>
+                  <span class="status-tag neutral">SIN DATOS</span>
+                </span>
+              </div>
+            }
+
             @for (reporte of reportes; track reporte.id_incidencia) {
               <div class="table-row reports-row">
-                <span>{{ reporte.id_incidencia }}</span>
-                <span>{{ reporte.titulo }}</span>
+                <span>{{ reporte.id_incidencia ?? '—' }}</span>
+                <span>{{ reporte.titulo || 'Reporte sin título' }}</span>
                 <span>
-                  <span class="status-tag warning" [class.success]="reporte.estado === 'CERRADA'" [class.neutral]="reporte.estado === 'EN REVISION'">{{ reporte.estado }}</span>
+                  <span class="status-tag warning" [class.success]="(reporte.estado || 'ABIERTA').toString().toUpperCase() === 'CERRADA'" [class.neutral]="(reporte.estado || 'ABIERTA').toString().toUpperCase() === 'EN REVISION'">{{ (reporte.estado || 'ABIERTA').toString().toUpperCase() }}</span>
                 </span>
               </div>
             }
