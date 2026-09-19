@@ -9,7 +9,6 @@ export interface NotificacionesDTO {
     leida: boolean,
     fecha_envio: Date
 }
-
 enum TipoNoti{
     INCIDENTE = "INCIDENTE",
     ASISTENCIA = "ASISTENCIA",
