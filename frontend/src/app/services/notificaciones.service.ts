@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed, effect } from '@angular/core';
-import { forkJoin, of, Observable } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { forkJoin, of, Observable, throwError } from 'rxjs';
+import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { CrudService } from './crud.service';
 import { NotificacionesDTO } from '../models/notificacionesDTO.interface';
 import { ApiResponse } from '../models/apiResponseDTO.interface';
@@ -10,7 +10,7 @@ import { LoginService } from './login';
 export class NotificacionesService {
     private crud = inject(CrudService);
     private loginService = inject(LoginService);
-    private endpoint = '/notificaciones';
+    private endpoint = '/notificaciones'; 
 
     notificaciones = signal<NotificacionesDTO[]>([]);
     cargando = signal(false);
@@ -42,11 +42,24 @@ export class NotificacionesService {
     }
 
     private putLeida(n: NotificacionesDTO): Observable<ApiResponse<NotificacionesDTO>> {
-        const { id_notificaciones, ...resto } = n as any;
-        return this.crud.update<NotificacionesDTO>(this.endpoint, id_notificaciones, {
-            ...resto,
-            leida: true
-        });
+        const id = n.id_notificaciones;
+        if (id === undefined) {
+            return throwError(() => new Error('La notificación no tiene un identificador válido.'));
+        }
+
+        return this.crud.getById<NotificacionesDTO>(this.endpoint, id).pipe(
+            switchMap((res) => {
+                if (!res.success || !res.data) {
+                    return throwError(() => new Error('No se pudo obtener la notificación.'));
+                }
+
+                const { id_notificaciones, ...notificacion } = res.data;
+                return this.crud.update<NotificacionesDTO>(this.endpoint, id, {
+                    ...notificacion,
+                    leida: true
+                });
+            })
+        );
     }
 
     cargar(): void {
@@ -64,7 +77,7 @@ export class NotificacionesService {
             return;
         }
 
-        this.crud.getAll<NotificacionesDTO>(`${this.endpoint}?id_usuario=${idUsuario}`)
+        this.crud.getAll<NotificacionesDTO>(this.endpoint)
             .pipe(finalize(() => {
                 if (solicitud === this.solicitudActual) {
                     this.cargando.set(false);
