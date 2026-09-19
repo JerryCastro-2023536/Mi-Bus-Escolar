@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -18,10 +18,13 @@ import { NotificacionEstiloPipe } from '../../shared/pipes/notificacionEstilo.pi
     templateUrl: './notificaciones.html',
     styleUrl: './notificaciones.css'
 })
-export class Notificaciones {
+export class Notificaciones implements OnInit {
     notifService = inject(NotificacionesService);
     loginService = inject(LoginService);
 
+    ngOnInit(): void {
+        this.notifService.cargar();
+    }
     filtroActual: string = 'TODAS';
     busqueda: string = '';
 

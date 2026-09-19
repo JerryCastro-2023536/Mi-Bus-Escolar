@@ -1,25 +1,44 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { forkJoin, of, Observable } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { CrudService } from './crud.service';
 import { NotificacionesDTO } from '../models/notificacionesDTO.interface';
 import { ApiResponse } from '../models/apiResponseDTO.interface';
+import { LoginService } from './login';
 
 @Injectable({ providedIn: 'root' })
 export class NotificacionesService {
     private crud = inject(CrudService);
-    private endpoint = '/notificaciones'; // CrudService ya agrega API_URL
+    private loginService = inject(LoginService);
+    private endpoint = '/notificaciones';
 
     notificaciones = signal<NotificacionesDTO[]>([]);
     cargando = signal(false);
     error = signal<string | null>(null);
+    private solicitudActual = 0;
+    private idUsuarioActual: number | null = null;
 
     noLeidasCount = computed(() =>
         this.notificaciones().filter(n => !n.leida).length
     );
 
     constructor() {
-        this.cargar();
+        effect(() => {
+            const usuario = this.loginService.user();
+            const idUsuario = Number(usuario?.id_usuario ?? usuario?.id);
+
+            if (idUsuario === this.idUsuarioActual) return;
+
+            this.idUsuarioActual = Number.isInteger(idUsuario) && idUsuario > 0
+                ? idUsuario
+                : null;
+            this.notificaciones.set([]);
+            this.error.set(null);
+
+            if (this.idUsuarioActual !== null) {
+                this.cargar();
+            }
+        });
     }
 
     private putLeida(n: NotificacionesDTO): Observable<ApiResponse<NotificacionesDTO>> {
@@ -31,13 +50,26 @@ export class NotificacionesService {
     }
 
     cargar(): void {
-        if (this.cargando()) return;
-
         this.cargando.set(true);
         this.error.set(null);
 
-        this.crud.getAll<NotificacionesDTO>(this.endpoint)
-            .pipe(finalize(() => this.cargando.set(false)))
+        const usuario = this.loginService.getUser();
+        const idUsuario = Number(usuario?.id_usuario ?? usuario?.id);
+        const solicitud = ++this.solicitudActual;
+
+        if (!Number.isInteger(idUsuario) || idUsuario <= 0) {
+            this.cargando.set(false);
+            this.notificaciones.set([]);
+            this.error.set('No se pudo identificar al usuario para cargar sus notificaciones.');
+            return;
+        }
+
+        this.crud.getAll<NotificacionesDTO>(`${this.endpoint}?id_usuario=${idUsuario}`)
+            .pipe(finalize(() => {
+                if (solicitud === this.solicitudActual) {
+                    this.cargando.set(false);
+                }
+            }))
             .subscribe({
                 next: (res) => {
                     if (res.success) {
@@ -45,15 +77,21 @@ export class NotificacionesService {
                             ...n,
                             id_notificaciones: n.id_notificaciones ?? n.id_notificacion
                         })) as NotificacionesDTO[];
-                        this.notificaciones.set(lista);
+                        if (solicitud === this.solicitudActual && idUsuario === this.idUsuarioActual) {
+                            this.notificaciones.set(lista);
+                        }
                     } else {
-                        this.notificaciones.set([]);
-                        this.error.set('No se pudieron cargar las notificaciones.');
+                        if (solicitud === this.solicitudActual && idUsuario === this.idUsuarioActual) {
+                            this.notificaciones.set([]);
+                            this.error.set('No se pudieron cargar las notificaciones.');
+                        }
                     }
                 },
                 error: () => {
-                    this.notificaciones.set([]);
-                    this.error.set('No se pudieron cargar las notificaciones.');
+                    if (solicitud === this.solicitudActual && idUsuario === this.idUsuarioActual) {
+                        this.notificaciones.set([]);
+                        this.error.set('No se pudieron cargar las notificaciones.');
+                    }
                 }
             });
     }
@@ -64,7 +102,7 @@ export class NotificacionesService {
         const actual = this.notificaciones().find(n => n.id_notificaciones === id);
         if (!actual || actual.leida) return;
 
-        this.setLeida([id], true); 
+        this.setLeida([id], true);
 
         const revertir = () => {
             this.setLeida([id], false);
