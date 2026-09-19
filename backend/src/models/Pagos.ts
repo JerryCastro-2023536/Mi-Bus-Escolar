@@ -17,51 +17,28 @@ export interface Pagos {
     observaciones: string
 }
 
-export interface EstudianteResumenDTO {
-    id_estudiante: number;
-    nombre: string;
-    apellido: string;
-    foto_estudiante: string | null;
-    grado: string | null;
-    nombre_colegio: string | null;
-}
-
 export interface MesPagoDTO {
+    id_servicio: number;
+    nombre_servicio: string;
+    precio_mensual: number;
     periodo_mes: number;
     periodo_anio: number;
-    precio_mensual: number;
-    estado: 'PENDIENTE' | 'PAGADO' | 'CANCELADO';
     id_pago: number | null;
-    fecha_pago_limite: string | null;
-    fecha_verificacion: string | null;
-    foto_comprobante: string | null;
+    estado: EstadoPago;
+    monto: number | null;
     metodo_pago: string | null;
     referencia_pago: string | null;
-}
-
-export interface PagoDetalleDTO {
-    id_pago: number;
-    id_estudiante: number;
-    id_servicio: number;
-    periodo_mes: number;
-    periodo_anio: number;
-    monto: number;
-    metodo_pago: string;
-    referencia_pago: string;
     foto_comprobante: string | null;
-    estado: string;
-    fecha_pago_limite: string | null;
-    fecha_verificacion: string | null;
-    observaciones: string | null;
-    nombre_estudiante: string;
-    nombre_servicio: string;
+    fecha_pago_limite: Date | null;
+    fecha_verificacion: Date | null;
 }
 
 export interface RegistrarPagoDTO {
     id_estudiante: number;
+    id_servicio: number;
     periodo_mes: number;
     periodo_anio: number;
     metodo_pago: string;
-    referencia_pago: string;
-    foto_comprobante: string;
+    referencia_pago?: string | null;
+    foto_comprobante?: string | null;
 }
