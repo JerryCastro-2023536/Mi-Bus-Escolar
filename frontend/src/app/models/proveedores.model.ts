@@ -57,8 +57,7 @@ export const proveedoresConfig = {
         {
             key: 'direccion',
             label: 'Dirección',
-            type: 'text',
-            required: true
+            type: 'text'
         },
         {
             key: 'telefono_contacto',
@@ -84,8 +83,7 @@ export const proveedoresConfig = {
         {
             key: 'direccion',
             label: 'Dirección',
-            type: 'text',
-            required: true
+            type: 'text'
         },
         {
             key: 'telefono_contacto',

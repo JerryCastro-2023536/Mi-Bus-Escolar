@@ -52,8 +52,7 @@ export const valoracionesConfig = {
         {
             key: 'comentario',
             label: 'Comentario',
-            type: 'text',
-            required: true
+            type: 'text'
         },
         {
             key: 'calificacion',

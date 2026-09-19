@@ -2,7 +2,7 @@ export const notificacionesConfig = {
     title: 'Notificaciones',
     subtitle: 'Gestiona las notificaciones de los usuarios',
     apiEndpoint: '/notificaciones',
-    idKey: 'id_notificaciones',
+    idKey: 'id_notificacion',
 
     kpis: [
         {
@@ -84,13 +84,13 @@ export const notificacionesConfig = {
             key: 'id_incidencia',
             label: 'ID Incidencia',
             type: 'number',
-            required: true
+            required: false
         },
         {
             key: 'id_asistencia',
             label: 'ID Asistencia',
             type: 'number',
-            required: true
+            required: false
         },
         {
             key: 'tipo',
@@ -99,12 +99,20 @@ export const notificacionesConfig = {
             required: true,
             options: [
                 {
-                    value: 'INCIDENCIA',
-                    label: 'Incidencia'
+                    value: 'INCIDENTE',
+                    label: 'Incidente'
                 },
                 {
                     value: 'ASISTENCIA',
                     label: 'Asistencia'
+                },
+                {
+                    value: 'INASISTENCIA',
+                    label: 'Inasistencia'
+                },
+                {
+                    value: 'OTRO',
+                    label: 'Otro'
                 }
             ]
         },
@@ -145,13 +153,13 @@ export const notificacionesConfig = {
             key: 'id_incidencia',
             label: 'ID Incidencia',
             type: 'number',
-            required: true
+            required: false
         },
         {
             key: 'id_asistencia',
             label: 'ID Asistencia',
             type: 'number',
-            required: true
+            required: false
         },
         {
             key: 'tipo',
@@ -160,12 +168,20 @@ export const notificacionesConfig = {
             required: true,
             options: [
                 {
-                    value: 'INCIDENCIA',
-                    label: 'Incidencia'
+                    value: 'INCIDENTE',
+                    label: 'Incidente'
                 },
                 {
                     value: 'ASISTENCIA',
                     label: 'Asistencia'
+                },
+                {
+                    value: 'INASISTENCIA',
+                    label: 'Inasistencia'
+                },
+                {
+                    value: 'OTRO',
+                    label: 'Otro'
                 }
             ]
         },

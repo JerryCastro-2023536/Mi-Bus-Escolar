@@ -73,8 +73,7 @@ export const serviciosConfig = {
         {
             key: 'descripcion',
             label: 'Descripción',
-            type: 'text',
-            required: true
+            type: 'text'
         },
         {
             key: 'precio_mensual',
@@ -101,8 +100,7 @@ export const serviciosConfig = {
         {
             key: 'fecha_creacion',
             label: 'Fecha de creación',
-            type: 'date',
-            required: true
+            type: 'date'
         }
     ],
 
@@ -122,8 +120,7 @@ export const serviciosConfig = {
         {
             key: 'descripcion',
             label: 'Descripción',
-            type: 'text',
-            required: true
+            type: 'text'
         },
         {
             key: 'precio_mensual',
@@ -150,8 +147,7 @@ export const serviciosConfig = {
         {
             key: 'fecha_creacion',
             label: 'Fecha de creación',
-            type: 'date',
-            required: true
+            type: 'date'
         }
     ]
 };
