@@ -42,7 +42,7 @@ export async function obtenerEstudiantesPorChofer(idChofer: number) {
 
 export async function obtenerReportesPorChofer(idChofer: number) {
   const query = `
-    SELECT
+    SELECT DISTINCT
       i.id_incidencia,
       i.titulo,
       i.descripcion,
@@ -53,11 +53,13 @@ export async function obtenerReportesPorChofer(idChofer: number) {
       r.nombre AS ruta
     FROM Incidencias i
     LEFT JOIN Rutas r ON r.id_ruta = i.id_ruta
-    WHERE i.id_usuario_reporta = (
-      SELECT id_usuario
-      FROM Choferes
-      WHERE id_chofer = $1
-      LIMIT 1
+    LEFT JOIN Choferes ch ON ch.id_chofer = $1
+    WHERE (
+      r.id_chofer = $1
+      OR (
+        ch.id_usuario IS NOT NULL
+        AND i.id_usuario_reporta = ch.id_usuario
+      )
     )
     ORDER BY i.fecha_hora DESC;
   `;
