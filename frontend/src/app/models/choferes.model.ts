@@ -31,6 +31,11 @@ export const choferesConfig = {
             type: 'number'
         },
         {
+            key: 'id_proveedor',
+            label: 'Proveedor',
+            type: 'number'
+        },
+        {
             key: 'telefono_contacto',
             label: 'Teléfono',
             type: 'text'
@@ -46,6 +51,12 @@ export const choferesConfig = {
         {
             key: 'id_usuario',
             label: 'ID Usuario',
+            type: 'number',
+            required: true
+        },
+        {
+            key: 'id_proveedor',
+            label: 'ID Proveedor',
             type: 'number',
             required: true
         },
@@ -77,6 +88,12 @@ export const choferesConfig = {
         {
             key: 'id_usuario',
             label: 'ID Usuario',
+            type: 'number',
+            required: true
+        },
+        {
+            key: 'id_proveedor',
+            label: 'ID Proveedor',
             type: 'number',
             required: true
         },
