@@ -206,3 +206,12 @@ export async function eliminarVehiculoProveedor(id_usuario: number, id_vehiculo:
         errorThrower(error);
     }
 }
+
+export async function listarVehiculosDelProveedorBase(id_proveedor: number) {
+    try {
+        const res = await pool.query('SELECT * FROM sp_vehiculos_por_proveedor($1)', [id_proveedor]);
+        return res.rows;
+    } catch (error) {
+        errorThrower(error);
+    }
+}
