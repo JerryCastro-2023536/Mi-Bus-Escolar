@@ -76,6 +76,8 @@ export async function eliminarPagoById(id: number) {
     }
 }
 
+//VISTA PADRE/USUARIO---------------------------------------------------------------
+
 export async function listarEstudiantesPorTutor(id_usuario_tutor: number) {
     try {
         const res = await pool.query('SELECT * FROM sp_estudiantes_por_tutor($1)', [id_usuario_tutor]);
@@ -194,4 +196,55 @@ async function notificarProveedor(id_servicio: number, pago: any) {
             `Se registró un pago de Q${pago.monto} correspondiente a ${nombreMes}.`
         ]
     );
+}
+
+//VISTA PROVEEDOR---------------------------------------------------------------
+
+async function verificarServicioDelProveedor(id_usuario: number, id_servicio: number) {
+    const res = await pool.query(
+        'SELECT sp_proveedor_es_dueno_servicio($1, $2) AS es_dueno',
+        [id_usuario, id_servicio]
+    );
+
+    if (!res.rows[0]?.es_dueno) {
+        throw new NotFoundError('El servicio no existe o no pertenece a este proveedor.');
+    }
+}
+
+export async function listarServiciosProveedor(id_usuario: number) {
+    try {
+        const res = await pool.query('SELECT * FROM sp_proveedor_servicios_listar($1)', [id_usuario]);
+        return res.rows;
+    } catch (error) {
+        errorThrower(error);
+    }
+}
+
+export async function listarEstudiantesPorServicio(id_usuario: number, id_servicio: number) {
+    try {
+        await verificarServicioDelProveedor(id_usuario, id_servicio);
+
+        const res = await pool.query('SELECT * FROM sp_proveedor_estudiantes_por_servicio($1)', [id_servicio]);
+        return res.rows;
+    } catch (error) {
+        errorThrower(error);
+    }
+}
+
+export async function listarMesesEstudianteProveedor(
+    id_usuario: number,
+    id_servicio: number,
+    id_estudiante: number
+) {
+    try {
+        await verificarServicioDelProveedor(id_usuario, id_servicio);
+
+        const res = await pool.query(
+            'SELECT * FROM sp_proveedor_meses_estudiante($1, $2)',
+            [id_estudiante, id_servicio]
+        );
+        return res.rows;
+    } catch (error) {
+        errorThrower(error);
+    }
 }
