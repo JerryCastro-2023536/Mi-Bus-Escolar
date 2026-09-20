@@ -12,6 +12,19 @@ export async function listarEstudiantes() {
     }
 }
 
+export async function listarEstudiantesPorTutor(idUsuario: number) {
+    try {
+        const resultado = await pool.query(
+            "SELECT * FROM sp_estudiantes_por_tutor($1)",
+            [idUsuario]
+        );
+
+        return resultado.rows;
+    } catch (error) {
+        errorThrower(error);
+    }
+}
+
 export async function buscarEstudianteById(id: number) {
     try {
         const res = await pool.query("SELECT * FROM sp_estudiantes_buscar($1)", [id]);
