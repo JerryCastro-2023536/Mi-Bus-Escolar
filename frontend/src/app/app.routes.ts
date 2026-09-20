@@ -92,6 +92,18 @@ export const routes: Routes = [
                 }
             },
 
+            {
+                path: 'mis-vehiculos',
+                title: 'Mis Vehículos | MiBusEscolar',
+                canActivate: [roleGuard],
+                loadComponent: () => import('./components/vehiculos-proveedor-view/vehiculos-proveedor-view').then(m => m.VehiculosProveedorView),
+                data: {
+                    roles: ['PROVEEDOR'],
+                    title: 'Mis Vehículos',
+                    subtitle: 'Administra tu flota, sube fotos y consulta a qué ruta y chofer está asignado cada vehículo.'
+                }
+            },
+
             ...crudRoutes,
         ],
     },
