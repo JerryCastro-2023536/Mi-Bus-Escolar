@@ -104,7 +104,7 @@ LANGUAGE sql STABLE AS $$
     SELECT
         COUNT(*)::int AS total,
         COUNT(*) FILTER (WHERE estado = 'PENDIENTE')::int AS pendientes,
-        COUNT(*) FILTER (WHERE estado = 'VERIFICADO')::int AS verificados
+        COUNT(*) FILTER (WHERE estado = 'PAGADO')::int AS verificados
     FROM pagos;
 $$;
  
@@ -912,5 +912,264 @@ BEGIN
     FROM sp_pagos_meses_pendientes(p_id_estudiante) m
     WHERE m.id_servicio = p_id_servicio
     ORDER BY m.periodo_anio, m.periodo_mes;
+END;
+$$;
+
+-- ============================================================
+-- SERVICIOS · VISTA DEL PROVEEDOR
+-- ============================================================
+
+-- ------------------------------------------------------------
+-- 1. id_proveedor a partir del usuario logueado (NULL si el usuario
+--    no es proveedor). Proveedores.id_usuario es UNIQUE.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_id_por_usuario(
+    p_id_usuario INTEGER
+)
+RETURNS INTEGER
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT p.id_proveedor
+    FROM Proveedores p
+    WHERE p.id_usuario = p_id_usuario;
+$$;
+
+
+-- ------------------------------------------------------------
+-- 2. ¿El proveedor ya tiene un servicio con ese nombre?
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_servicios_nombre_existe(
+    p_id_proveedor INTEGER,
+    p_nombre       VARCHAR
+)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT EXISTS (
+        SELECT 1
+        FROM Servicios s
+        WHERE s.id_proveedor = p_id_proveedor
+          AND LOWER(TRIM(s.nombre)) = LOWER(TRIM(p_nombre))
+    );
+$$;
+
+
+-- ------------------------------------------------------------
+-- 3. Servicios del proveedor con conteo de rutas y estudiantes
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_servicios_por_proveedor(
+    p_id_proveedor INTEGER
+)
+RETURNS TABLE (
+    id_servicio       INTEGER,
+    nombre            VARCHAR(150),
+    descripcion       TEXT,
+    precio_mensual    DECIMAL(10,2),
+    estado            VARCHAR(10),
+    fecha_creacion    TIMESTAMP,
+    total_rutas       INTEGER,
+    total_estudiantes INTEGER
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        s.id_servicio,
+        s.nombre,
+        s.descripcion,
+        s.precio_mensual,
+        s.estado,
+        s.fecha_creacion,
+        (
+            SELECT COUNT(*)::INTEGER
+            FROM Rutas r
+            WHERE r.id_servicio = s.id_servicio
+        ) AS total_rutas,
+        (
+            SELECT COUNT(DISTINCT a.id_estudiante)::INTEGER
+            FROM Rutas r
+            JOIN Asignaciones_Ruta a ON a.id_ruta = r.id_ruta
+            WHERE r.id_servicio = s.id_servicio
+        ) AS total_estudiantes
+    FROM Servicios s
+    WHERE s.id_proveedor = p_id_proveedor
+    ORDER BY s.nombre;
+END;
+$$;
+
+
+-- ------------------------------------------------------------
+-- 4. Registrar un servicio nuevo (queda ACTIVO por defecto).
+--    Devuelve la fila con la misma forma que sp_servicios_por_proveedor.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_servicios_registrar(
+    p_id_proveedor   INTEGER,
+    p_nombre         VARCHAR,
+    p_descripcion    TEXT,
+    p_precio_mensual DECIMAL
+)
+RETURNS TABLE (
+    id_servicio       INTEGER,
+    nombre            VARCHAR(150),
+    descripcion       TEXT,
+    precio_mensual    DECIMAL(10,2),
+    estado            VARCHAR(10),
+    fecha_creacion    TIMESTAMP,
+    total_rutas       INTEGER,
+    total_estudiantes INTEGER
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_id_servicio INTEGER;
+BEGIN
+    INSERT INTO Servicios (id_proveedor, nombre, descripcion, precio_mensual)
+    VALUES (p_id_proveedor, p_nombre, p_descripcion, p_precio_mensual)
+    RETURNING Servicios.id_servicio INTO v_id_servicio;
+
+    RETURN QUERY
+    SELECT
+        s.id_servicio,
+        s.nombre,
+        s.descripcion,
+        s.precio_mensual,
+        s.estado,
+        s.fecha_creacion,
+        0::INTEGER,   -- un servicio recién creado aún no tiene rutas
+        0::INTEGER    -- ni estudiantes
+    FROM Servicios s
+    WHERE s.id_servicio = v_id_servicio;
+END;
+$$;
+
+
+-- ============================================================
+-- ADMINISTRAR SERVICIO (editar · activar/desactivar · eliminar)
+-- Todas filtran por id_proveedor: un proveedor solo puede tocar sus servicios.
+-- ============================================================
+
+
+-- ------------------------------------------------------------
+-- 5. ¿Otro servicio del mismo proveedor ya usa ese nombre?
+--    (excluye al propio servicio que se está editando)
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_servicios_nombre_existe_otro(
+    p_id_proveedor INTEGER,
+    p_nombre       VARCHAR,
+    p_id_servicio  INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT EXISTS (
+        SELECT 1
+        FROM Servicios s
+        WHERE s.id_proveedor = p_id_proveedor
+          AND s.id_servicio <> p_id_servicio
+          AND LOWER(TRIM(s.nombre)) = LOWER(TRIM(p_nombre))
+    );
+$$;
+
+
+-- ------------------------------------------------------------
+-- 6. Actualizar un servicio (datos + estado).
+--    Devuelve la fila actualizada con la misma forma que
+--    sp_servicios_por_proveedor. Sin filas = no existe o no es del proveedor.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_servicios_actualizar(
+    p_id_servicio    INTEGER,
+    p_id_proveedor   INTEGER,
+    p_nombre         VARCHAR,
+    p_descripcion    TEXT,
+    p_precio_mensual DECIMAL,
+    p_estado         VARCHAR
+)
+RETURNS TABLE (
+    id_servicio       INTEGER,
+    nombre            VARCHAR(150),
+    descripcion       TEXT,
+    precio_mensual    DECIMAL(10,2),
+    estado            VARCHAR(10),
+    fecha_creacion    TIMESTAMP,
+    total_rutas       INTEGER,
+    total_estudiantes INTEGER
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE Servicios
+    SET nombre         = p_nombre,
+        descripcion    = p_descripcion,
+        precio_mensual = p_precio_mensual,
+        estado         = p_estado
+    WHERE Servicios.id_servicio  = p_id_servicio
+      AND Servicios.id_proveedor = p_id_proveedor;
+
+    IF NOT FOUND THEN
+        RETURN;
+    END IF;
+
+    RETURN QUERY
+    SELECT f.*
+    FROM sp_servicios_por_proveedor(p_id_proveedor) f
+    WHERE f.id_servicio = p_id_servicio;
+END;
+$$;
+
+
+-- ------------------------------------------------------------
+-- 7. Dependencias de un servicio
+--    Sin filas = no existe o no es del proveedor.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_servicios_dependencias(
+    p_id_proveedor INTEGER,
+    p_id_servicio  INTEGER
+)
+RETURNS TABLE (
+    total_rutas INTEGER,
+    total_pagos INTEGER
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        (SELECT COUNT(*)::INTEGER FROM Rutas r  WHERE r.id_servicio  = s.id_servicio),
+        (SELECT COUNT(*)::INTEGER FROM Pagos pg WHERE pg.id_servicio = s.id_servicio)
+    FROM Servicios s
+    WHERE s.id_servicio  = p_id_servicio
+      AND s.id_proveedor = p_id_proveedor;
+END;
+$$;
+
+
+-- ------------------------------------------------------------
+-- 8. Eliminar un servicio SOLO si no tiene rutas ni pagos.
+--    Las FK de Rutas y Pagos son ON DELETE CASCADE: sin esta guarda,
+--    borrar el servicio arrastraría rutas, asignaciones y el historial
+--    de pagos. Devuelve las filas eliminadas (0 = no se eliminó nada).
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_servicios_eliminar(
+    p_id_servicio  INTEGER,
+    p_id_proveedor INTEGER
+)
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_filas INTEGER;
+BEGIN
+    DELETE FROM Servicios s
+    WHERE s.id_servicio  = p_id_servicio
+      AND s.id_proveedor = p_id_proveedor
+      AND NOT EXISTS (SELECT 1 FROM Rutas r  WHERE r.id_servicio  = s.id_servicio)
+      AND NOT EXISTS (SELECT 1 FROM Pagos pg WHERE pg.id_servicio = s.id_servicio);
+
+    GET DIAGNOSTICS v_filas = ROW_COUNT;
+    RETURN v_filas;
 END;
 $$;
