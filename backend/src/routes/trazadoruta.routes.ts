@@ -1,26 +1,46 @@
 import { Router } from 'express';
-import { getViajeHoy, getTrazado, patchIniciarRuta, patchFinalizarRuta, postUbicacionGPS } from '../controllers/trazadoruta.controller';
+import {
+  getViajeHoy,
+  getTrazado,
+  getTrazadoAsistencia,
+  patchIniciarRuta,
+  patchFinalizarRuta,
+  postUbicacionGPS,
+  getChoferPorUsuario,
+  getEstudiantesConAsistencia,
+  patchAbordajeEstudiante,
+  patchDescensoEstudiante,
+  patchAusenteEstudiante
+} from '../controllers/trazadoruta.controller';
 
 const router = Router();
 
-// GET /api/viajes/hoy/1
+
 router.get('/viajes/hoy/:idChofer', getViajeHoy);
 
-// GET /api/rutas/5/paradas
-router.get('/rutas/:idRuta/paradas', getTrazado);
 
-// POST o PATCH para iniciar el viaje (soporta idChofer o idViaje)
+router.get('/rutas/:idRuta/paradas', getTrazado);
+router.get('/rutas/:idRuta/paradas-asistencia/:idViaje', getTrazadoAsistencia);
+
 router.patch('/viajes/:idViaje/iniciar', patchIniciarRuta);
 router.post('/viajes/iniciar/:idChofer', patchIniciarRuta);
 router.post('/viajes/iniciar', patchIniciarRuta);
 
-// PATCH /api/viajes/:idViaje/finalizar
 router.patch('/viajes/:idViaje/finalizar', patchFinalizarRuta);
 router.post('/viajes/:idViaje/finalizar', patchFinalizarRuta);
 
-// POST /api/ubicaciones y POST /api/ubicaciones-bus para telemetría GPS
 router.post('/ubicaciones', postUbicacionGPS);
 router.post('/ubicaciones-bus', postUbicacionGPS);
 
+router.get('/chofer/usuario/:idUsuario', getChoferPorUsuario);
+
+router.get('/viajes/chofer/:idChofer/estudiantes', getEstudiantesConAsistencia);
+
+router.patch('/viajes/:idViaje/abordaje/:idEstudiante', patchAbordajeEstudiante);
+
+router.patch('/viajes/:idViaje/descenso/:idEstudiante', patchDescensoEstudiante);
+
+router.patch('/viajes/:idViaje/ausente/:idEstudiante', patchAusenteEstudiante);
+
 export default router;
-
+
