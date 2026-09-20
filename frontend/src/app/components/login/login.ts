@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login';
-import { UsuarioLoginDTO, UsuarioRegisterDTO } from "../../../../../backend/src/models/usuario"
-import { RegisterService} from '../../services/register';
+import { UsuarioLoginDTO, UsuarioRegisterDTO } from '../../models/usuarioDTO.interface';
+import { RegisterService } from '../../services/register';
 import { CloudinaryService } from '../../services/cloudinary.service';
 
 @Component({

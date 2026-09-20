@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
@@ -20,6 +20,7 @@ export class CuentaView implements OnInit {
   private usuarioService = inject(UsuarioService);
   private router = inject(Router);
   private cloudinaryService = inject(CloudinaryService);
+  private cdr = inject(ChangeDetectorRef);
 
   usuario: UsuarioDTO = {
     nombre: '',
@@ -33,14 +34,15 @@ export class CuentaView implements OnInit {
   };
 
   tabActiva: 'perfil' | 'seguridad' | 'rol' = 'perfil';
-  guardando = false;
-  mensajeExito = '';
-  mensajeError = '';
+
+  guardando = signal(false);
+  mensajeExito = signal('');
+  mensajeError = signal('');
 
   mostrarPasswordNueva = false;
   mostrarPasswordConfirmar = false;
+  mostrarPasswordActual = false;
 
-  // --- Foto de perfil (mismo patrón que el form del CRUD) ---
   subiendoFoto = signal(false);
   draggingImage = false;
   private passwordActual = '';
@@ -84,7 +86,7 @@ export class CuentaView implements OnInit {
 
   private subirFoto(file: File): void {
     this.subiendoFoto.set(true);
-    this.mensajeError = '';
+    this.mensajeError.set('');
 
     this.cloudinaryService.upload(file, 'usuarios').subscribe({
       next: (url) => {
@@ -94,17 +96,17 @@ export class CuentaView implements OnInit {
           next: () => {
             this.loginService.updateFotoUsuario(url); // propaga a header y sidebar
             this.subiendoFoto.set(false);
-            this.mensajeExito = 'Foto de perfil actualizada correctamente';
+            this.mensajeExito.set('Foto de perfil actualizada correctamente');
           },
           error: () => {
             this.subiendoFoto.set(false);
-            this.mensajeError = 'No se pudo guardar la foto en el servidor';
+            this.mensajeError.set('No se pudo guardar la foto en el servidor');
           }
         });
       },
       error: () => {
         this.subiendoFoto.set(false);
-        this.mensajeError = 'No se pudo subir la imagen. Intenta de nuevo.';
+        this.mensajeError.set('No se pudo subir la imagen. Intenta de nuevo.');
       }
     });
   }
@@ -114,11 +116,11 @@ export class CuentaView implements OnInit {
 
     this.usuarioService.editarUsuarioById(this.usuario.id_usuario!, this.payloadUsuario({ foto_usuario: null })).subscribe({
       next: () => {
-        this.loginService.updateFotoUsuario(''); // limpia también en header/sidebar
-        this.mensajeExito = 'Foto de perfil eliminada';
+        this.loginService.updateFotoUsuario(''); 
+        this.mensajeExito.set('Foto de perfil eliminada');
       },
       error: () => {
-        this.mensajeError = 'No se pudo eliminar la foto en el servidor';
+        this.mensajeError.set('No se pudo eliminar la foto en el servidor');
       }
     });
   }
@@ -134,6 +136,7 @@ export class CuentaView implements OnInit {
           if (!response?.data) return;
           this.passwordActual = response.data.password || '';
           this.usuario = { ...this.usuario, ...response.data };
+          this.cdr.markForCheck();
         }
       });
     }
@@ -170,65 +173,65 @@ export class CuentaView implements OnInit {
 
   actualizarPassword(): void {
     if (!this.seguridad.antiguaPassword) {
-      this.mensajeError = 'Debes ingresar tu contraseña actual.';
+      this.mensajeError.set('Debes ingresar tu contraseña actual.');
       return;
     }
     if (this.seguridad.nuevaPassword !== this.seguridad.confirmarPassword) {
-      this.mensajeError = 'Las contraseñas no coinciden.';
+      this.mensajeError.set('Las contraseñas no coinciden.');
       return;
     }
     if (!this.seguridad.nuevaPassword) {
-      this.mensajeError = 'Debes ingresar una contraseña.';
+      this.mensajeError.set('Debes ingresar una contraseña.');
       return;
     }
 
-    this.guardando = true;
-    this.mensajeExito = '';
-    this.mensajeError = '';
+    this.guardando.set(true);
+    this.mensajeExito.set('');
+    this.mensajeError.set('');
 
     this.usuarioService.cambiarPassword(this.usuario.id_usuario!, {
       oldPassword: this.seguridad.antiguaPassword,
       newPassword: this.seguridad.nuevaPassword
     }).subscribe({
       next: () => {
-        this.guardando = false;
-        this.mensajeExito = '¡Contraseña actualizada exitosamente!';
+        this.guardando.set(false);
+        this.mensajeExito.set('¡Contraseña actualizada exitosamente!');
         this.seguridad = { antiguaPassword: '', nuevaPassword: '', confirmarPassword: '' };
       },
       error: (err) => {
         const errorData = err?.error;
         if (errorData?.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
-          this.mensajeError = errorData.errors[0]?.mensaje || errorData.message || 'Error de validación';
+          this.mensajeError.set(errorData.errors[0]?.mensaje || errorData.message || 'Error de validación');
         } else {
-          this.mensajeError = errorData?.message || err?.message || 'Error al actualizar la contraseña';
+          this.mensajeError.set(errorData?.message || err?.message || 'Error al actualizar la contraseña');
         }
-        this.guardando = false;
+        this.guardando.set(false);
       }
     });
   }
 
   private actualizar(payload: Partial<UsuarioDTO>, mensaje: string): void {
-    this.guardando = true;
-    this.mensajeExito = '';
-    this.mensajeError = '';
+    this.guardando.set(true);
+    this.mensajeExito.set('');
+    this.mensajeError.set('');
 
     this.usuarioService.editarUsuarioById(this.usuario.id_usuario!, this.payloadUsuario(payload)).subscribe({
       next: () => this.finalizarActualizacion(mensaje),
       error: (err) => {
         const errorData = err?.error;
         if (errorData?.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
-          this.mensajeError = errorData.errors[0]?.mensaje || errorData.message || 'Error de validación';
+          this.mensajeError.set(errorData.errors[0]?.mensaje || errorData.message || 'Error de validación');
         } else {
-          this.mensajeError = errorData?.message || err?.message || 'Error al procesar la solicitud';
+          this.mensajeError.set(errorData?.message || err?.message || 'Error al procesar la solicitud');
         }
-        this.guardando = false;
+        this.guardando.set(false);
       }
     });
   }
 
   private finalizarActualizacion(mensaje: string): void {
-    this.guardando = false;
-    if (mensaje) this.mensajeExito = mensaje;
+    this.guardando.set(false);
+    if (mensaje) this.mensajeExito.set(mensaje);
     this.loginService.saveUser({ ...this.loginService.getUser(), ...this.usuario, password: undefined });
   }
 

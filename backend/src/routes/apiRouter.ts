@@ -22,6 +22,7 @@ import paradasRoutes from './paradas.routes'
 import trazadoRutaRoutes from './trazadoruta.routes'
 import choferDashboardRoutes from './choferDashboard.routes'
 import kpisRoutes from './kpis.routes'
+import proveedorOperacionesRoutes from './proveedorOperaciones.routes';
 
 const apiRouter = Router();
 
@@ -52,6 +53,7 @@ apiRouter.use(notificacionesRoutes);
 apiRouter.use(pagosRoutes);
 apiRouter.use(paradasRoutes);
 
-apiRouter.use(kpisRoutes)
+apiRouter.use(kpisRoutes);
+apiRouter.use(proveedorOperacionesRoutes)
 
 export default apiRouter;

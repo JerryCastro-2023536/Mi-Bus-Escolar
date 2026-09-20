@@ -15,26 +15,25 @@
       </div>
     </div>
 
-    @if (mensajeExito) {
+    @if (mensajeExito()) {
     <div class="alert-box success">
       <i class="fa-solid fa-circle-check"></i>
-      <span>{{ mensajeExito }}</span>
-      <button class="btn-close-alert" (click)="mensajeExito = ''" type="button">
+      <span>{{ mensajeExito() }}</span>
+      <button class="btn-close-alert" (click)="mensajeExito.set('')" type="button">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
     }
 
-    @if (mensajeError) {
+    @if (mensajeError()) {
     <div class="alert-box error">
       <i class="fa-solid fa-triangle-exclamation"></i>
-      <span>{{ mensajeError }}</span>
-      <button class="btn-close-alert" (click)="mensajeError = ''" type="button">
+      <span>{{ mensajeError() }}</span>
+      <button class="btn-close-alert" (click)="mensajeError.set('')" type="button">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
     }
-
     <div class="profile-hero-card">
       <div class="hero-left-section">
         <div class="profile-avatar-wrapper">
@@ -233,8 +232,8 @@
           </div>
 
           <div class="form-actions-row">
-            <button type="submit" class="btn-primary-action" [disabled]="guardando">
-              @if (guardando) {
+            <button type="submit" class="btn-primary-action" [disabled]="guardando()">
+              @if (guardando()) {
               <i class="fa-solid fa-spinner fa-spin"></i>
               <span>Guardando cambios...</span>
               } @else {
@@ -261,13 +260,17 @@
 
             <div class="form-group">
               <label for="input-antigua-pass">Contraseña Actual <span class="req">*</span></label>
-              <div class="input-icon-wrap">
-                <i class="fa-solid fa-lock input-icon"></i>
-                <input type="password" id="input-antigua-pass"
-                  [(ngModel)]="seguridad.antiguaPassword" name="antiguaPassword"
-                  placeholder="Ingresa tu contraseña actual" required />
-              </div>
+                <div class="input-icon-wrap">
+                  <i class="fa-solid fa-lock input-icon"></i>
+                  <input [type]="mostrarPasswordActual ? 'text' : 'password'" id="input-antigua-pass"
+                    [(ngModel)]="seguridad.antiguaPassword" name="antiguaPassword"
+                   placeholder="Ingresa tu contraseña actual" required />
+                  <button type="button" class="btn-toggle-eye" (click)="mostrarPasswordActual = !mostrarPasswordActual"
+                    [title]="mostrarPasswordActual ? 'Ocultar' : 'Mostrar'">
+                  <i [class]="'fa-solid ' + (mostrarPasswordActual ? 'fa-eye-slash' : 'fa-eye')"></i>
+              </button>
             </div>
+          </div>  
 
             <div class="form-group">
               <label for="input-nueva-pass">Nueva Contraseña <span class="req">*</span></label>
@@ -323,9 +326,8 @@
           </div>
 
           <div class="form-actions-row">
-            <button type="submit" class="btn-primary-action"
-              [disabled]="guardando || !seguridad.antiguaPassword || !tieneMinimo8 || !tieneMayuscula || !tieneNumero || !passwordsCoinciden">
-              @if (guardando) {
+            <button type="submit" class="btn-primary-action" [disabled]="guardando()">
+              @if (guardando()) {
               <i class="fa-solid fa-spinner fa-spin"></i>
               <span>Actualizando contraseña...</span>
               } @else {

@@ -1,0 +1,198 @@
+<div class="pagos-container">
+
+    @if (mensajeExito) {
+    <div class="alert-box success">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>{{ mensajeExito }}</span>
+        <button class="btn-close-alert" (click)="mensajeExito = ''" type="button"><i
+                class="fa-solid fa-xmark"></i></button>
+    </div>
+    }
+    @if (mensajeError) {
+    <div class="alert-box error">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>{{ mensajeError }}</span>
+        <button class="btn-close-alert" (click)="mensajeError = ''" type="button"><i
+                class="fa-solid fa-xmark"></i></button>
+    </div>
+    }
+
+    <!-- PASO 1: Selección de estudiante -->
+    @if (!estudianteSeleccionado()) {
+    <div class="step-card">
+        <h3>Selecciona un estudiante</h3>
+        <p class="step-subtitle">Elige a tu hijo/a para ver sus pagos de transporte escolar.</p>
+
+        @if (cargandoEstudiantes()) {
+        <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Cargando estudiantes...</div>
+        } @else if (estudiantes().length === 0) {
+        <div class="empty-state">No tienes estudiantes registrados.</div>
+        } @else {
+        <div class="estudiantes-grid">
+            @for (est of estudiantes(); track est.id_estudiante) {
+            <button type="button" class="estudiante-card" (click)="seleccionarEstudiante(est)">
+                @if (est.foto_estudiante) {
+                <img [src]="est.foto_estudiante" alt="Foto" class="estudiante-foto" />
+                } @else {
+                <div class="estudiante-foto-placeholder">{{ est.nombre.charAt(0) }}</div>
+                }
+                <div class="estudiante-info">
+                    <span class="estudiante-nombre">{{ est.nombre }} {{ est.apellido }}</span>
+                    <span class="estudiante-meta">{{ est.grado || 'Sin grado' }} · {{ est.nombre_colegio || 'Sin colegio' }} </span>
+                </div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            }
+        </div>
+        }
+    </div>
+    }
+
+    <!-- PASO 2: 10 meses -->
+    @if (estudianteSeleccionado() && !mesSeleccionado()) {
+    <div class="step-card">
+        <div class="step-header-row">
+            <button class="btn-back" (click)="volverAEstudiantes()"><i class="fa-solid fa-arrow-left"></i></button>
+            <div>
+                <h3>Pagos de {{ estudianteSeleccionado()!.nombre }}</h3>
+                <p class="step-subtitle">Selecciona un mes para ver o realizar el pago.</p>
+            </div>
+        </div>
+
+        @if (cargandoMeses()) {
+        <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Cargando meses...</div>
+        } @else if (meses().length === 0) {
+        <div class="empty-state">Este estudiante no tiene un servicio de transporte asignado.</div>
+        } @else {
+        <div class="meses-grid">
+            @for (mes of meses(); track mes.periodo_anio + '-' + mes.periodo_mes) {
+            <button type="button" class="mes-card" [class.pagado]="mes.estado === 'PAGADO'"
+                (click)="seleccionarMes(mes)">
+                <span class="mes-nombre">{{ nombreMes(mes.periodo_mes) }} {{ mes.periodo_anio }}</span>
+                <span class="mes-precio">Q{{ mes.precio_mensual }}</span>
+                <span class="mes-badge" [class.pagado]="mes.estado === 'PAGADO'">
+                    <i [class]="'fa-solid ' + (mes.estado === 'PAGADO' ? 'fa-circle-check' : 'fa-clock')"></i>
+                    {{ mes.estado === 'PAGADO' ? 'Pagado' : 'Pendiente' }}
+                </span>
+            </button>
+            }
+        </div>
+        }
+    </div>
+    }
+
+    <!-- Resumen (ya pagado) -->
+    @if (mesSeleccionado() && mesSeleccionado()!.estado === 'PAGADO') {
+    <div class="step-card">
+        <div class="step-header-row">
+            <button class="btn-back" (click)="volverAMeses()"><i class="fa-solid fa-arrow-left"></i></button>
+            <div>
+                <h3>{{ nombreMes(mesSeleccionado()!.periodo_mes) }} {{ mesSeleccionado()!.periodo_anio }}</h3>
+                <p class="step-subtitle">Este mes ya fue pagado.</p>
+            </div>
+        </div>
+
+        <div class="resumen-pago">
+            <div class="resumen-fila"><span>Servicio</span><span>{{ mesSeleccionado()!.nombre_servicio }}</span></div>
+            <div class="resumen-fila"><span>Monto</span><span>Q{{ mesSeleccionado()!.monto }}</span></div>
+            <div class="resumen-fila"><span>Método de pago</span><span>{{ mesSeleccionado()!.metodo_pago }}</span></div>
+            @if (mesSeleccionado()!.referencia_pago) {
+            <div class="resumen-fila"><span>Referencia</span><span>{{ mesSeleccionado()!.referencia_pago }}</span></div>
+            }
+                <div class="resumen-fila"><span>Fecha de verificación</span><span>{{ mesSeleccionado()!.fecha_verificacion | date: 'dd/MM/yyyy HH:mm' }}</span></div>
+
+            @if (mesSeleccionado()!.foto_comprobante) {
+            <div class="comprobante-preview">
+                <span class="comprobante-label">Comprobante</span>
+                <img [src]="mesSeleccionado()!.foto_comprobante!" alt="Comprobante de pago" />
+            </div>
+            }
+        </div>
+    </div>
+    }
+
+    <!-- Formulario de pago (pendiente) -->
+    @if (mesSeleccionado() && mesSeleccionado()!.estado !== 'PAGADO') {
+    <div class="step-card">
+        <div class="step-header-row">
+            <button class="btn-back" (click)="volverAMeses()"><i class="fa-solid fa-arrow-left"></i></button>
+            <div>
+                <h3>Pagar {{ nombreMes(mesSeleccionado()!.periodo_mes) }} {{ mesSeleccionado()!.periodo_anio }}</h3>
+                <p class="step-subtitle">Monto a pagar: Q{{ mesSeleccionado()!.precio_mensual }}</p>
+            </div>
+        </div>
+
+        <form (ngSubmit)="confirmarPago()" class="pago-form">
+            <div class="form-group">
+                <label for="metodo-pago">Método de pago <span class="req">*</span></label>
+                <div class="select-wrapper">
+                    <select id="metodo-pago" name="metodoPago" [(ngModel)]="metodoPago" required>
+                        <option value="" disabled>Selecciona un método</option>
+                        <option value="TRANSFERENCIA">Transferencia bancaria</option>
+                        <option value="DEPOSITO">Depósito</option>
+                        <option value="EFECTIVO">Efectivo</option>
+                        <option value="TARJETA">Tarjeta</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="referencia-pago">Número de referencia / boleta (opcional)</label>
+                <input type="text" id="referencia-pago" name="referenciaPago" [(ngModel)]="referenciaPago"
+                    placeholder="Ej. 00123456" />
+            </div>
+
+            <div class="form-group">
+                <label>Comprobante de pago</label>
+                <div class="image-field">
+                    @if (fotoComprobante) {
+                    <div class="image-preview">
+                        <img [src]="fotoComprobante" alt="Vista previa" />
+                        <button type="button" class="image-remove" (click)="removeComprobante()"
+                            title="Eliminar">✕</button>
+                    </div>
+                    } @else {
+                    <div class="dropzone-container" [class.drag-active]="draggingImage"
+                        (dragover)="onDragOverImage($event)" (dragleave)="onDragLeaveImage($event)"
+                        (drop)="onFileDrop($event)">
+                        <div class="image-dropzone">
+                            @if (subiendoFoto()) {
+                            <span class="image-spinner"></span>
+                            <span>Subiendo...</span>
+                            } @else {
+                            <span class="image-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="8 12 12 16 16 12"></polyline>
+                                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                                </svg>
+                            </span>
+                            <span class="dropzone-text">Arrastra la boleta o comprobante aquí</span>
+                            <span class="dropzone-hint">o haz clic para buscarlo en tu equipo</span>
+                            }
+                        </div>
+                        <input type="file" accept="image/*" class="image-input" [disabled]="subiendoFoto()"
+                            (change)="onFotoSeleccionada($event)" />
+                    </div>
+                    }
+                </div>
+                <span class="help-hint">Opcional, pero recomendado para agilizar la verificación.</span>
+            </div>
+
+            <div class="form-actions-row">
+                <button type="submit" class="btn-primary-action" [disabled]="guardando() || subiendoFoto()">
+                    @if (guardando()) {
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <span>Registrando pago...</span>
+                    } @else {
+                    <i class="fa-solid fa-check"></i>
+                    <span>Confirmar pago</span>
+                    }
+                </button>
+            </div>
+        </form>
+    </div>
+    }
+
+</div>

@@ -78,7 +78,8 @@
               </div>
               } @else {
               @for (notif of notifService.notificaciones(); track notif.id_notificaciones) {
-              @let estilo = notif.tipo | notificacionEstilo;
+                @let estilo = notif.tipo | notificacionEstilo;
+                @let notifId = notif.id_notificaciones;
               <div class="notif-item" [class.no-leida]="!notif.leida">
                 <div class="notif-icono" [style.color]="estilo.color" [style.backgroundColor]="estilo.bg">
                   <i [class]="'fa-solid fa-' + estilo.icon"></i>
@@ -90,12 +91,12 @@
                 </div>
                 <div class="notif-btns">
                   @if (!notif.leida) {
-                  <button class="btn-leida" (click)="marcarLeida(notif.id_notificaciones)" type="button"
+                  <button class="btn-leida" (click)="marcarLeida(notifId)" type="button"
                     title="Marcar como leída">
                     <i class="fa-solid fa-check"></i>
                   </button>
                   }
-                  <button class="btn-eliminar" (click)="eliminar(notif.id_notificaciones)" type="button"
+                  <button class="btn-eliminar" (click)="eliminar(notifId)" type="button"
                     title="Eliminar">
                     <i class="fa-solid fa-trash-can"></i>
                   </button>

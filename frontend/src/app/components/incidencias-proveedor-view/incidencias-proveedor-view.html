@@ -1,0 +1,41 @@
+<div class="container">
+    <div class="card">
+        <div class="head">
+            <div>
+                <h3>Incidencias</h3>
+                <p>Consulta las incidencias reportadas en tus rutas.</p>
+            </div>
+        </div>
+
+        @if(error) {
+        <div class="alert error">{{ error }}</div>
+        }
+
+        @if(cargando()) {
+        <div class="empty">Cargando incidencias...</div>
+        } @else if(!incidencias().length) {
+        <div class="empty">No hay incidencias registradas.</div>
+        } @else {
+        <div class="list">
+            @for(i of incidencias(); track i.id_incidencia) {
+            <article class="item">
+                <div class="item-head">
+                    <div>
+                        <span class="route">
+                            <i class="fa-solid fa-route"></i> {{ i.nombre_ruta }}
+                        </span>
+                        <h4>{{ i.titulo }}</h4>
+                    </div>
+                    <span class="badge" [class.closed]="i.estado === 'CERRADA'">
+                        {{ i.estado === 'CERRADA' ? 'Cerrada' : 'Abierta' }}
+                    </span>
+                </div>
+
+                <p>{{ i.descripcion || 'Sin descripción.' }}</p>
+                <small>{{ i.fecha_hora | date:'dd/MM/yyyy HH:mm' }}</small>
+            </article>
+            }
+        </div>
+        }
+    </div>
+</div>

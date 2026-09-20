@@ -1,11 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { NotificacionesService } from '../../services/notificaciones.service';
-import { Notificaciones as NotificacionItem } from '../../../../../backend/src/models/Notificaciones';
+import { NotificacionesDTO as NotificacionItem } from '../../models/notificacionesDTO.interface';
 import { LoginService } from '../../services/login';
-import { HeaderComponent } from '../dashboard-layout/header/header';
-import { SidebarComponent } from '../dashboard-layout/sidebar/sidebar';
 import { SidebarUser } from '../../models/sidebar.model';
 import { TiempoRelativoPipe } from '../../shared/pipes/tiempoRelativo.pipe';
 import { NotificacionEstiloPipe } from '../../shared/pipes/notificacionEstilo.pipe';
@@ -14,15 +13,18 @@ import { NotificacionEstiloPipe } from '../../shared/pipes/notificacionEstilo.pi
     selector: 'app-notificaciones',
     standalone: true,
     imports: [
-        CommonModule, FormsModule,TiempoRelativoPipe, NotificacionEstiloPipe
+        CommonModule, FormsModule, TiempoRelativoPipe, NotificacionEstiloPipe, RouterLink
     ],
     templateUrl: './notificaciones.html',
     styleUrl: './notificaciones.css'
 })
-export class Notificaciones {
+export class Notificaciones implements OnInit {
     notifService = inject(NotificacionesService);
     loginService = inject(LoginService);
 
+    ngOnInit(): void {
+        this.notifService.cargar();
+    }
     filtroActual: string = 'TODAS';
     busqueda: string = '';
 

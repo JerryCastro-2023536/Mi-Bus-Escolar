@@ -57,8 +57,7 @@ export const proveedoresConfig = {
         {
             key: 'direccion',
             label: 'Dirección',
-            type: 'text',
-            required: true
+            type: 'text'
         },
         {
             key: 'telefono_contacto',
@@ -84,8 +83,7 @@ export const proveedoresConfig = {
         {
             key: 'direccion',
             label: 'Dirección',
-            type: 'text',
-            required: true
+            type: 'text'
         },
         {
             key: 'telefono_contacto',
@@ -95,3 +93,12 @@ export const proveedoresConfig = {
         }
     ]
 };
+
+export interface ServicioProveedor {
+    id_servicio: number;
+    nombre: string;
+    descripcion: string | null;
+    precio_mensual: number;
+    estado: 'ACTIVO' | 'INACTIVO';
+    total_estudiantes: number;
+}

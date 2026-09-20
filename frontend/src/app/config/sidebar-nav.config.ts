@@ -44,7 +44,7 @@ export const miBusEscolarSidebarConfig: SidebarSection[] = [
     {
         title: 'Comunicación',
         items: [
-            { label: 'Notificaciones', icon: 'bell', route: '/notificaciones', description: 'Avisos y alertas automáticas a padres de familia' },
+            { label: 'Notificaciones', icon: 'bell', route: '/notificacionesCrud', description: 'Avisos y alertas automáticas a padres de familia' },
             { label: 'Incidencias', icon: 'triangle-exclamation', route: '/incidencias', description: 'Reportes de tráfico, averías mecánicas o emergencias' },
             { label: 'Valoraciones', icon: 'star', route: '/valoraciones', description: 'Calificaciones de calidad y comentarios del servicio' }
         ]

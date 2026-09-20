@@ -31,6 +31,11 @@ export const valoracionesConfig = {
             type: 'number'
         },
         {
+            key: 'id_usuario',
+            label: 'Usuario',
+            type: 'number'
+        },
+        {
             key: 'comentario',
             label: 'Comentario',
             type: 'text'
@@ -50,10 +55,15 @@ export const valoracionesConfig = {
             required: true
         },
         {
+            key: 'id_usuario',
+            label: 'ID Usuario',
+            type: 'number',
+            required: true
+        },
+        {
             key: 'comentario',
             label: 'Comentario',
-            type: 'text',
-            required: true
+            type: 'text'
         },
         {
             key: 'calificacion',
@@ -67,6 +77,13 @@ export const valoracionesConfig = {
         {
             key: 'id_proveedor',
             label: 'ID Proveedor',
+            type: 'number',
+            required: true,
+            readonly: true
+        },
+        {
+            key: 'id_usuario',
+            label: 'ID Usuario',
             type: 'number',
             required: true,
             readonly: true

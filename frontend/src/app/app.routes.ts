@@ -1,9 +1,11 @@
+import { PagosProveedorView } from './components/pagos-proveedor-view/pagos-proveedor-view';
 import { crudRoutes } from './shared/crud.routes';
 import { Routes } from '@angular/router';
 import { MapaComponent } from './components/mapa/mapa.component';
 import { ChoferDashboardComponents } from './components/mapa-chofer/chofer-dashboard.components';
 import { DashboardChoferComponents } from './components/dashboard-chofer/dashboard-chofer.components';
-import { authGuard, guestGuard, dashboardRedirectGuard } from './core/guards/auth.guard';
+import { authGuard, guestGuard } from './core/guards/auth.guard';
+import { roleGuard, dashboardRedirectGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
     {
@@ -25,17 +27,39 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () => import('./components/dashboard-layout/dashboard-layout').then(m => m.DashboardComponent),
         children: [
+            { path: 'dashboard', canActivate: [dashboardRedirectGuard], children: [] },
+
             {
-                path: 'dashboard',
-                canActivate: [dashboardRedirectGuard],
-                // El guard redirige siempre; este componente es un placeholder
-                loadComponent: () => import('./components/login/login').then(m => m.Login),
-            },
-            {
-                path: 'dashboard-administrador',
+                path: 'dashboard/admin',
                 title: 'Administrador | MiBusEscolar',
+                canActivate: [roleGuard],
+                data: { roles: ['ADMINISTRADOR'] },
                 loadComponent: () => import('./components/admin-view/admin-view').then(m => m.AdminView),
             },
+            {
+                path: 'dashboard/proveedor',
+                title: 'Proveedor | MiBusEscolar',
+                canActivate: [roleGuard],
+                data: { roles: ['PROVEEDOR'] },
+                loadComponent: () => import('../app/components/proveedores-view/proveedores-view').then(m => m.ProveedoresView),
+            },
+            {
+                path: "dashboard-chofer",
+                title: "Dashboard Chofer | MiBusEscolar",
+                loadComponent: () => import('./components/dashboard-chofer/dashboard-chofer.components').then(d => d.DashboardChoferComponents),
+                data: {
+                    title: "Gestión de acciones del Chofer",
+                    subtitle: "Administracion de Rutas, Estudiantes, Buses y Reportes del chofer asignado."
+                }
+            },
+            {
+                path: 'dashboard/usuario',
+                title: 'Mi Panel | MiBusEscolar',
+                canActivate: [roleGuard],
+                data: { roles: ['USUARIO'] },
+                loadComponent: () => import('../app/components/pagos-view/pagos-view').then(m => m.PagosView),
+            },
+
             {
                 path: 'cuenta',
                 title: 'Mi Cuenta | MiBusEscolar',
@@ -55,15 +79,6 @@ export const routes: Routes = [
                 }
             },
             {
-                path: "dashboard-chofer",
-                title: "Dashboard Chofer | MiBusEscolar",
-                loadComponent: () => import('./components/dashboard-chofer/dashboard-chofer.components').then(d => d.DashboardChoferComponents),
-                data: {
-                    title: "Gestión de acciones del Chofer",
-                    subtitle: "Administracion de Rutas, Estudiantes, Buses y Reportes del chofer asignado."
-                }
-            },
-            {
                 path: "ruta-chofer",
                 title: "Ruta Chofer | MiBusEscolar",
                 loadComponent: () => import('./components/mapa-chofer/chofer-dashboard.components').then(d => d.ChoferDashboardComponents),
@@ -72,6 +87,47 @@ export const routes: Routes = [
                     subtitle: "Ver las rutas, tomar asistencias, iniciar viaje, anotar abordaje y finalizar ruta."
                 }
             },
+                path: 'pagosUser',
+                title: 'Mis Pagos | MiBusEscolar',
+                canActivate: [roleGuard],
+                loadComponent: () => import('./components/pagos-view/pagos-view').then(m => m.PagosView),
+                data: {
+                    roles: ['USUARIO'],
+                    title: 'Mis Pagos',
+                    subtitle: 'Consulta y realiza los pagos del transporte escolar de tus hijos.'
+                }
+            },
+            {
+                path: 'mis-servicios',
+                title: 'Mis Servicios | MiBusEscolar',
+                canActivate: [roleGuard],
+                loadComponent: () => import('./components/mis-servicios-view/mis-servicios-view').then(m => m.MisServiciosView),
+                data: {
+                    roles: ['PROVEEDOR'],
+                    title: 'Mis Servicios',
+                    subtitle: 'Consulta, agrega y edita tus servicios asignados.'
+                }
+            },
+
+            {
+                path: 'mis-vehiculos',
+                title: 'Mis Vehículos | MiBusEscolar',
+                canActivate: [roleGuard],
+                loadComponent: () => import('./components/vehiculos-proveedor-view/vehiculos-proveedor-view').then(m => m.VehiculosProveedorView),
+                data: {
+                    roles: ['PROVEEDOR'],
+                    title: 'Mis Vehículos',
+                    subtitle: 'Administra tu flota, sube fotos y consulta a qué ruta y chofer está asignado cada vehículo.'
+                }
+            },
+
+            { path: 'mis-choferes', title: 'Mis Choferes | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/choferes-proveedor-view/choferes-proveedor-view').then(m => m.ChoferesProveedorView), data: { roles: ['PROVEEDOR'], title: 'Mis Choferes', subtitle: 'Administra los choferes y las rutas que tienen asignadas.' } },
+            { path: 'mis-rutas', title: 'Mis Rutas | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/rutas-proveedor-view/rutas-proveedor-view').then(m => m.RutasProveedorView), data: { roles: ['PROVEEDOR'], title: 'Mis Rutas', subtitle: 'Administra rutas, horarios, choferes y vehículos.' } },
+            { path: 'asignacion-ruta-proveedor', title: 'Asignación de Ruta | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/asignacion-ruta-proveedor-view/asignacion-ruta-proveedor-view').then(m => m.AsignacionRutaProveedorView), data: { roles: ['PROVEEDOR'], title: 'Asignación de Ruta', subtitle: 'Administra los estudiantes asignados a tus rutas.' } },
+            { path: 'mis-incidencias', title: 'Incidencias | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/incidencias-proveedor-view/incidencias-proveedor-view').then(m => m.IncidenciasProveedorView), data: { roles: ['PROVEEDOR'], title: 'Incidencias', subtitle: 'Consulta las incidencias reportadas en tus rutas.' } },
+            { path: 'mis-viajes', title: 'Viajes | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/viajes-proveedor-view/viajes-proveedor-view').then(m => m.ViajesProveedorView), data: { roles: ['PROVEEDOR'], title: 'Viajes', subtitle: 'Consulta viajes en curso y finalizados.' } },
+            { path: 'mis-valoraciones', title: 'Valoraciones | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/valoraciones-proveedor-view/valoraciones-proveedor-view').then(m => m.ValoracionesProveedorView), data: { roles: ['PROVEEDOR'], title: 'Valoraciones', subtitle: 'Consulta las valoraciones recibidas por tu proveedor.' } },
+            { path: 'pagos-proveedor', title: 'Pagos | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/pagos-proveedor-view/pagos-proveedor-view').then(m => m.PagosProveedorView), data: { roles: ['PROVEEDOR'], title: 'Pagos', subtitle: 'Consulta los pagos de cada uno de los estudiantes asignados a tus servicios' } },
 
             ...crudRoutes,
         ],

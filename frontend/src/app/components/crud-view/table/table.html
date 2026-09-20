@@ -27,8 +27,8 @@
                         {{ getValue(row, col) }}
                     </span>
                 </td>
-                } @else if (col.type === 'date') {
-                <td>{{ getValue(row, col) | date: 'yyyy-MM-dd HH:mm' }}</td>
+                } @else if (col.type === 'date' || col.type === 'time' || col.type === 'datetime') {
+                <td>{{ getValue(row, col) | date: (col.type === 'datetime' ? 'dd/MM/yyyy HH:mm' : col.type === 'time' ? 'HH:mm' : 'dd/MM/yyyy') }}</td>
                 }@else if (col.type === 'image') {
                 <td>
                     @if (getValue(row, col)) {

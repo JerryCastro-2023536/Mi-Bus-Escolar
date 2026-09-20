@@ -2,8 +2,8 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthResponse } from './login';
-import { UsuarioRegisterDTO } from '../../../../backend/src/models/usuario';
-import { environment } from '../../environments/environment';
+import { UsuarioRegisterDTO } from '../models/usuarioDTO.interface';
+import { environment } from '../../environments/enviroment';
 
 @Injectable({
   providedIn: 'root'

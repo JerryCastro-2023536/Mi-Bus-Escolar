@@ -1,0 +1,58 @@
+<div class="container">
+    <div class="card">
+        <div class="head">
+            <div>
+                <h3>Viajes</h3>
+                <p>Consulta los viajes de tus rutas.</p>
+            </div>
+            <div class="filters">
+                <button [class.active]="filtro() === 'TODOS'" (click)="filtro.set('TODOS')">Todos</button>
+                <button [class.active]="filtro() === 'ACTIVO'" (click)="filtro.set('ACTIVO')">En curso</button>
+                <button [class.active]="filtro() === 'FINALIZADO'"
+                    (click)="filtro.set('FINALIZADO')">Finalizados</button>
+            </div>
+        </div>
+
+        @if(error) {
+        <div class="alert error">{{ error }}</div>
+        }
+
+        @if(cargando()) {
+        <div class="empty">Cargando viajes...</div>
+        } @else if(!filtrados().length) {
+        <div class="empty">No hay viajes para este filtro.</div>
+        } @else {
+        <div class="grid">
+            @for(v of filtrados(); track v.id_viaje) {
+            <article class="item">
+                <div class="top">
+                    <strong>{{ v.nombre_ruta || 'Ruta no disponible' }}</strong>
+                    <span class="badge" [class.active]="v.estado === 'ACTIVO'">
+                        {{ labelEstado(v.estado) }}
+                    </span>
+                </div>
+
+                <div class="data">
+                    <span>
+                        <i class="fa-solid fa-id-card"></i>
+                        {{ v.nombre_chofer ? (v.nombre_chofer + ' ' + v.apellido_chofer) : 'Chofer no asignado' }}
+                    </span>
+                    <span>
+                        <i class="fa-solid fa-bus"></i>
+                        {{ v.placa_vehiculo || 'Vehículo no asignado' }}
+                    </span>
+                    <span>
+                        <i class="fa-regular fa-calendar"></i>
+                        {{ v.fecha_viaje | date:'dd/MM/yyyy' }}
+                    </span>
+                    <span>
+                        <i class="fa-regular fa-clock"></i>
+                        {{ v.hora_inicio || '--' }} - {{ v.hora_fin || '--' }}
+                    </span>
+                </div>
+            </article>
+            }
+        </div>
+        }
+    </div>
+</div>

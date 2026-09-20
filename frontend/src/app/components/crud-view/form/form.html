@@ -43,8 +43,8 @@
                 } @else if (field.type === 'number') {
                 <input type="number" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
                     [required]="!!field.required && !field.readonly" [readonly]="!!field.readonly">
-                } @else if (field.type === 'date') {
-                <input type="date" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
+                } @else if (field.type === 'date' || field.type === 'time' || field.type === 'datetime-local') {
+                <input [type]="field.type" [id]="field.key" [name]="field.label" [(ngModel)]="model[field.key]"
                     [required]="!!field.required && !field.readonly" [disabled]="!!field.readonly" />
                 } @else if (field.type === 'image') {
                 <div class="image-field">

@@ -16,10 +16,10 @@ export async function getValoraciones(req: Request, res: Response, next: NextFun
 }
 
 export async function postValoraciones(req: Request, res: Response, next: NextFunction) {
-    const { id_valoracion, id_proveedor, comentario, calificacion } = req.body
-    const nuevaValoracion : Valoraciones = { id_valoracion, id_proveedor, comentario, calificacion }
-    const valoracionCreada = await agregarValoraciones(nuevaValoracion);
     try{
+        const { id_valoracion, id_proveedor, id_usuario, comentario, calificacion } = req.body;
+        const nuevaValoracion: Valoraciones = { id_valoracion, id_proveedor, id_usuario, comentario, calificacion };
+        const valoracionCreada = await agregarValoraciones(nuevaValoracion);
         return res.status(201).json({
             success: true,
             message: "Valoración creada",
@@ -47,8 +47,8 @@ export async function getValoracionById(req: Request, res: Response, next: NextF
 export async function putValoracion(req: Request, res: Response, next: NextFunction) {
     try{
         const id = Number(req.params.id);
-        const { id_proveedor, comentario, calificacion } = req.body;
-        const valoracionActualizar : Valoraciones = { id_valoracion: id, id_proveedor, comentario, calificacion }
+        const { id_proveedor, id_usuario, comentario, calificacion } = req.body;
+        const valoracionActualizar : Valoraciones = { id_valoracion: id, id_proveedor, id_usuario, comentario, calificacion }
         const valoracionEditada = await actualizarValoracion(valoracionActualizar, id);
 
         return res.status(200).json({

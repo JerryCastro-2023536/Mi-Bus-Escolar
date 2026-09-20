@@ -1,10 +1,35 @@
 import { Request, Response, NextFunction } from "express";
 import { Notificaciones } from "../models/Notificaciones";
-import { listarNotificaciones, agregarNotificacion, buscarNotificacionById, editarNotificacionById, eliminarNotificacionById } from "../services/notificaciones.service";
+import { listarNotificaciones, listarTodasNotificaciones, agregarNotificacion, buscarNotificacionById, editarNotificacionById, eliminarNotificacionById } from "../services/notificaciones.service";
+
+function esAdmin(req: Request): boolean {
+    const rol = String((req.user as any)?.rol ?? (req.user as any)?.role ?? '').toUpperCase();
+    return rol === 'ADMIN' || rol === 'ADMINISTRADOR';
+}
+
+function idDelToken(req: Request): number | undefined {
+    const id = Number(req.user?.id);
+    return Number.isInteger(id) && id > 0 ? id : undefined;
+}
 
 export async function getNotificaciones(req: Request, res: Response, next: NextFunction){
     try{
-        const datos = await listarNotificaciones();
+        const datos = esAdmin(req)
+            ? await listarTodasNotificaciones()
+            : await listarNotificaciones(idDelToken(req), req.user?.email);
+        return res.status(200).json({
+            success: true,
+            message: "Notificaciones cargadas",
+            data: datos
+        });
+    }catch(error){
+        next(error)
+    }
+}
+
+export async function getMisNotificaciones(req: Request, res: Response, next: NextFunction){
+    try{
+        const datos = await listarNotificaciones(idDelToken(req), req.user?.email);
         return res.status(200).json({
             success: true,
             message: "Notificaciones cargadas",
@@ -16,10 +41,10 @@ export async function getNotificaciones(req: Request, res: Response, next: NextF
 }
 
 export async function postNotificaciones(req: Request, res: Response, next: NextFunction) {
-    const { id_usuario, id_incidencia, id_asistencia, tipo, titulo, mensaje, leida, fecha_envio } = req.body
-    const nuevaNotificacion : Notificaciones = { id_usuario, id_incidencia, id_asistencia, tipo, titulo, mensaje, leida, fecha_envio } 
-    const notificacionCreada = await agregarNotificacion(nuevaNotificacion);
     try{
+        const { id_usuario, id_incidencia, id_asistencia, tipo, titulo, mensaje, leida, fecha_envio } = req.body
+        const nuevaNotificacion : Notificaciones = { id_usuario, id_incidencia, id_asistencia, tipo, titulo, mensaje, leida, fecha_envio } 
+        const notificacionCreada = await agregarNotificacion(nuevaNotificacion);
         return res.status(201).json({
             success: true,
             message: "Notificacion creada",
@@ -67,7 +92,7 @@ export async function deleteNotificacion(req: Request, res: Response, next: Next
         const resultado = await eliminarNotificacionById(id);
          
         return res.status(200).json({
-            sucess: true,
+            success: true,
             message: "Notificacion eliminada",
             data: resultado
         })
