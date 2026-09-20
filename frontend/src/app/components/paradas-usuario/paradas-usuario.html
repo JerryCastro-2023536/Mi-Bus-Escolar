@@ -1,0 +1,349 @@
+<section class="paradas-view">
+
+    @if (mensajeError) {
+
+        <div class="alert-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            {{ mensajeError }}
+        </div>
+
+    }
+
+
+    <!-- =========================================
+         LISTA DE ESTUDIANTES
+    ========================================== -->
+
+    @if (!estudianteSeleccionado()) {
+
+        <div class="section-intro">
+
+            <span class="eyebrow">
+                Transporte escolar
+            </span>
+
+            <h2>
+                Selecciona un estudiante
+            </h2>
+
+            <p>
+                Selecciona uno de tus estudiantes para consultar
+                el apartado de paradas asignadas.
+            </p>
+
+        </div>
+
+
+        @if (cargando()) {
+
+            <div class="state-card">
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                <p>
+                    Cargando estudiantes...
+                </p>
+
+            </div>
+
+        } @else {
+
+            <div class="students-grid">
+
+                @for (
+                    estudiante of estudiantes();
+                    track estudiante.id_estudiante
+                ) {
+
+                    <button
+                        type="button"
+                        class="student-card"
+                        (click)="seleccionarEstudiante(estudiante)"
+                    >
+
+                        <div class="student-photo">
+
+                            @if (estudiante.foto_estudiante) {
+
+                                <img
+                                    [src]="estudiante.foto_estudiante"
+                                    [alt]="estudiante.nombre + ' ' + estudiante.apellido"
+                                />
+
+                            } @else {
+
+                                <i class="fa-solid fa-user-graduate"></i>
+
+                            }
+
+                        </div>
+
+
+                        <div class="student-data">
+
+                            <span>
+                                Estudiante
+                            </span>
+
+                            <h3>
+                                {{ estudiante.nombre }}
+                                {{ estudiante.apellido }}
+                            </h3>
+
+                            <p>
+                                {{
+                                    estudiante.nombre_colegio
+                                    || 'Sin colegio registrado'
+                                }}
+                            </p>
+
+                            <small>
+                                {{
+                                    estudiante.grado
+                                    || 'Sin grado registrado'
+                                }}
+                            </small>
+
+                        </div>
+
+
+                        <i
+                            class="fa-solid fa-chevron-right arrow"
+                        ></i>
+
+                    </button>
+
+                } @empty {
+
+                    <div class="state-card">
+
+                        <i class="fa-solid fa-user-graduate"></i>
+
+                        <h3>
+                            No tienes estudiantes registrados
+                        </h3>
+
+                        <p>
+                            Actualmente no hay estudiantes
+                            asociados a tu cuenta.
+                        </p>
+
+                    </div>
+
+                }
+
+            </div>
+
+        }
+
+    }
+
+
+    <!-- =========================================
+         ESTUDIANTE SELECCIONADO
+    ========================================== -->
+
+    @else {
+
+        <div class="selected-header">
+
+            <button
+                type="button"
+                class="back-button"
+                (click)="volver()"
+            >
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Volver
+
+            </button>
+
+
+            <div>
+
+                <span>
+                    Paradas de
+                </span>
+
+                <h2>
+                    {{ estudianteSeleccionado()?.nombre }}
+                    {{ estudianteSeleccionado()?.apellido }}
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             PENDIENTE - NO IMPLEMENTAR
+
+             En esta sección se implementará:
+
+             - Mostrar parada de subida
+             - Mostrar parada de descenso
+             - Agregar parada
+             - Editar parada
+             - Relacionar automáticamente la parada
+               con RutaParada
+
+             Estas funciones NO forman parte
+             de la implementación actual.
+        ====================================== -->
+
+
+        <div class="stops-grid">
+
+
+            <!-- PARADA DE SUBIDA -->
+
+            <article class="stop-card">
+
+                <div class="stop-icon pickup">
+
+                    <i class="fa-solid fa-location-dot"></i>
+
+                </div>
+
+
+                <div class="stop-content">
+
+                    <span class="stop-label">
+                        Parada de subida
+                    </span>
+
+                    <h3>
+                        Punto de recogida
+                    </h3>
+
+                    <p>
+                        Aquí se mostrará la parada donde
+                        el estudiante aborda el transporte.
+                    </p>
+
+
+                    <div class="pending-badge">
+
+                        <i class="fa-solid fa-clock"></i>
+
+                        Funcionalidad pendiente
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- PARADA DE DESCENSO -->
+
+            <article class="stop-card">
+
+                <div class="stop-icon dropoff">
+
+                    <i class="fa-solid fa-location-dot"></i>
+
+                </div>
+
+
+                <div class="stop-content">
+
+                    <span class="stop-label">
+                        Parada de descenso
+                    </span>
+
+                    <h3>
+                        Punto de descenso
+                    </h3>
+
+                    <p>
+                        Aquí se mostrará la parada donde
+                        el estudiante desciende del transporte.
+                    </p>
+
+
+                    <div class="pending-badge">
+
+                        <i class="fa-solid fa-clock"></i>
+
+                        Funcionalidad pendiente
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+
+        <!-- =====================================
+             ACCIONES FUTURAS
+        ====================================== -->
+
+        <div class="future-section">
+
+            <div class="future-header">
+
+                <div class="future-icon">
+
+                    <i class="fa-solid fa-map-location-dot"></i>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Próximamente
+                    </span>
+
+                    <h3>
+                        Gestión de paradas
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+            <p>
+                En esta sección el usuario podrá agregar o editar
+                las paradas del estudiante.
+            </p>
+
+
+            <div class="future-actions">
+
+                <button
+                    type="button"
+                    disabled
+                >
+
+                    <i class="fa-solid fa-plus"></i>
+
+                    Agregar parada
+
+                </button>
+
+
+                <button
+                    type="button"
+                    disabled
+                >
+
+                    <i class="fa-solid fa-pen"></i>
+
+                    Editar parada
+
+                </button>
+
+            </div>
+
+        </div>
+
+    }
+
+</section>
