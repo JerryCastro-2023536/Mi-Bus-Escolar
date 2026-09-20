@@ -19,6 +19,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION sp_valoraciones_crear(
     p_id_proveedor INTEGER,
+    p_id_usuario INTEGER,
     p_comentario TEXT,
     p_calificacion DOUBLE PRECISION
 )
@@ -30,11 +31,13 @@ DECLARE
 BEGIN
     INSERT INTO Valoraciones(
         id_proveedor,
+        id_usuario,
         comentario,
         calificacion
     )
     VALUES (
         p_id_proveedor,
+        p_id_usuario,
         p_comentario,
         p_calificacion
     )
@@ -63,6 +66,7 @@ $$;
 CREATE OR REPLACE FUNCTION sp_valoraciones_editar(
     p_id_valoracion INTEGER,
     p_id_proveedor INTEGER,
+    p_id_usuario INTEGER,
     p_comentario TEXT,
     p_calificacion DOUBLE PRECISION
 )
@@ -74,6 +78,7 @@ DECLARE
 BEGIN
     UPDATE Valoraciones
     SET id_proveedor = p_id_proveedor,
+        id_usuario = p_id_usuario,
         comentario = p_comentario,
         calificacion = p_calificacion
     WHERE id_valoracion = p_id_valoracion
@@ -118,6 +123,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION sp_choferes_crear(
     p_id_usuario INTEGER,
+    p_id_proveedor INTEGER,
     p_telefono_contacto VARCHAR(20),
     p_estado VARCHAR(10)
 )
@@ -129,11 +135,13 @@ DECLARE
 BEGIN
     INSERT INTO Choferes(
         id_usuario,
+        id_proveedor,
         telefono_contacto,
         estado
     )
     VALUES (
         p_id_usuario,
+        p_id_proveedor,
         p_telefono_contacto,
         p_estado
     )
@@ -162,6 +170,7 @@ $$;
 CREATE OR REPLACE FUNCTION sp_choferes_editar(
     p_id_chofer INTEGER,
     p_id_usuario INTEGER,
+    p_id_proveedor INTEGER,
     p_telefono_contacto VARCHAR(20),
     p_estado VARCHAR(10)
 )
@@ -173,6 +182,7 @@ DECLARE
 BEGIN
     UPDATE Choferes
     SET id_usuario = p_id_usuario,
+        id_proveedor = p_id_proveedor,
         telefono_contacto = p_telefono_contacto,
         estado = p_estado
     WHERE id_chofer = p_id_chofer

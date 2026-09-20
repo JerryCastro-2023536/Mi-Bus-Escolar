@@ -28,8 +28,8 @@ export async function buscarChoferById(id: number) {
 
 export async function agregarChofer(c: Choferes) {
     try {
-        const values = [c.id_usuario, c.telefono_contacto, c.estado];
-        const query = "SELECT * FROM sp_choferes_crear($1, $2, $3)";
+        const values = [c.id_usuario, c.id_proveedor, c.telefono_contacto, c.estado];
+        const query = "SELECT * FROM sp_choferes_crear($1, $2, $3, $4)";
         const res = await pool.query(query, values);
         return res.rows[0];
     } catch (error) {
@@ -39,8 +39,8 @@ export async function agregarChofer(c: Choferes) {
 
 export async function editarChoferById(id: number, c: Choferes) {
     try {
-        const values = [id, c.id_usuario, c.telefono_contacto, c.estado];
-        const query = "SELECT * FROM sp_choferes_editar($1, $2, $3, $4)";
+        const values = [id, c.id_usuario, c.id_proveedor, c.telefono_contacto, c.estado];
+        const query = "SELECT * FROM sp_choferes_editar($1, $2, $3, $4, $5)";
         const res = await pool.query(query, values);
 
         if (!res.rows[0]) {

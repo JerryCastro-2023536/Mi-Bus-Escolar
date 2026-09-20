@@ -20,6 +20,7 @@ import notificacionesRoutes from './notificaciones.routes';
 import pagosRoutes from './pagos.routes';
 import paradasRoutes from './paradas.routes'
 import kpisRoutes from './kpis.routes'
+import proveedorOperacionesRoutes from './proveedorOperaciones.routes';
 
 const apiRouter = Router();
 
@@ -48,6 +49,7 @@ apiRouter.use(notificacionesRoutes);
 apiRouter.use(pagosRoutes);
 apiRouter.use(paradasRoutes);
 
-apiRouter.use(kpisRoutes)
+apiRouter.use(kpisRoutes);
+apiRouter.use(proveedorOperacionesRoutes)
 
 export default apiRouter;

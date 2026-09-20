@@ -1,0 +1,209 @@
+<div class="rutas-container">
+    @if(mensajeExito) {
+    <div class="alert-box success">{{ mensajeExito }}</div>
+    }
+
+    @if(mensajeError) {
+    <div class="alert-box error">{{ mensajeError }}</div>
+    }
+
+    <div class="step-card">
+        <div class="header-row">
+            <div>
+                <h3>Mis rutas</h3>
+                <p class="step-subtitle">Selecciona un servicio para ver sus rutas y administrar choferes y vehículos.
+                </p>
+            </div>
+            <button class="btn-primary" (click)="abrirNueva()">
+                <i class="fa-solid fa-plus"></i> Agregar ruta
+            </button>
+        </div>
+
+        <div class="service-cards">
+            @for(s of servicios(); track s.id_servicio) {
+            <button class="service-card" [class.active]="servicioSeleccionado() === s.id_servicio"
+                (click)="seleccionarServicio(s.id_servicio)">
+                <i class="fa-solid fa-bus"></i>
+                <strong>{{ s.nombre }}</strong>
+                <span>{{ rutas().filter(r => r.id_servicio === s.id_servicio).length }} rutas</span>
+            </button>
+            }
+        </div>
+
+        @if(cargando()) {
+        <div class="loading-state">Cargando rutas...</div>
+        } @else if(!rutasFiltradas().length) {
+        <div class="empty-state">No hay rutas para este servicio.</div>
+        } @else {
+        <div class="route-grid">
+            @for(r of rutasFiltradas(); track r.id_ruta) {
+            <article class="route-card">
+                <div class="route-head">
+                    <div>
+                        <h4>{{ r.nombre }}</h4>
+                        <span class="muted">{{ r.nombre_servicio }}</span>
+                    </div>
+                    <span class="estado" [class.inactivo]="r.estado !== 'ACTIVO'">
+                        {{ r.estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
+                    </span>
+                </div>
+
+                <div class="route-data">
+                    <div>
+                        <i class="fa-solid fa-bus"></i>
+                        <span>Vehículo</span>
+                        <strong>{{ r.placa_vehiculo || 'No asignado' }}</strong>
+                    </div>
+                    <div>
+                        <i class="fa-solid fa-id-card"></i>
+                        <span>Chofer</span>
+                        <strong>{{ r.nombre_chofer ? (r.nombre_chofer + ' ' + r.apellido_chofer) : 'No asignado'
+                            }}</strong>
+                    </div>
+                    <div>
+                        <i class="fa-regular fa-clock"></i>
+                        <span>Inicio</span>
+                        <strong>{{ r.hora_inicio_estimada?.slice(0, 5) || 'No asignado' }}</strong>
+                    </div>
+                    <div>
+                        <i class="fa-regular fa-clock"></i>
+                        <span>Fin</span>
+                        <strong>{{ r.hora_fin_estimada?.slice(0, 5) || 'No asignado' }}</strong>
+                    </div>
+                </div>
+
+                <div class="route-actions">
+                    <button class="btn-secondary" (click)="abrirAsignacion(r, 'chofer')">
+                        <i class="fa-solid fa-id-card"></i>{{ r.id_chofer ? 'Cambiar chofer' : 'Asignar chofer' }}
+                    </button>
+                    <button class="btn-secondary" (click)="abrirAsignacion(r, 'vehiculo')">
+                        <i class="fa-solid fa-bus"></i>{{ r.id_vehiculo ? 'Cambiar vehículo' : 'Asignar vehículo' }}
+                    </button>
+                    <button class="btn-icon" (click)="abrirEditar(r)">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="btn-icon danger" (click)="pedirEliminar(r)">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </article>
+            }
+        </div>
+        }
+    </div>
+</div>
+
+@if(modalRuta()) {
+<div class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>{{ editar() ? 'Editar ruta' : 'Agregar ruta' }}</h3>
+            <button class="btn-icon" (click)="modalRuta.set(false)">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        @if(errorModal) {
+        <div class="alert-box error">{{ errorModal }}</div>
+        }
+
+        <div class="form-field">
+            <label>Servicio</label>
+            <select class="text-input" [(ngModel)]="servicioForm">
+                <option [ngValue]="null">Selecciona un servicio</option>
+                @for(s of servicios(); track s.id_servicio) {
+                <option [ngValue]="s.id_servicio">{{ s.nombre }}</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label>Nombre de la ruta</label>
+            <input class="text-input" [(ngModel)]="nombre" placeholder="Ej. Zona 10 - Centro">
+        </div>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label>Hora de inicio estimada (opcional)</label>
+                <input class="text-input" type="time" [(ngModel)]="inicio">
+            </div>
+            <div class="form-field">
+                <label>Hora de fin estimada (opcional)</label>
+                <input class="text-input" type="time" [(ngModel)]="fin">
+            </div>
+        </div>
+
+        @if(editar()) {
+        <div class="form-field">
+            <label>Estado</label>
+            <select class="text-input" [(ngModel)]="estado">
+                <option value="ACTIVO">Activo</option>
+                <option value="INACTIVO">Inactivo</option>
+            </select>
+        </div>
+        }
+
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="modalRuta.set(false)">Cancelar</button>
+            <button class="btn-primary" (click)="guardarRuta()" [disabled]="guardando()">Guardar</button>
+        </div>
+    </div>
+</div>
+}
+
+@if(modalAsignacion()) {
+<div class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>{{ modalAsignacion() === 'chofer' ? 'Asignar chofer' : 'Asignar vehículo' }}</h3>
+            <button class="btn-icon" (click)="modalAsignacion.set(null)">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        @if(errorModal) {
+        <div class="alert-box error">{{ errorModal }}</div>
+        }
+
+        <p class="muted">Ruta: <strong>{{ rutaAsignando()?.nombre }}</strong></p>
+
+        <div class="assignment-list">
+            <button class="assignment-item none" (click)="asignar(null)">
+                <span><i class="fa-solid fa-ban"></i> Sin asignar</span>
+            </button>
+
+            @if(modalAsignacion() === 'chofer') {
+            @for(c of choferes(); track c.id_chofer) {
+            <button class="assignment-item" (click)="asignar(c.id_chofer)">
+                <span>{{ c.nombre }} {{ c.apellido }}</span>
+                <small>{{ c.estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}</small>
+            </button>
+            }
+            } @else {
+            @for(v of vehiculos(); track v.id_vehiculo) {
+            <button class="assignment-item" (click)="asignar(v.id_vehiculo)">
+                <span>{{ v.placa }}</span>
+                <small>{{ v.estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}</small>
+            </button>
+            }
+            }
+        </div>
+    </div>
+</div>
+}
+
+@if(modalEliminar()) {
+<div class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>Eliminar ruta</h3>
+        </div>
+        <p>¿Eliminar <strong>{{ modalEliminar()?.nombre }}</strong>? También se eliminarán las asignaciones de
+            estudiantes de esta ruta.</p>
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="modalEliminar.set(null)">Cancelar</button>
+            <button class="btn-danger" (click)="confirmarEliminar()" [disabled]="guardando()">Sí, eliminar</button>
+        </div>
+    </div>
+</div>
+}
