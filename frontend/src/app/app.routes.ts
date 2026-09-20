@@ -33,7 +33,7 @@ export const routes: Routes = [
                 title: 'Proveedor | MiBusEscolar',
                 canActivate: [roleGuard],
                 data: { roles: ['PROVEEDOR'] },
-                loadComponent: () => import('../app/components/pagos-proveedor-view/pagos-proveedor-view').then(m => m.PagosProveedorView),
+                loadComponent: () => import('../app/components/proveedores-view/proveedores-view').then(m => m.ProveedoresView),
             },/*
             {
                 path: 'dashboard/chofer',
@@ -109,6 +109,7 @@ export const routes: Routes = [
             { path: 'mis-incidencias', title: 'Incidencias | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/incidencias-proveedor-view/incidencias-proveedor-view').then(m => m.IncidenciasProveedorView), data: { roles: ['PROVEEDOR'], title: 'Incidencias', subtitle: 'Consulta las incidencias reportadas en tus rutas.' } },
             { path: 'mis-viajes', title: 'Viajes | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/viajes-proveedor-view/viajes-proveedor-view').then(m => m.ViajesProveedorView), data: { roles: ['PROVEEDOR'], title: 'Viajes', subtitle: 'Consulta viajes en curso y finalizados.' } },
             { path: 'mis-valoraciones', title: 'Valoraciones | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/valoraciones-proveedor-view/valoraciones-proveedor-view').then(m => m.ValoracionesProveedorView), data: { roles: ['PROVEEDOR'], title: 'Valoraciones', subtitle: 'Consulta las valoraciones recibidas por tu proveedor.' } },
+            { path: 'pagos-proveedor', title: 'Pagos | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/pagos-proveedor-view/pagos-proveedor-view').then(m => m.PagosProveedorView), data: { roles: ['PROVEEDOR'], title: 'Pagos', subtitle: 'Consulta los pagos de cada uno de los estudiantes asignados a tus servicios' } },
 
             ...crudRoutes,
         ],

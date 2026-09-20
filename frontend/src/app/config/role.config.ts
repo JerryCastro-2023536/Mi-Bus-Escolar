@@ -93,7 +93,7 @@ const proveedorSidebar: SidebarSection[] = [
             { label: 'Valoraciones', icon: 'star', route: '/mis-valoraciones', description: 'Comentarios y calificaciones recibidas' }
         ]
     },
-    { title: 'Facturación', items: [{ label: 'Pagos', icon: 'credit-card', route: '/pagos', description: 'Control de cuotas mensuales, recibos y estados de cuenta' }] }
+    { title: 'Facturación', items: [{ label: 'Pagos', icon: 'credit-card', route: '/pagos-proveedor', description: 'Control de cuotas mensuales, recibos y estados de cuenta' }] }
 ];
 
 const choferSidebar: SidebarSection[] = [
