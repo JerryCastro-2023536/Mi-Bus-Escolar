@@ -3,6 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { LoginService } from '../../services/login';
 
 @Component({
   imports: [CommonModule, FormsModule],
@@ -14,6 +15,7 @@ export class DashboardChoferComponents implements OnInit {
   private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
   private router = inject(Router);
+  private loginService = inject(LoginService);
 
   idChoferActual = 1;
   vehiculos: any[] = [];
@@ -28,17 +30,11 @@ export class DashboardChoferComponents implements OnInit {
   reportesAbierto = false;
 
   get vehiculoActual(): any {
-    return this.vehiculos[0] ?? {
-      id_vehiculo: 1,
-      placa: 'KTR-842',
-      estado: 'ACTIVO',
-      nombre: 'Bus #12',
-      proveedor: 'Mi Bus Escolar'
-    };
+    return this.vehiculos[0] ?? null;
   }
 
   get estudiantesCount(): number {
-    return this.estudiantes.length || 24;
+    return this.estudiantes.length;
   }
 
   get rutaSeleccionada(): any | null {
@@ -68,65 +64,87 @@ export class DashboardChoferComponents implements OnInit {
       return;
     }
 
-    const tokenActual = localStorage.getItem('token') ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImplcnJ5QGdtYWlsLmNvbSIsInJvbCI6IlVTVUFSSU8iLCJpYXQiOjE3ODk2MDQ4ODksImV4cCI6MTc4OTYzMzY4OX0._5bQPd6eOMi2Pk3GLn3MXq7TiUidfgT2Ivu4Ci58gLc';
-    localStorage.setItem('token', tokenActual);
+    this.cargarDashboardCompleto();
+  }
+
+  private cargarDashboardCompleto(): void {
+    const user = this.loginService.getUser();
+    const userId = user?.id_usuario || user?.id;
+
+    if (user?.id_chofer) {
+      this.idChoferActual = Number(user.id_chofer || this.idChoferActual);
+      this.cargarRutasAsignadas();
+      this.cargarDatosDashboardChofer();
+      return;
+    }
+
+    if (userId) {
+      this.http.get<any>(`http://localhost:3000/api/chofer/usuario/${userId}`).subscribe({
+        next: (res) => {
+          const choferId = res?.id_chofer ?? res?.data?.id_chofer;
+          if (choferId) {
+            this.idChoferActual = Number(choferId);
+            this.loginService.saveUser({ ...user, id_chofer: choferId });
+          }
+          this.cargarRutasAsignadas();
+          this.cargarDatosDashboardChofer();
+        },
+        error: () => {
+          this.cargarRutasAsignadas();
+          this.cargarDatosDashboardChofer();
+        }
+      });
+      return;
+    }
+
     this.cargarRutasAsignadas();
     this.cargarDatosDashboardChofer();
   }
 
-  private getDefaultRoutes(): any[] {
-    return [
-      { id_ruta: 1, nombre: 'Ruta #01', zona: 'Zona Centro - Col. Las Flores', id_chofer: 1 },
-      { id_ruta: 4, nombre: 'Ruta #04', zona: 'Zona Norte - Col. San José', id_chofer: 1 },
-      { id_ruta: 7, nombre: 'Ruta #07', zona: 'Zona Sur - Col. La Primavera', id_chofer: 1 },
-    ];
-  }
+  private sincronizarRutaSeleccionada(): void {
+    if (!this.rutasAsignadas.length) {
+      this.selectedRutaId = null;
+      return;
+    }
 
-  private getDefaultVehicles(): any[] {
-    return [{ id_vehiculo: 1, placa: 'KTR-842', estado: 'ACTIVO', proveedor: 'Mi Bus Escolar' }];
-  }
-
-  private getDefaultStudents(): any[] {
-    return [
-      { id_estudiante: 1, nombre: 'Ana', apellido: 'García', grado: '3°', colegio: 'San José' },
-      { id_estudiante: 2, nombre: 'Luis', apellido: 'Pérez', grado: '4°', colegio: 'San José' },
-      { id_estudiante: 3, nombre: 'María', apellido: 'López', grado: '5°', colegio: 'San José' }
-    ];
+    const existeSeleccionActual = this.rutasAsignadas.some(ruta => Number(ruta.id_ruta) === Number(this.selectedRutaId));
+    if (!existeSeleccionActual) {
+      this.selectedRutaId = Number(this.rutasAsignadas[0].id_ruta);
+    } else {
+      this.selectedRutaId = Number(this.selectedRutaId);
+    }
   }
 
   cargarRutasAsignadas(): void {
     const baseUrl = 'http://localhost:3000/api';
-    const token = localStorage.getItem('token');
+    const token = this.loginService.getToken();
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
 
     this.http.get(`${baseUrl}/rutas`, { headers }).subscribe({
       next: (res: any) => {
-        const rutas = Array.isArray(res?.data) ? res.data : [];
+        const rutas = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
         this.rutasAsignadas = rutas
-          .filter((ruta: any) => Number(ruta.id_chofer) === this.idChoferActual)
+          .filter((ruta: any) => Number(ruta.id_chofer) === Number(this.idChoferActual))
           .map((ruta: any) => ({
-            id_ruta: ruta.id_ruta ?? ruta.id,
+            id_ruta: Number(ruta.id_ruta ?? ruta.id),
             nombre: ruta.nombre || `Ruta #${ruta.id_ruta ?? ruta.id}`,
             zona: ruta.zona || ruta.descripcion || 'Ruta asignada al chofer',
-            id_chofer: ruta.id_chofer,
+            id_chofer: Number(ruta.id_chofer),
           }));
 
-        if (!this.rutasAsignadas.length) {
-          this.rutasAsignadas = this.getDefaultRoutes();
-        }
-
-        this.selectedRutaId = this.rutasAsignadas[0]?.id_ruta ?? null;
+        this.sincronizarRutaSeleccionada();
         this.flujoActual = 1;
       },
       error: () => {
-        this.rutasAsignadas = this.getDefaultRoutes();
-        this.selectedRutaId = this.rutasAsignadas[0]?.id_ruta ?? null;
+        this.rutasAsignadas = [];
+        this.selectedRutaId = null;
         this.flujoActual = 1;
       }
     });
   }
 
   onRutaSeleccionada(): void {
+    this.selectedRutaId = Number(this.selectedRutaId);
     this.flujoActual = 1;
   }
 
@@ -154,32 +172,30 @@ export class DashboardChoferComponents implements OnInit {
     }
 
     const baseUrl = 'http://localhost:3000/api';
-    const token = localStorage.getItem('token');
+    const token = this.loginService.getToken();
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
 
     this.http.get(`${baseUrl}/chofer-dashboard/${this.idChoferActual}/vehiculos`, { headers }).subscribe({
       next: (res: any) => {
-        const vehiculos = Array.isArray(res?.data) ? res.data : [];
-        this.vehiculos = vehiculos.length ? vehiculos : this.getDefaultVehicles();
+        this.vehiculos = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
       },
       error: () => {
-        this.vehiculos = this.getDefaultVehicles();
+        this.vehiculos = [];
       }
     });
 
     this.http.get(`${baseUrl}/chofer-dashboard/${this.idChoferActual}/estudiantes`, { headers }).subscribe({
       next: (res: any) => {
-        const estudiantes = Array.isArray(res?.data) ? res.data : [];
-        this.estudiantes = estudiantes.length ? estudiantes : this.getDefaultStudents();
+        this.estudiantes = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
       },
       error: () => {
-        this.estudiantes = this.getDefaultStudents();
+        this.estudiantes = [];
       }
     });
 
     this.http.get(`${baseUrl}/chofer-dashboard/${this.idChoferActual}/reportes`, { headers }).subscribe({
       next: (res: any) => {
-        this.reportes = Array.isArray(res?.data) ? res.data : [];
+        this.reportes = Array.isArray(res) ? res : Array.isArray(res?.data) ? res.data : [];
       },
       error: (err) => {
         console.error('Error cargando reportes del chofer', err);
