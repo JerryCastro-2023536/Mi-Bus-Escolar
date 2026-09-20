@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS Proveedores (
 CREATE TABLE IF NOT EXISTS Valoraciones (
     id_valoracion INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_proveedor INTEGER NOT NULL,
+    id_usuario INTEGER,
     comentario TEXT,
     calificacion DOUBLE PRECISION NOT NULL,
 
@@ -60,7 +61,13 @@ CREATE TABLE IF NOT EXISTS Valoraciones (
         FOREIGN KEY (id_proveedor)
         REFERENCES Proveedores(id_proveedor)
         ON UPDATE CASCADE
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_valoraciones_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES Usuarios(id_usuario)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
 
@@ -71,6 +78,7 @@ CREATE TABLE IF NOT EXISTS Valoraciones (
 CREATE TABLE IF NOT EXISTS Choferes (
     id_chofer INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_usuario INTEGER NOT NULL UNIQUE,
+    id_proveedor INTEGER NOT NULL,
     telefono_contacto VARCHAR(20) NOT NULL UNIQUE,
 
     estado VARCHAR(10) NOT NULL DEFAULT 'ACTIVO'
@@ -79,6 +87,12 @@ CREATE TABLE IF NOT EXISTS Choferes (
     CONSTRAINT fk_choferes_usuario
         FOREIGN KEY (id_usuario)
         REFERENCES Usuarios(id_usuario)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_choferes_proveedor
+        FOREIGN KEY (id_proveedor)
+        REFERENCES Proveedores(id_proveedor)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
@@ -559,11 +573,17 @@ CREATE INDEX IF NOT EXISTS idx_valoraciones_proveedor
 CREATE INDEX IF NOT EXISTS idx_valoraciones_proveedor_calificacion
     ON Valoraciones(id_proveedor, calificacion);
 
+CREATE INDEX IF NOT EXISTS idx_valoraciones_usuario
+    ON Valoraciones(id_usuario);
+
 
 -- CHOFERES
 
 CREATE INDEX IF NOT EXISTS idx_choferes_estado
     ON Choferes(estado);
+
+CREATE INDEX IF NOT EXISTS idx_choferes_proveedor
+    ON Choferes(id_proveedor);
 
 
 -- COLEGIOS

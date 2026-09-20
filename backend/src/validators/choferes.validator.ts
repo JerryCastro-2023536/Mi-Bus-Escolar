@@ -4,7 +4,9 @@ import { zUtils } from "../utils/zodHelpers";
 const choferSchema = z.object({
     id_chofer: zUtils.optionalPositiveInt("ID del chofer"),
 
-    id_usuario: zUtils.requiredPositiveInt("ID del usuario"),
+    id_proveedor: zUtils.requiredPositiveInt("ID del proveedor"),
+
+	id_usuario: zUtils.requiredPositiveInt("ID del usuario"),
 
     telefono_contacto: zUtils.requiredString("teléfono de contacto")
         .min(8, "El teléfono debe tener al menos 8 caracteres")

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 import { Pagos, RegistrarPagoDTO } from "../models/Pagos";
-import { editarPagoById, agregarPago, buscarPagoById, eliminarPagoById, listarPagos, buscarDetallePago, registrarPago, listarMesesPendientes, listarEstudiantesPorTutor } from "../services/pagos.service";
+import { editarPagoById, agregarPago, buscarPagoById, eliminarPagoById, listarPagos, buscarDetallePago, registrarPago, listarMesesPendientes, listarEstudiantesPorTutor, listarServiciosProveedor, listarEstudiantesPorServicio, listarMesesEstudianteProveedor } from "../services/pagos.service";
 
 export async function getPagos(req: Request, res: Response, next: NextFunction) {
     try {
@@ -77,6 +77,8 @@ export async function deletePago(req: Request, res: Response, next: NextFunction
     }
 }
 
+// Vista del usuario
+
 export async function getEstudiantesPorTutor(req: Request, res: Response, next: NextFunction) {
     try {
         const id_usuario_tutor = Number(req.params.idUsuario);
@@ -143,6 +145,56 @@ export async function postRegistrarPago(req: Request, res: Response, next: NextF
             success: true,
             message: 'Pago registrado correctamente',
             data: pago
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+// Vista del proveedor
+
+export async function getServiciosProveedor(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id_usuario = Number(req.params.idUsuario);
+        const servicios = await listarServiciosProveedor(id_usuario);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Servicios cargados correctamente',
+            data: servicios
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getEstudiantesPorServicio(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id_usuario = Number(req.params.idUsuario);
+        const id_servicio = Number(req.params.idServicio);
+        const estudiantes = await listarEstudiantesPorServicio(id_usuario, id_servicio);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Estudiantes del servicio cargados correctamente',
+            data: estudiantes
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getMesesEstudianteProveedor(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id_usuario = Number(req.params.idUsuario);
+        const id_servicio = Number(req.params.idServicio);
+        const id_estudiante = Number(req.params.idEstudiante);
+        const meses = await listarMesesEstudianteProveedor(id_usuario, id_servicio, id_estudiante);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Meses cargados correctamente',
+            data: meses
         });
     } catch (error) {
         next(error);

@@ -33,7 +33,7 @@ const adminSidebar: SidebarSection[] = [
         items: [
             { label: 'Usuarios', icon: 'users', route: '/usuarios', description: 'Cuentas de acceso, contraseñas y asignación de roles' },
             { label: 'Estudiantes', icon: 'graduation-cap', route: '/estudiantes', description: 'Padrón de alumnos, tutores y colegios asignados' },
-            { label: 'Choferes', icon: 'id-card', route: '/choferes', description: 'Conductores certificados, licencias y datos de contacto' },
+            { label: 'Choferes', icon: 'id-card', route: '/mis-choferes', description: 'Conductores y rutas asignadas' },
             { label: 'Colegios', icon: 'school', route: '/colegios', description: 'Sedes escolares afiliadas, convenios y horarios' }
         ]
     },
@@ -73,23 +73,24 @@ const proveedorSidebar: SidebarSection[] = [
     {
         title: 'Mi Flotilla',
         items: [
-            { label: 'Vehículos', icon: 'bus', route: '/vehiculos', description: 'Buses y microbuses, placas, modelo y capacidad' },
-            { label: 'Choferes', icon: 'id-card', route: '/choferes', description: 'Conductores certificados, licencias y datos de contacto' }
+            { label: 'Vehículos', icon: 'bus', route: '/mis-vehiculos', description: 'Buses y microbuses, placas, modelo y capacidad' },
+            { label: 'Choferes', icon: 'id-card', route: '/mis-choferes', description: 'Conductores y rutas asignadas' }
         ]
     },
     {
         title: 'Afiliaciones',
         items: [
-            { label: 'Colegios', icon: 'school', route: '/colegios', description: 'Sedes escolares afiliadas, convenios y horarios' },
-            { label: 'Servicios', icon: 'box', route: '/servicios', description: 'Planes de transporte escolar, paquetes y tarifas' }
+            { label: 'Servicios', icon: 'box', route: '/mis-servicios', description: 'Planes de transporte escolar, paquetes y tarifas' }
         ]
     },
     {
         title: 'Operación',
         items: [
-            { label: 'Rutas', icon: 'route', route: '/rutas', description: 'Trazados de trayectos matutinos, vespertinos y zonas' },
-            { label: 'Asignación de Ruta', icon: 'link', route: '/asignaciones-ruta', description: 'Vinculación de chofer, vehículo, colegio y ruta' },
-            { label: 'Viajes', icon: 'map', route: '/viajes', description: 'Despacho, viajes en curso y registros históricos' }
+            { label: 'Rutas', icon: 'route', route: '/mis-rutas', description: 'Rutas, horarios, choferes y vehículos' },
+            { label: 'Asignación de Ruta', icon: 'link', route: '/asignacion-ruta-proveedor', description: 'Estudiantes asignados a cada ruta' },
+            { label: 'Viajes', icon: 'map', route: '/mis-viajes', description: 'Viajes en curso e historial' },
+            { label: 'Incidencias', icon: 'triangle-exclamation', route: '/mis-incidencias', description: 'Incidencias de tus rutas' },
+            { label: 'Valoraciones', icon: 'star', route: '/mis-valoraciones', description: 'Comentarios y calificaciones recibidas' }
         ]
     },
     { title: 'Facturación', items: [{ label: 'Pagos', icon: 'credit-card', route: '/pagos', description: 'Control de cuotas mensuales, recibos y estados de cuenta' }] }

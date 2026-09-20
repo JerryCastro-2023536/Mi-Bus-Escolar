@@ -16,8 +16,8 @@ export async function getChoferes(req: Request, res: Response, next: NextFunctio
 }
 
 export async function postChoferes(req: Request, res: Response, next: NextFunction) {
-    const { id_chofer, id_usuario, telefono_contacto, estado } = req.body
-    const nuevoChofer : Choferes = { id_chofer, id_usuario, telefono_contacto, estado }
+    const { id_chofer, id_usuario, id_proveedor, telefono_contacto, estado } = req.body
+    const nuevoChofer : Choferes = { id_chofer, id_usuario, id_proveedor, telefono_contacto, estado }
     const choferCreado = await agregarChofer(nuevoChofer);
     try{
         return res.status(201).json({
@@ -47,8 +47,8 @@ export async function getChoferById(req: Request, res: Response, next: NextFunct
 export async function putChofer(req: Request, res: Response, next: NextFunction) {
     try{
         const id = Number(req.params.id);
-        const { id_chofer, id_usuario, telefono_contacto, estado } = req.body;
-        const choferActualizar : Choferes = { id_chofer, id_usuario, telefono_contacto, estado }
+        const { id_chofer, id_usuario, id_proveedor, telefono_contacto, estado } = req.body;
+        const choferActualizar : Choferes = { id_chofer, id_usuario, id_proveedor, telefono_contacto, estado }
         const choferEditado = await editarChoferById(id, choferActualizar);
 
         return res.status(200).json({
