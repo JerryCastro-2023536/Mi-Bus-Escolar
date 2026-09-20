@@ -1,0 +1,384 @@
+:host {
+    display: block;
+}
+
+.viajes-view {
+    width: 100%;
+}
+
+.section-intro {
+    margin-bottom: 22px;
+}
+
+.eyebrow {
+    color: #1A456B;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+}
+
+.section-intro h2,
+.selected-header h2 {
+    margin: 5px 0 6px;
+    color: #193044;
+}
+
+.section-intro p {
+    margin: 0;
+    color: #6D7D87;
+    font-size: 13px;
+}
+
+
+/* ESTUDIANTES */
+
+.students-grid,
+.trips-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.student-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    width: 100%;
+
+    padding: 20px;
+
+    background: #fff;
+
+    border: 1px solid #E2E8EC;
+    border-radius: 16px;
+
+    cursor: pointer;
+
+    text-align: left;
+
+    transition: .2s ease;
+}
+
+.student-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #1A456B;
+
+    box-shadow: 0 10px 25px rgba(26, 69, 107, .08);
+}
+
+.student-photo {
+    width: 60px;
+    height: 60px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: 14px;
+
+    background: #EAF1F6;
+
+    color: #1A456B;
+
+    font-size: 22px;
+}
+
+.student-photo img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.student-data {
+    flex: 1;
+}
+
+.student-data span {
+    color: #84939C;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+.student-data h3 {
+    margin: 3px 0;
+
+    color: #193044;
+
+    font-size: 16px;
+}
+
+.student-data p,
+.student-data small {
+    margin: 0;
+
+    color: #6D7D87;
+}
+
+.arrow {
+    color: #AAB6BE;
+}
+
+
+/* HEADER */
+
+.selected-header {
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+
+    margin-bottom: 22px;
+}
+
+.selected-header span {
+    color: #6D7D87;
+    font-size: 11px;
+}
+
+.back-button {
+    padding: 10px 14px;
+
+    background: #fff;
+
+    border: 1px solid #E2E8EC;
+    border-radius: 10px;
+
+    color: #1A456B;
+
+    cursor: pointer;
+}
+
+
+/* VIAJE */
+
+.trip-card {
+    padding: 22px;
+
+    background: #fff;
+
+    border: 1px solid #E2E8EC;
+    border-radius: 18px;
+}
+
+.trip-header {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+.bus-icon {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #EAF1F6;
+
+    color: #1A456B;
+}
+
+.trip-header h3 {
+    margin: 2px 0 0;
+
+    color: #193044;
+
+    font-size: 16px;
+}
+
+.trip-label {
+    color: #84939C;
+
+    font-size: 10px;
+}
+
+.status-active {
+    margin-left: auto;
+
+    display: flex;
+    align-items: center;
+
+    gap: 6px;
+
+    padding: 6px 9px;
+
+    border-radius: 20px;
+
+    background: #E9F7EF;
+
+    color: #198754;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: currentColor;
+}
+
+.trip-information {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+}
+
+.trip-information div {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    color: #6D7D87;
+
+    font-size: 12px;
+}
+
+.trip-information i {
+    color: #1A456B;
+}
+
+
+/* FUTURO */
+
+.future-feature {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 20px;
+
+    padding: 14px;
+
+    border: 1px dashed #CBD5DC;
+    border-radius: 12px;
+
+    background: #F8FAFB;
+
+    color: #87949D;
+}
+
+.future-feature > i {
+    font-size: 20px;
+}
+
+.future-feature div {
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+.future-feature strong {
+    font-size: 12px;
+}
+
+.future-feature span {
+    font-size: 10px;
+}
+
+
+/* ESTADOS */
+
+.state-card {
+    grid-column: 1 / -1;
+
+    min-height: 220px;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    background: #fff;
+
+    border: 1px solid #E2E8EC;
+    border-radius: 18px;
+
+    color: #6D7D87;
+
+    text-align: center;
+}
+
+.state-card > i {
+    margin-bottom: 10px;
+
+    color: #1A456B;
+
+    font-size: 26px;
+}
+
+.state-card h3 {
+    margin: 4px 0;
+
+    color: #193044;
+}
+
+.state-card p {
+    margin: 4px 0;
+
+    font-size: 12px;
+}
+
+.alert-error {
+    margin-bottom: 18px;
+
+    padding: 12px 15px;
+
+    border: 1px solid #F4CCCC;
+    border-radius: 10px;
+
+    background: #FDECEC;
+
+    color: #A72828;
+
+    font-size: 12px;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+    .students-grid,
+    .trips-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 520px) {
+
+    .trip-information {
+        grid-template-columns: 1fr;
+    }
+
+    .selected-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
