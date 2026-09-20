@@ -93,3 +93,12 @@ export const proveedoresConfig = {
         }
     ]
 };
+
+export interface ServicioProveedor {
+    id_servicio: number;
+    nombre: string;
+    descripcion: string | null;
+    precio_mensual: number;
+    estado: 'ACTIVO' | 'INACTIVO';
+    total_estudiantes: number;
+}
