@@ -1,3 +1,4 @@
+import { PagosProveedorView } from './components/pagos-proveedor-view/pagos-proveedor-view';
 import { crudRoutes } from './shared/crud.routes';
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
@@ -28,13 +29,13 @@ export const routes: Routes = [
                 data: { roles: ['ADMINISTRADOR'] },
                 loadComponent: () => import('./components/admin-view/admin-view').then(m => m.AdminView),
             },
-            /*{
+            {
                 path: 'dashboard/proveedor',
                 title: 'Proveedor | MiBusEscolar',
                 canActivate: [roleGuard],
                 data: { roles: ['PROVEEDOR'] },
-                loadComponent: () => import('../app/components/').then(m => m.ProveedorView),
-            },
+                loadComponent: () => import('../app/components/pagos-proveedor-view/pagos-proveedor-view').then(m => m.PagosProveedorView),
+            },/*
             {
                 path: 'dashboard/chofer',
                 title: 'Chofer | MiBusEscolar',
