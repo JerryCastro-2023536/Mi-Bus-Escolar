@@ -16,7 +16,7 @@
         <div class="kpi-icon bg-blue"><i class="bi bi-bus-front-fill"></i></div>
         <div class="kpi-data">
           <span class="kpi-label">Vehículo</span>
-          <strong class="kpi-value">{{ vehiculoActual?.nombre || 'Bus #12' }}</strong>
+          <strong class="kpi-value">Bus #{{ vehiculoActual?.id_vehiculo ?? 1 }}</strong>
           <span class="kpi-sub">Placa: {{ vehiculoActual?.placa || 'KTR-842' }}</span>
         </div>
       </div>
