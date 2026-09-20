@@ -46,14 +46,9 @@ function normalize(text: string): string {
 })
 export class ProveedoresView {
 
-  /** Señales: se repinta bien con o sin zone.js. */
   readonly searchQuery = signal('');
   readonly selectedCategory = signal<CategoryFilter>('ALL');
 
-  /**
-   * Catálogo de módulos del proveedor.
-   * Las rutas y los íconos coinciden con crud.routes.ts y role.config.ts.
-   */
   private readonly sections: ProveedorSection[] = [
     {
       id: 'Servicio',
@@ -65,21 +60,21 @@ export class ProveedoresView {
           label: 'Servicios',
           description: 'Registra y edita los planes de transporte que ofreces, con sus tarifas, para conseguir pasajeros.',
           icon: 'box',
-          route: '/servicios',
+          route: '/mis-servicios',
           keywords: 'registrar publicar oferta paquetes tarifas pasajeros'
         },
         {
           label: 'Vehículos',
           description: 'Buses y microbuses de tu flota, con placa, modelo y capacidad.',
           icon: 'bus',
-          route: '/vehiculos',
+          route: '/mis-vehiculos',
           keywords: 'flota buses placa capacidad'
         },
         {
           label: 'Choferes',
           description: 'Conductores a tu cargo, sus licencias y datos de contacto.',
           icon: 'id-card',
-          route: '/choferes',
+          route: '/mis-choferes',
           keywords: 'conductores pilotos licencia'
         }
       ]
@@ -94,7 +89,7 @@ export class ProveedoresView {
           label: 'Pagos',
           description: 'Comprobantes de pago del servicio de bus y estado de cada cuenta.',
           icon: 'credit-card',
-          route: '/pagos',
+          route: '/pagos-proveedor',
           keywords: 'comprobantes boleta deposito transferencia recibo mora deuda pendiente al dia'
         }
       ]
@@ -109,36 +104,15 @@ export class ProveedoresView {
           label: 'Rutas',
           description: 'Trazados de trayectos matutinos y vespertinos que operas.',
           icon: 'route',
-          route: '/rutas',
+          route: '/mis-rutas',
           keywords: 'recorridos horario zonas'
-        },
-        {
-          label: 'Paradas',
-          description: 'Puntos de abordaje y su geolocalización.',
-          icon: 'location-dot',
-          route: '/paradas',
-          keywords: 'puntos recogida abordaje'
-        },
-        {
-          label: 'Ruta - Parada',
-          description: 'Secuencia ordenada de paradas y tiempos estimados de cada ruta.',
-          icon: 'road',
-          route: '/ruta-parada',
-          keywords: 'secuencia orden tiempos'
         },
         {
           label: 'Asignación de Ruta',
           description: 'Qué chofer, vehículo y colegio cubren cada ruta.',
           icon: 'link',
-          route: '/asignaciones-ruta',
+          route: '/asignacion-ruta-proveedor',
           keywords: 'asignar chofer vehiculo colegio'
-        },
-        {
-          label: 'Ubicaciones del Bus',
-          description: 'Posición GPS de tus buses mientras están en recorrido.',
-          icon: 'location-arrow',
-          route: '/ubicaciones-bus',
-          keywords: 'gps mapa tiempo real seguimiento telemetria'
         }
       ]
     },
@@ -152,21 +126,21 @@ export class ProveedoresView {
           label: 'Incidencias',
           description: 'Reportes de tráfico, averías mecánicas o emergencias ocurridas en el camino.',
           icon: 'triangle-exclamation',
-          route: '/incidencias',
+          route: '/mis-incidencias',
           keywords: 'reportes accidente falla retraso problema emergencia'
         },
         {
           label: 'Viajes',
           description: 'Viajes en curso y registro histórico con fecha, ruta y estado.',
           icon: 'map',
-          route: '/viajes',
+          route: '/mis-viajes',
           keywords: 'historial recorridos despacho'
         },
         {
           label: 'Valoraciones',
           description: 'Calificaciones y comentarios de los padres sobre tu servicio.',
           icon: 'star',
-          route: '/valoraciones',
+          route: '/mis-valoraciones',
           keywords: 'calificaciones opiniones reseñas'
         }
       ]
