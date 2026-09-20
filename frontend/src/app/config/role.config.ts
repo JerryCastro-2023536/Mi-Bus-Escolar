@@ -73,7 +73,7 @@ const proveedorSidebar: SidebarSection[] = [
     {
         title: 'Mi Flotilla',
         items: [
-            { label: 'Vehículos', icon: 'bus', route: '/vehiculos', description: 'Buses y microbuses, placas, modelo y capacidad' },
+            { label: 'Vehículos', icon: 'bus', route: '/mis-vehiculos', description: 'Buses y microbuses, placas, modelo y capacidad' },
             { label: 'Choferes', icon: 'id-card', route: '/choferes', description: 'Conductores certificados, licencias y datos de contacto' }
         ]
     },
