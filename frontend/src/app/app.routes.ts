@@ -1,10 +1,18 @@
 import { PagosProveedorView } from './components/pagos-proveedor-view/pagos-proveedor-view';
 import { crudRoutes } from './shared/crud.routes';
 import { Routes } from '@angular/router';
+import { MapaComponent } from './components/mapa/mapa.component';
+import { ChoferDashboardComponents } from './components/mapa-chofer/chofer-dashboard.components';
+import { DashboardChoferComponents } from './components/dashboard-chofer/dashboard-chofer.components';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
 import { roleGuard, dashboardRedirectGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
+    {
+        path: "mapa", 
+        component: MapaComponent
+    },
+
     { path: '', redirectTo: 'login', pathMatch: 'full' },
 
     {
@@ -34,14 +42,16 @@ export const routes: Routes = [
                 canActivate: [roleGuard],
                 data: { roles: ['PROVEEDOR'] },
                 loadComponent: () => import('../app/components/proveedores-view/proveedores-view').then(m => m.ProveedoresView),
-            },/*
+            },
             {
-                path: 'dashboard/chofer',
-                title: 'Chofer | MiBusEscolar',
-                canActivate: [roleGuard],
-                data: { roles: ['CHOFER'] },
-                loadComponent: () => import('./components/chofer-view/chofer-view').then(m => m.ChoferView),
-            },*/
+                path: "dashboard-chofer",
+                title: "Dashboard Chofer | MiBusEscolar",
+                loadComponent: () => import('./components/dashboard-chofer/dashboard-chofer.components').then(d => d.DashboardChoferComponents),
+                data: {
+                    title: "Gestión de acciones del Chofer",
+                    subtitle: "Administracion de Rutas, Estudiantes, Buses y Reportes del chofer asignado."
+                }
+            },
             {
                 path: 'dashboard/usuario',
                 title: 'Mi Panel | MiBusEscolar',
@@ -69,6 +79,14 @@ export const routes: Routes = [
                 }
             },
             {
+                path: "ruta-chofer",
+                title: "Ruta Chofer | MiBusEscolar",
+                loadComponent: () => import('./components/mapa-chofer/chofer-dashboard.components').then(d => d.ChoferDashboardComponents),
+                data: {
+                    title: "Gestión de Rutas del chofer",
+                    subtitle: "Ver las rutas, tomar asistencias, iniciar viaje, anotar abordaje y finalizar ruta."
+                }
+            },
                 path: 'pagosUser',
                 title: 'Mis Pagos | MiBusEscolar',
                 canActivate: [roleGuard],

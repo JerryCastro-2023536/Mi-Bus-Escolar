@@ -1,4 +1,4 @@
-import { environment } from './../../environments/enviroment';
+import { environment } from '../../environments/environment';
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -56,6 +56,11 @@ export class LoginService {
 
   getUser(): any {
     return this.userSignal();
+  }
+
+  getIdChofer(): number | null {
+    const user = this.userSignal();
+    return user?.id_chofer ? Number(user.id_chofer) : null;
   }
 
   updateFotoUsuario(url: string): void {

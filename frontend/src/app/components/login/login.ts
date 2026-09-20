@@ -125,7 +125,11 @@ export class Login implements OnInit {
           this.loginService.saveUser(res.usuario);
           this.currentUser.set(res.usuario);
           this.currentToken.set(res.token);
-          this.router.navigateByUrl('/dashboard');
+          if(this.currentUser().rol === "CHOFER"){
+            this.router.navigateByUrl('/dashboard-chofer');
+          }else{
+            this.router.navigateByUrl('/dashboard');
+          }
         } else {
           this.successMessage.set(res.message || 'Login exitoso');
         }
