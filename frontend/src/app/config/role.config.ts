@@ -81,7 +81,7 @@ const proveedorSidebar: SidebarSection[] = [
         title: 'Afiliaciones',
         items: [
             { label: 'Colegios', icon: 'school', route: '/colegios', description: 'Sedes escolares afiliadas, convenios y horarios' },
-            { label: 'Servicios', icon: 'box', route: '/servicios', description: 'Planes de transporte escolar, paquetes y tarifas' }
+            { label: 'Servicios', icon: 'box', route: '/mis-servicios', description: 'Planes de transporte escolar, paquetes y tarifas' }
         ]
     },
     {
