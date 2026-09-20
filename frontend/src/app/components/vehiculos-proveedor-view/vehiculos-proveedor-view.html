@@ -1,0 +1,187 @@
+<div class="vehiculos-container">
+
+  @if (mensajeExito) {
+  <div class="alert-box success">
+    <i class="fa-solid fa-circle-check"></i>
+    <span>{{ mensajeExito }}</span>
+    <button class="btn-close-alert" (click)="mensajeExito = ''" type="button" aria-label="Cerrar alerta">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+  }
+
+  @if (mensajeError) {
+  <div class="alert-box error">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>{{ mensajeError }}</span>
+    <button class="btn-close-alert" (click)="mensajeError = ''" type="button" aria-label="Cerrar alerta">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+  }
+
+  <div class="step-card">
+    <div class="header-row">
+      <div>
+        <h3>Mis vehículos</h3>
+        <p class="step-subtitle">Administra la flota de tu servicio de transporte escolar.</p>
+      </div>
+      <button class="btn-primary" type="button" (click)="abrirModalNuevo()">
+        <i class="fa-solid fa-plus"></i> Agregar vehículo
+      </button>
+    </div>
+
+    @if (cargando()) {
+    <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Cargando vehículos...</div>
+    } @else if (vehiculos().length === 0) {
+    <div class="empty-state">Aún no tienes vehículos registrados.</div>
+    } @else {
+    <div class="vehiculos-grid">
+      @for (veh of vehiculos(); track veh.id_vehiculo) {
+      <div class="vehiculo-card">
+        @if (veh.foto_vehiculo) {
+        <img [src]="veh.foto_vehiculo" [alt]="'Foto de ' + veh.placa" class="vehiculo-foto" />
+        } @else {
+        <div class="vehiculo-foto-placeholder"><i class="fa-solid fa-bus"></i></div>
+        }
+
+        <div class="vehiculo-info">
+          <div class="vehiculo-header">
+            <span class="vehiculo-placa">{{ veh.placa }}</span>
+            <span class="vehiculo-estado" [class.inactivo]="veh.estado !== 'ACTIVO'">
+              {{ veh.estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+
+          <div class="vehiculo-asignacion">
+            @if (veh.id_ruta) {
+            <span class="asignacion-linea">
+              <i class="fa-solid fa-route"></i> {{ veh.nombre_ruta }} · {{ veh.nombre_servicio }}
+            </span>
+            } @else {
+            <span class="asignacion-linea sin-dato"><i class="fa-solid fa-route"></i> Sin ruta asignada</span>
+            }
+
+            @if (veh.id_chofer) {
+            <span class="asignacion-linea">
+              <i class="fa-solid fa-id-card"></i> {{ veh.nombre_chofer }} {{ veh.apellido_chofer }}
+            </span>
+            } @else if (veh.id_ruta) {
+            <span class="asignacion-linea sin-dato"><i class="fa-solid fa-id-card"></i> Sin chofer asignado</span>
+            }
+          </div>
+
+          <div class="vehiculo-acciones">
+            <button class="btn-icon" type="button" (click)="abrirModalEditar(veh)" aria-label="Editar vehículo">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="btn-icon danger" type="button" (click)="pedirConfirmacionEliminar(veh)" aria-label="Eliminar vehículo">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+    }
+  </div>
+
+  <!-- ===================== Modal alta / edición ===================== -->
+  @if (modalAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ modoEdicion() ? 'Editar vehículo' : 'Agregar vehículo' }}</h3>
+        <button class="btn-icon" type="button" (click)="cerrarModal()" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      @if (errorModal) {
+      <div class="alert-box error">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>{{ errorModal }}</span>
+      </div>
+      }
+
+      <div class="form-field">
+        <label>Foto del vehículo</label>
+        <div class="foto-upload">
+          @if (fotoUrlForm) {
+          <img [src]="fotoUrlForm" alt="Vista previa del vehículo" class="foto-preview" />
+          } @else {
+          <div class="foto-preview-placeholder"><i class="fa-solid fa-bus"></i></div>
+          }
+
+          <label class="btn-secondary btn-upload" for="foto-input">
+            @if (subiendoFoto()) {
+            <span><i class="fa-solid fa-spinner fa-spin"></i> Subiendo...</span>
+            } @else {
+            <span><i class="fa-solid fa-camera"></i> {{ fotoUrlForm ? 'Cambiar foto' : 'Subir foto' }}</span>
+            }
+          </label>
+          <input id="foto-input" type="file" accept="image/*" hidden
+                 [disabled]="subiendoFoto()" (change)="onFotoSeleccionada($event)" />
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="placa">Placa</label>
+        <input id="placa" type="text" class="text-input" [(ngModel)]="placaForm"
+               placeholder="Ej. P-123ABC" maxlength="20" />
+      </div>
+
+      @if (modoEdicion()) {
+      <div class="form-field">
+        <label for="estado">Estado</label>
+        <select id="estado" class="text-input" [(ngModel)]="estadoForm">
+          <option value="ACTIVO">Activo</option>
+          <option value="INACTIVO">Inactivo</option>
+        </select>
+      </div>
+      }
+
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primary" type="button" (click)="guardarVehiculo()" [disabled]="guardando() || subiendoFoto()">
+          @if (guardando()) {
+          <span><i class="fa-solid fa-spinner fa-spin"></i> Guardando...</span>
+          } @else {
+          <span>{{ modoEdicion() ? 'Guardar cambios' : 'Registrar vehículo' }}</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- ===================== Modal confirmación de borrado ===================== -->
+  @if (vehiculoAEliminar()) {
+  <div class="modal-overlay" (click)="cancelarEliminar()">
+    <div class="modal-box modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Eliminar vehículo</h3>
+      </div>
+
+      <p>
+        ¿Seguro que deseas eliminar el vehículo <strong>{{ vehiculoAEliminar()!.placa }}</strong>?
+        @if (vehiculoAEliminar()!.id_ruta) {
+        Está asignado a la ruta <strong>{{ vehiculoAEliminar()!.nombre_ruta }}</strong>, que quedará sin vehículo.
+        }
+      </p>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" (click)="cancelarEliminar()">Cancelar</button>
+        <button class="btn-danger" type="button" (click)="confirmarEliminar()" [disabled]="eliminando()">
+          @if (eliminando()) {
+          <span><i class="fa-solid fa-spinner fa-spin"></i> Eliminando...</span>
+          } @else {
+          <span>Sí, eliminar</span>
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+</div>
