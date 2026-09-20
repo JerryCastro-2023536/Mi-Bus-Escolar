@@ -1173,3 +1173,186 @@ BEGIN
     RETURN v_filas;
 END;
 $$;
+
+-- ============================================================
+-- VEHICULOS · VISTA DEL PROVEEDOR
+-- Agregar este archivo a tu carpeta de procedimientos y ejecutarlo
+-- contra la base de datos (no reemplaza nada existente).
+-- ============================================================
+
+-- ------------------------------------------------------------
+-- 1. Listar los vehículos del proveedor, con la ruta, servicio
+--    y chofer a los que está asignado cada uno (si aplica).
+--    Si un vehículo tuviera más de una ruta, se prioriza la
+--    ruta ACTIVA más reciente.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_vehiculos_listar(
+    p_id_usuario INTEGER
+)
+RETURNS TABLE (
+    id_vehiculo     INTEGER,
+    placa           VARCHAR(20),
+    foto_vehiculo   TEXT,
+    estado          VARCHAR(10),
+    id_ruta         INTEGER,
+    nombre_ruta     VARCHAR(150),
+    id_servicio     INTEGER,
+    nombre_servicio VARCHAR(150),
+    id_chofer       INTEGER,
+    nombre_chofer   VARCHAR(100),
+    apellido_chofer VARCHAR(100)
+)
+LANGUAGE plpgsql
+STABLE
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        v.id_vehiculo, v.placa, v.foto_vehiculo, v.estado,
+        ra.id_ruta, ra.nombre_ruta, ra.id_servicio, ra.nombre_servicio,
+        ra.id_chofer, ra.nombre_chofer, ra.apellido_chofer
+    FROM Vehiculos v
+    JOIN Proveedores pr ON pr.id_proveedor = v.id_proveedor
+    LEFT JOIN LATERAL (
+        SELECT
+            r.id_ruta,
+            r.nombre AS nombre_ruta,
+            s.id_servicio,
+            s.nombre AS nombre_servicio,
+            c.id_chofer,
+            u.nombre AS nombre_chofer,
+            u.apellido AS apellido_chofer
+        FROM Rutas r
+        JOIN Servicios s ON s.id_servicio = r.id_servicio
+        LEFT JOIN Choferes c ON c.id_chofer = r.id_chofer
+        LEFT JOIN Usuarios u ON u.id_usuario = c.id_usuario
+        WHERE r.id_vehiculo = v.id_vehiculo
+        ORDER BY (r.estado = 'ACTIVO') DESC, r.id_ruta DESC
+        LIMIT 1
+    ) ra ON true
+    WHERE pr.id_usuario = p_id_usuario
+    ORDER BY v.placa;
+END;
+$$;
+
+
+-- ------------------------------------------------------------
+-- 2. ¿La placa ya está en uso? (Vehiculos.placa es UNIQUE global,
+--    esto es solo para dar un mensaje de validación amigable
+--    antes de tocar la base de datos)
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_vehiculo_placa_existe(
+    p_placa VARCHAR,
+    p_id_vehiculo_excluir INTEGER DEFAULT NULL
+)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT EXISTS (
+        SELECT 1
+        FROM Vehiculos
+        WHERE UPPER(TRIM(placa)) = UPPER(TRIM(p_placa))
+          AND (p_id_vehiculo_excluir IS NULL OR id_vehiculo <> p_id_vehiculo_excluir)
+    );
+$$;
+
+
+-- ------------------------------------------------------------
+-- 3. Registrar un vehículo nuevo (queda ACTIVO por defecto).
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_vehiculo_registrar(
+    p_id_proveedor  INTEGER,
+    p_placa         VARCHAR,
+    p_foto_vehiculo TEXT
+)
+RETURNS SETOF Vehiculos
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_vehiculo Vehiculos;
+BEGIN
+    INSERT INTO Vehiculos(id_proveedor, placa, foto_vehiculo)
+    VALUES (p_id_proveedor, p_placa, p_foto_vehiculo)
+    RETURNING * INTO v_vehiculo;
+
+    RETURN NEXT v_vehiculo;
+END;
+$$;
+
+
+-- ------------------------------------------------------------
+-- 4. Actualizar un vehículo (datos + estado).
+--    Filtra por id_proveedor: un proveedor solo puede tocar
+--    sus propios vehículos. Sin filas = no existe o no es suyo.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_vehiculo_actualizar(
+    p_id_vehiculo   INTEGER,
+    p_id_proveedor  INTEGER,
+    p_placa         VARCHAR,
+    p_foto_vehiculo TEXT,
+    p_estado        VARCHAR
+)
+RETURNS SETOF Vehiculos
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_vehiculo Vehiculos;
+BEGIN
+    UPDATE Vehiculos
+    SET placa         = p_placa,
+        foto_vehiculo = p_foto_vehiculo,
+        estado        = p_estado
+    WHERE id_vehiculo  = p_id_vehiculo
+      AND id_proveedor = p_id_proveedor
+    RETURNING * INTO v_vehiculo;
+
+    IF v_vehiculo.id_vehiculo IS NULL THEN
+        RETURN;
+    END IF;
+
+    RETURN NEXT v_vehiculo;
+END;
+$$;
+
+
+-- ------------------------------------------------------------
+-- 5. Total de rutas que usan este vehículo (para avisar antes
+--    de eliminar: Rutas.id_vehiculo es ON DELETE SET NULL, así
+--    que borrar es seguro, pero el proveedor debe saber que
+--    esa ruta se quedará sin vehículo asignado).
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_vehiculo_total_rutas(
+    p_id_vehiculo INTEGER
+)
+RETURNS INTEGER
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT COUNT(*)::INTEGER
+    FROM Rutas
+    WHERE id_vehiculo = p_id_vehiculo;
+$$;
+
+
+-- ------------------------------------------------------------
+-- 6. Eliminar un vehículo del proveedor.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_vehiculo_eliminar(
+    p_id_vehiculo  INTEGER,
+    p_id_proveedor INTEGER
+)
+RETURNS INTEGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_filas INTEGER;
+BEGIN
+    DELETE FROM Vehiculos
+    WHERE id_vehiculo  = p_id_vehiculo
+      AND id_proveedor = p_id_proveedor;
+
+    GET DIAGNOSTICS v_filas = ROW_COUNT;
+    RETURN v_filas;
+END;
+$$;
