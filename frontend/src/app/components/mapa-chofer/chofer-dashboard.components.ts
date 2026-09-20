@@ -342,6 +342,7 @@ export class ChoferDashboardComponents implements OnInit {
       localStorage.setItem('tipoRutaGuardada', this.tipoRutaActual);
       this.cdr.detectChanges();
     } else {
+      this.rutaRutaAsignada = [];
       const idViaje = this.viajeActual?.id_viaje;
       this.viajeActual = { ...this.viajeActual, estado: 'ACTIVO', tipo_ruta: 'IDA_COMPLETADA' };
       localStorage.setItem('viajeActualGuardado', JSON.stringify(this.viajeActual));
