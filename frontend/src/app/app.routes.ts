@@ -18,7 +18,6 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () => import('./components/dashboard-layout/dashboard-layout').then(m => m.DashboardComponent),
         children: [
-            // /dashboard → redirige al dashboard del rol del usuario
             { path: 'dashboard', canActivate: [dashboardRedirectGuard], children: [] },
 
             {
@@ -28,13 +27,14 @@ export const routes: Routes = [
                 data: { roles: ['ADMINISTRADOR'] },
                 loadComponent: () => import('./components/admin-view/admin-view').then(m => m.AdminView),
             },
-            /*{
+            {
                 path: 'dashboard/proveedor',
                 title: 'Proveedor | MiBusEscolar',
                 canActivate: [roleGuard],
                 data: { roles: ['PROVEEDOR'] },
-                loadComponent: () => import('../app/components/').then(m => m.ProveedorView),
+                loadComponent: () => import('../app/components/proveedores-view/proveedores-view').then(m => m.ProveedoresView),
             },
+            /*
             {
                 path: 'dashboard/chofer',
                 title: 'Chofer | MiBusEscolar',
