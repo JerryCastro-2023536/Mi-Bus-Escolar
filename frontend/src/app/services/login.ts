@@ -59,6 +59,11 @@ export class LoginService {
     return this.userSignal();
   }
 
+  getIdChofer(): number | null {
+    const user = this.userSignal();
+    return user?.id_chofer ? Number(user.id_chofer) : null;
+  }
+
   updateFotoUsuario(url: string): void {
     const current = this.userSignal();
     if (!current) return;
