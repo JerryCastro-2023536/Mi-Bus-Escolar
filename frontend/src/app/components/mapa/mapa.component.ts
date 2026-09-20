@@ -45,6 +45,12 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (this.mapa && changes['rutaDefinida']) {
+      if (this.rutaDefinida && this.rutaDefinida.length >= 2) {
+        this.trazarRuta(this.rutaDefinida);
+      }
+    }
+
     if (this.mapa && changes['posicionChofer'] && this.posicionChofer) {
       if (this.rol === 'usuario' || this.rol === 'proveedor') {
         this.actualizarPosicionRemotaChofer(this.posicionChofer);
@@ -62,9 +68,9 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
     await import('leaflet-routing-machine');
 
     const centroInicial: [number, number] = this.puntoSeleccionado
-      ? [this.puntoSeleccionado.lat, this.puntoSeleccionado.lng]
+      ? [Number(this.puntoSeleccionado.lat), Number(this.puntoSeleccionado.lng)]
       : this.rutaDefinida.length > 0
-        ? [this.rutaDefinida[0].lat, this.rutaDefinida[0].lng]
+        ? [Number(this.rutaDefinida[0].lat), Number(this.rutaDefinida[0].lng)]
         : [14.6349, -90.5069]; 
     this.mapa = this.L.map('mapa').setView(centroInicial, 14);
 
@@ -88,23 +94,21 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
       this.mapa?.invalidateSize();
     }, 300);
 
+    if (this.rutaDefinida && this.rutaDefinida.length >= 2) {
+      this.trazarRuta(this.rutaDefinida);
+    }
+
     if (this.rol === 'chofer') {
       this.iniciarGpsChofer();
-    } else {
-      if (this.rutaDefinida.length > 0) {
-        this.trazarRuta(this.rutaDefinida);
-      }
+    } else if (this.rol === 'admin' || this.rol === 'usuario') {
+      const puntoInicial: PuntoRuta = this.puntoSeleccionado ?? {
+        lat: centroInicial[0],
+        lng: centroInicial[1]
+      };
 
-      if (this.rol === 'admin' || this.rol === 'usuario') {
-        const puntoInicial: PuntoRuta = this.puntoSeleccionado ?? {
-          lat: centroInicial[0],
-          lng: centroInicial[1]
-        };
-
-        this.actualizarMarcadorPunto(puntoInicial);
-        this.cambioUbicacion.emit(puntoInicial);
-        this.habilitarSeleccionPunto();
-      }
+      this.actualizarMarcadorPunto(puntoInicial);
+      this.cambioUbicacion.emit(puntoInicial);
+      this.habilitarSeleccionPunto();
     }
   }
 
@@ -134,7 +138,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
     });
 
     if (!this.marcadorPunto) {
-      this.marcadorPunto = this.L.marker([punto.lat, punto.lng], {
+      this.marcadorPunto = this.L.marker([Number(punto.lat), Number(punto.lng)], {
         icon: iconoPersonalizado,
         draggable: esEditable
       }).addTo(this.mapa);
@@ -147,16 +151,21 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
         });
       }
     } else {
-      this.marcadorPunto.setLatLng([punto.lat, punto.lng]);
+      this.marcadorPunto.setLatLng([Number(punto.lat), Number(punto.lng)]);
     }
 
-    this.mapa.panTo([punto.lat, punto.lng]);
+    this.mapa.panTo([Number(punto.lat), Number(punto.lng)]);
   }
 
   private trazarRuta(puntos: PuntoRuta[]): void {
-    if (!puntos || puntos.length < 2 || !this.L) return;
+    if (!puntos || puntos.length === 0 || !this.L || !this.mapa) return;
 
-    const waypoints = puntos.map(p => this.L.latLng(p.lat, p.lng));
+    let waypoints = puntos.map(p => this.L.latLng(Number(p.lat), Number(p.lng)));
+    
+    // Engancha el inicio de la ruta a la posición GPS del chofer
+    if (this.marcadorChofer && this.rol === 'chofer') {
+      waypoints.unshift(this.marcadorChofer.getLatLng());
+    }
 
     if (this.controlRuta) {
       this.controlRuta.setWaypoints(waypoints);
@@ -168,21 +177,29 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
         addWaypoints: false,
         draggableWaypoints: false,
         show: false,
+        createMarker: (i: number, wp: any, n: number) => {
+          return this.L.marker(wp.latLng, {
+            icon: this.L.icon({
+              iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+              shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+              iconSize: [25, 41],
+              iconAnchor: [12, 41]
+            })
+          });
+        }
       }).addTo(this.mapa);
     }
   }
 
   private iniciarGpsChofer(): void {
     if (!('geolocation' in navigator)) {
-      alert('Tu navegador no soporta geolocalización');
-      this.trazarRuta(this.rutaDefinida);
       return;
     }
 
     this.seguimientoGPS = navigator.geolocation.watchPosition(
       (posicion) => {
-        const lat = posicion.coords.latitude;
-        const lng = posicion.coords.longitude;
+        const lat = Number(posicion.coords.latitude);
+        const lng = Number(posicion.coords.longitude);
         const puntoGps = { lat, lng };
 
         if (!this.marcadorChofer) {
@@ -191,36 +208,40 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
             .addTo(this.mapa);
         } else {
           this.marcadorChofer.setLatLng([lat, lng]);
+          // ACTUALIZAR RUTA DINÁMICAMENTE DESDE LA UBICACIÓN ACTUAL
+          if (this.controlRuta) {
+            const wps = this.controlRuta.getWaypoints();
+            if (wps.length > 0) {
+              wps[0].latLng = this.L.latLng(lat, lng);
+              this.controlRuta.setWaypoints(wps);
+            }
+          }
         }
-
-        this.mapa.panTo([lat, lng]);
-
-        const rutaCompleta = [puntoGps, ...this.rutaDefinida];
-        this.trazarRuta(rutaCompleta);
 
         this.cambioUbicacion.emit(puntoGps);
       },
       (error) => {
-        console.error('Error GPS Chofer:', error);
-        alert('Por favor autoriza los permisos de ubicación en tu navegador.');
-        this.trazarRuta(this.rutaDefinida);
+        console.warn('GPS Chofer:', error?.message);
       },
-      { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
     );
   }
 
   private actualizarPosicionRemotaChofer(coords: PuntoRuta): void {
-    if (!this.L) return;
+    if (!this.L || !this.mapa) return;
+
+    const lat = Number(coords.lat);
+    const lng = Number(coords.lng);
 
     if (!this.marcadorChofer) {
-      this.marcadorChofer = this.L.marker([coords.lat, coords.lng])
+      this.marcadorChofer = this.L.marker([lat, lng])
         .bindPopup(this.rol === 'usuario' ? '<b>El transporte viene aquí</b>' : '<b>Unidad en ruta</b>')
         .addTo(this.mapa);
     } else {
-      this.marcadorChofer.setLatLng([coords.lat, coords.lng]);
+      this.marcadorChofer.setLatLng([lat, lng]);
     }
 
-    this.mapa.panTo([coords.lat, coords.lng]);
+    this.mapa.panTo([lat, lng]);
   }
 
   ngOnDestroy(): void {
