@@ -21,16 +21,17 @@
           <span>Est. Inicio: {{ rutaInfo?.hora_inicio_estimada || '--:--' }}</span>
           <span>Est. Llegada: {{ rutaInfo?.hora_fin_estimada || '--:--' }}</span>
           <span class="status-badge" [ngClass]="{'bg-green': viajeActual?.estado === 'ACTIVO', 'bg-blue': viajeActual?.estado === 'FINALIZADO'}">
-            Estado: {{ viajeActual?.estado || 'SIN ASIGNAR' }}
+            Estado: {{ viajeActual?.estado || (rutaInfo ? 'SIN INICIAR' : 'SIN ASIGNAR') }}
+            {{ viajeActual?.tipo_ruta === 'IDA_COMPLETADA' ? '(Ida Completada)' : (viajeActual?.tipo_ruta ? '(' + viajeActual.tipo_ruta + ')' : '') }}
           </span>
         </div>
       </div>
 
       <div class="placeholder-map">
-        @if (rutaRutaAsignada.length > 0) {
+        @if (rutaRutaAsignada.length > 0 || trazadoBase.length > 0) {
           <app-mapa 
             [rol]="'chofer'" 
-            [rutaDefinida]="rutaRutaAsignada"
+            [rutaDefinida]="rutaRutaAsignada.length > 0 ? rutaRutaAsignada : trazadoBase"
             (cambioUbicacion)="enviarUbicacionAlServidor($event)">
           </app-mapa>
         } @else if (viajeActual?.estado === 'FINALIZADO') {
@@ -40,7 +41,7 @@
           </div>
         } @else {
           <p style="text-align:center; padding: 50px; color: #64748b; font-weight: 600;">
-            {{ errorViaje || 'No hay una ruta asignada para este chofer.' }}
+            {{ errorViaje || 'Cargando mapa y paradas de la ruta...' }}
           </p>
         }
       </div>
@@ -48,69 +49,174 @@
 
     <!-- Panel Derecho (Operaciones y Asistencia) -->
     <aside class="right-panel">
-      
-      <!-- Flujo de Control -->
-      <!-- En el Panel Derecho de Flujo de Control -->
+
+      <!-- Flujo de Control Ida -->
       <div class="card flow-control">
         <h3>Panel de control</h3>
         <p class="subIndice">Ruta de ida</p>
-        
-        <button class="btn btn-primary" [disabled]="viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'IDA'">
-          Tomar Asistencia
-        </button>
-        
-        <button 
-          class="btn btn-secondary" 
-          (click)="iniciarRuta('IDA')"
-          [disabled]="!rutaInfo || (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'IDA') || (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'IDA')">
-          {{ (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'IDA') ? 'Ruta en Progreso' : (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'IDA' ? 'Ruta Finalizada' : 'Iniciar Ruta') }}
-        </button>
-        
-        <button class="btn btn-secondary" (click)="registrarAbordaje()" [disabled]="viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'IDA'">
-          Abordaje
-        </button>
-      </div>
 
-      <div class="card flow-control">
-        <p class="subIndice">Ruta de vuelta</p>
-        <button class="btn btn-primary" [disabled]="viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'VUELTA'">
-          Tomar Asistencia
-        </button>
-
-        <button 
-          class="btn btn-secondary" 
-          (click)="iniciarRuta('VUELTA')"
-          [disabled]="!rutaInfo || (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'VUELTA') || (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'VUELTA')">
-          {{ (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'VUELTA') ? 'Ruta en Progreso' : (viajeActual?.estado === 'FINALIZADO' && tipoRutaActual === 'VUELTA' ? 'Ruta Finalizada' : 'Iniciar Ruta') }}
-        </button>
-
-        <button class="btn btn-secondary" (click)="registrarDescenso()" [disabled]="viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'VUELTA'">
-          Descenso
-        </button>
-      </div>
-      
-      <div class="card flow-control">
-        <p class="subIndice">Sección de Incidentes</p>
         <button
           class="btn btn-primary"
-          (click)="mostrarModalReporte = true"
-        >
+          (click)="iniciarRuta('IDA')"
+          [disabled]="!rutaInfo
+            || (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'IDA')
+            || viajeActual?.tipo_ruta === 'IDA_COMPLETADA'
+            || (viajeActual?.estado === 'ACTIVO' && viajeActual?.tipo_ruta === 'VUELTA')">
+          <i class="fa-solid fa-play"></i>
+          {{ viajeActual?.tipo_ruta === 'IDA_COMPLETADA' ? '✓ Ida Completada'
+            : (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'IDA' ? 'Ruta en Progreso'
+            : 'Iniciar Ruta') }}
+        </button>
+
+        <button
+          class="btn"
+          [class.btn-asistencia-ok]="asistenciaIdaTomada"
+          [class.btn-secondary]="!asistenciaIdaTomada"
+          [disabled]="!viajeActual || viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'IDA' || viajeActual?.tipo_ruta === 'IDA_COMPLETADA'"
+          (click)="tomarAsistencia('IDA')">
+          <i class="fa-solid" [class.fa-clipboard-check]="asistenciaIdaTomada" [class.fa-clipboard-list]="!asistenciaIdaTomada"></i>
+          {{ asistenciaIdaTomada ? '✓ Asistencia Tomada' : (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'IDA' ? 'Tomar Asistencia' : 'Inicia Ruta Primero') }}
+        </button>
+
+        <button class="btn btn-secondary" (click)="registrarAbordaje()" [disabled]="viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'IDA' || viajeActual?.tipo_ruta === 'IDA_COMPLETADA'">
+          <i class="fa-solid fa-bus"></i> Abordaje
+        </button>
+      </div>
+
+      <!-- Flujo de Control Vuelta -->
+      <div class="card flow-control">
+        <p class="subIndice">Ruta de vuelta</p>
+
+        <button
+          class="btn btn-primary"
+          (click)="iniciarRuta('VUELTA')"
+          [disabled]="!rutaInfo
+            || !viajeActual
+            || viajeActual?.estado !== 'ACTIVO'
+            || viajeActual?.tipo_ruta !== 'IDA_COMPLETADA'
+            || (tipoRutaActual === 'VUELTA' && viajeActual?.tipo_ruta === 'VUELTA')">
+          <i class="fa-solid fa-play"></i>
+          {{ (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'VUELTA' && viajeActual?.tipo_ruta === 'VUELTA') ? 'Ruta en Progreso'
+            : (viajeActual?.estado === 'FINALIZADO' ? 'Ruta Finalizada'
+            : 'Iniciar Ruta') }}
+        </button>
+
+        <button
+          class="btn"
+          [class.btn-asistencia-ok]="asistenciaVueltaTomada"
+          [class.btn-secondary]="!asistenciaVueltaTomada"
+          [disabled]="!viajeActual || viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'VUELTA' || viajeActual?.tipo_ruta !== 'VUELTA'"
+          (click)="tomarAsistencia('VUELTA')">
+          <i class="fa-solid" [class.fa-clipboard-check]="asistenciaVueltaTomada" [class.fa-clipboard-list]="!asistenciaVueltaTomada"></i>
+          {{ asistenciaVueltaTomada ? '✓ Asistencia Tomada' : (viajeActual?.estado === 'ACTIVO' && tipoRutaActual === 'VUELTA' ? 'Tomar Asistencia' : 'Inicia Ruta Primero') }}
+        </button>
+
+        <button class="btn btn-secondary" (click)="registrarDescenso()" [disabled]="viajeActual?.estado !== 'ACTIVO' || tipoRutaActual !== 'VUELTA' || viajeActual?.tipo_ruta !== 'VUELTA'">
+          <i class="fa-solid fa-bus"></i> Descenso
+        </button>
+      </div>
+
+      <div class="card flow-control">
+        <p class="subIndice">Sección de Incidentes</p>
+        <button class="btn btn-reporte" (click)="mostrarModalReporte = true">
           Crear Reporte
         </button>
       </div>
 
-      <div class="card flow-control">
-        <p class="subIndice">Flujo de Ruta</p>
-        <h3>Estado de Flota Escolar Asignada</h3>
-          <div class="fleet-cards">
-            <div class="fleet-card">Bus #12 - En Servicio</div>
-            <div class="fleet-card">Bus #05 - En Ruta</div>
-            <div class="fleet-card">Bus #08 - En Espera</div>
-          </div>
-      </div>
     </aside>
 
-  </div> 
+  </div>
+
+  <!-- ═══════════════ MODAL DE ASISTENCIA ═══════════════ -->
+  @if (mostrarModalAsistencia) {
+    <div class="modal-overlay" (click.self)="cerrarModalAsistencia()">
+      <div class="modal-asistencia">
+
+        <div class="modal-asistencia-header">
+          <div>
+            <h2>
+              <i class="fa-solid fa-clipboard-list"></i>
+              Tomar Asistencia — Ruta de {{ tipoAsistenciaModal === 'IDA' ? 'Ida' : 'Vuelta' }}
+            </h2>
+            <p>Marca a cada estudiante como PRESENTE o AUSENTE antes de iniciar la ruta.</p>
+          </div>
+          <button class="btn-cerrar" (click)="cerrarModalAsistencia()">×</button>
+        </div>
+
+        <div class="asistencia-contadores">
+          <span class="contador-presente">
+            <i class="fa-solid fa-circle-check"></i> {{ conteoPresentes }} Presentes
+          </span>
+          <span class="contador-ausente">
+            <i class="fa-solid fa-circle-xmark"></i> {{ conteoAusentes }} Ausentes
+          </span>
+          <span class="total-est">Total: {{ estudiantesAsistencia.length }}</span>
+        </div>
+
+        @if (cargandoAsistencia) {
+          <div class="asistencia-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i> Cargando estudiantes...
+          </div>
+        } @else if (estudiantesAsistencia.length === 0) {
+          <div class="asistencia-empty">
+            <i class="fa-solid fa-user-slash"></i>
+            <p>No hay estudiantes asignados a esta ruta.</p>
+          </div>
+        } @else {
+          <ul class="asistencia-lista">
+            @for (est of estudiantesAsistencia; track est.id_estudiante) {
+              <li
+                class="asistencia-item"
+                [class.est-presente]="est.marcaLocal === 'PRESENTE'"
+                [class.est-ausente]="est.marcaLocal === 'AUSENTE'"
+                (click)="toggleMarcaEstudiante(est.id_estudiante)">
+
+                <div class="est-avatar">
+                  @if (est.foto_estudiante) {
+                    <img [src]="est.foto_estudiante" [alt]="est.nombre" />
+                  } @else {
+                    <i class="fa-solid fa-user-graduate"></i>
+                  }
+                </div>
+
+                <div class="est-info">
+                  <span class="est-nombre">{{ est.nombre }} {{ est.apellido }}</span>
+                  <span class="est-grado">{{ est.grado }}</span>
+                </div>
+
+                <div class="est-toggle">
+                  <span class="badge-presente" [class.activo]="est.marcaLocal === 'PRESENTE'">
+                    <i class="fa-solid fa-check"></i> Presente
+                  </span>
+                  <span class="badge-ausente" [class.activo]="est.marcaLocal === 'AUSENTE'">
+                    <i class="fa-solid fa-xmark"></i> Ausente
+                  </span>
+                </div>
+
+              </li>
+            }
+          </ul>
+        }
+
+        <div class="modal-asistencia-footer">
+          <button class="btn-cancelar" (click)="cerrarModalAsistencia()" [disabled]="guardandoAsistencia">
+            Cancelar
+          </button>
+          <button
+            class="btn-confirmar-asistencia"
+            (click)="confirmarAsistencia()"
+            [disabled]="guardandoAsistencia || cargandoAsistencia || estudiantesAsistencia.length === 0">
+            @if (guardandoAsistencia) {
+              <i class="fa-solid fa-spinner fa-spin"></i> Guardando...
+            } @else {
+              <i class="fa-solid fa-clipboard-check"></i> Confirmar Asistencia
+            }
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
 
   @if (mostrarModalReporte) {
 
