@@ -3,6 +3,7 @@ import { NotFoundError } from "../errors/notFound.error";
 import { Notificaciones } from "../models/Notificaciones";
 import { errorThrower } from "../utils/middleware/errorThrower";
 
+
 export async function listarNotificaciones(idUsuario?: number, correo?: string) {
     try {
         let idUsuarioFiltrado = idUsuario;
@@ -24,6 +25,20 @@ export async function listarNotificaciones(idUsuario?: number, correo?: string) 
             [idUsuarioFiltrado]
         );
         return resultado.rows;
+    } catch (error) {
+        errorThrower(error);
+    }
+}
+
+export async function listarTodasNotificaciones() {
+    try {
+        const resultado = await pool.query(
+            "SELECT * FROM notificaciones ORDER BY fecha_envio DESC"
+        );
+        return resultado.rows.map((fila: any) => ({
+            ...fila,
+            id_notificaciones: fila.id_notificaciones ?? fila.id_notificacion
+        }));
     } catch (error) {
         errorThrower(error);
     }

@@ -19,7 +19,6 @@ export const routes: Routes = [
         canActivate: [authGuard],
         loadComponent: () => import('./components/dashboard-layout/dashboard-layout').then(m => m.DashboardComponent),
         children: [
-            // /dashboard → redirige al dashboard del rol del usuario
             { path: 'dashboard', canActivate: [dashboardRedirectGuard], children: [] },
 
             {

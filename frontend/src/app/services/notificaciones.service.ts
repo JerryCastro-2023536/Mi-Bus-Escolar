@@ -11,6 +11,7 @@ export class NotificacionesService {
     private crud = inject(CrudService);
     private loginService = inject(LoginService);
     private endpoint = '/notificaciones'; 
+    private endpointMias = '/notificaciones/mias';
 
     notificaciones = signal<NotificacionesDTO[]>([]);
     cargando = signal(false);
@@ -77,7 +78,7 @@ export class NotificacionesService {
             return;
         }
 
-        this.crud.getAll<NotificacionesDTO>(this.endpoint)
+        this.crud.getAll<NotificacionesDTO>(this.endpointMias)
             .pipe(finalize(() => {
                 if (solicitud === this.solicitudActual) {
                     this.cargando.set(false);

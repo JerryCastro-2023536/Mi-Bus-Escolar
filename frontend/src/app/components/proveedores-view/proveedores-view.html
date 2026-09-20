@@ -1,0 +1,107 @@
+<div class="admin-catalog">
+
+  <div class="admin-top-toolbar">
+    <div class="toolbar-title">
+      <h2>Panel del proveedor</h2>
+      <p>Administra tu servicio de bus, revisa los pagos y da seguimiento a lo que pasa en las rutas.</p>
+    </div>
+
+    <div class="toolbar-actions">
+      <a class="action-btn-primary" routerLink="/servicios">
+        <i class="fa-solid fa-plus"></i>
+        <span>Registrar servicio</span>
+      </a>
+      <a class="action-btn-outline" routerLink="/pagos">
+        <i class="fa-solid fa-receipt"></i>
+        <span>Comprobantes</span>
+      </a>
+      <a class="action-btn-outline" routerLink="/incidencias">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>Incidencias</span>
+      </a>
+    </div>
+  </div>
+
+  <section class="catalog-header-bar">
+    <div class="search-input-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input
+        type="text"
+        placeholder="Buscar módulo (ej. pagos, rutas, choferes, incidencias...)"
+        aria-label="Buscar módulo"
+        [(ngModel)]="searchQuery"
+      />
+      @if (searchQuery()) {
+        <button type="button" class="clear-btn" (click)="clearSearch()" title="Limpiar búsqueda">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      }
+    </div>
+
+    <div class="category-tabs">
+      <button type="button" [class.active]="selectedCategory() === 'ALL'" (click)="setCategory('ALL')">
+        Todos ({{ totalEntitiesCount }})
+      </button>
+      @for (tab of categoryTabs; track tab.id) {
+        <button type="button" [class.active]="selectedCategory() === tab.id" (click)="setCategory(tab.id)">
+          {{ tab.label }}
+        </button>
+      }
+    </div>
+  </section>
+
+  @if (filteredSections().length === 0) {
+    <div class="empty-results-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <h4>No se encontraron módulos</h4>
+      <p>
+        @if (searchQuery()) {
+          No hay módulos que coincidan con "{{ searchQuery() }}".
+        } @else {
+          No hay módulos en esta categoría.
+        }
+      </p>
+      <button type="button" (click)="resetFilters()">Ver todos los módulos</button>
+    </div>
+  }
+
+  @for (section of filteredSections(); track section.id) {
+    <section class="entity-category-section">
+
+      <div class="category-header">
+        <h4>{{ section.title }}</h4>
+        <span class="category-count">{{ section.items.length }}</span>
+        <span class="category-subtitle">{{ section.subtitle }}</span>
+      </div>
+
+      <div class="entity-cards-grid">
+        @for (item of section.items; track item.label) {
+          <div [class]="'entity-card card-' + section.theme">
+
+            <div class="card-top">
+              <div class="entity-icon-box">
+                <i [class]="'fa-solid fa-' + item.icon"></i>
+              </div>
+              <span class="entity-badge">{{ section.title }}</span>
+            </div>
+
+            <div class="card-middle">
+              <h5 class="entity-name">{{ item.label }}</h5>
+              <p class="entity-desc">{{ item.description }}</p>
+            </div>
+
+            <div class="card-bottom">
+              <a [routerLink]="item.route" class="card-action-link">
+                <span>Acceder</span>
+                <i class="fa-solid fa-chevron-right"></i>
+              </a>
+            </div>
+
+          </div>
+        }
+      </div>
+
+    </section>
+  }
+
+</div>
