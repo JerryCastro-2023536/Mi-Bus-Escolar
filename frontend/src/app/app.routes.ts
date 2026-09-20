@@ -80,6 +80,17 @@ export const routes: Routes = [
                     subtitle: 'Consulta y realiza los pagos del transporte escolar de tus hijos.'
                 }
             },
+            {
+                path: 'mis-servicios',
+                title: 'Mis Servicios | MiBusEscolar',
+                canActivate: [roleGuard],
+                loadComponent: () => import('./components/mis-servicios-view/mis-servicios-view').then(m => m.MisServiciosView),
+                data: {
+                    roles: ['PROVEEDOR'],
+                    title: 'Mis Servicios',
+                    subtitle: 'Consulta, agrega y edita tus servicios asignados.'
+                }
+            },
 
             ...crudRoutes,
         ],
