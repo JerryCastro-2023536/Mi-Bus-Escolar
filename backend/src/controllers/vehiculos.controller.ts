@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-import { listarVehiculos, buscarVehiculo, agregarVehiculo, actualizarVehiculo, eliminarVehiculo } from "../services/vehiculos.service";
+import { listarVehiculos, buscarVehiculo, agregarVehiculo, actualizarVehiculo, eliminarVehiculo, actualizarVehiculoProveedor, eliminarVehiculoProveedor, registrarVehiculoProveedor, listarVehiculosDelProveedor } from "../services/vehiculos.service";
 import { Vehiculos } from "../models/Vehiculos";
+import { ActualizarVehiculoProveedorDTO, NuevoVehiculoProveedorDTO } from "../models/vehiculosProveedorDTO";
 
 export async function obtenerVehiculos(_req: Request, res: Response, next: NextFunction) {
     try {
@@ -71,6 +72,74 @@ export async function eliminarVehiculos(req: Request, res: Response, next: NextF
         return res.status(200).json({
             success: true,
             message: `Vehiculo con id: ${id} eliminado`,
+            data: resultado
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getMisVehiculos(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id_usuario = Number(req.params.idUsuario);
+        const vehiculos = await listarVehiculosDelProveedor(id_usuario);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Vehículos cargados correctamente',
+            data: vehiculos
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function postMiVehiculo(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id_usuario = Number(req.params.idUsuario);
+        const { placa, foto_vehiculo } = req.body;
+
+        const payload: NuevoVehiculoProveedorDTO = { placa, foto_vehiculo };
+        const vehiculo = await registrarVehiculoProveedor(id_usuario, payload);
+
+        return res.status(201).json({
+            success: true,
+            message: 'Vehículo registrado correctamente',
+            data: vehiculo
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function putMiVehiculo(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id_usuario = Number(req.params.idUsuario);
+        const id_vehiculo = Number(req.params.idVehiculo);
+        const { placa, foto_vehiculo, estado } = req.body;
+
+        const payload: ActualizarVehiculoProveedorDTO = { placa, foto_vehiculo, estado };
+        const vehiculo = await actualizarVehiculoProveedor(id_usuario, id_vehiculo, payload);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Vehículo actualizado correctamente',
+            data: vehiculo
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function deleteMiVehiculo(req: Request, res: Response, next: NextFunction) {
+    try {
+        const id_usuario = Number(req.params.idUsuario);
+        const id_vehiculo = Number(req.params.idVehiculo);
+        const resultado = await eliminarVehiculoProveedor(id_usuario, id_vehiculo);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Vehículo eliminado correctamente',
             data: resultado
         });
     } catch (error) {
