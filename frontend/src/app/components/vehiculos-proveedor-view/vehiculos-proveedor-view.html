@@ -53,29 +53,46 @@
             </span>
           </div>
 
-          <div class="vehiculo-asignacion">
-            @if (veh.id_ruta) {
-            <span class="asignacion-linea">
-              <i class="fa-solid fa-route"></i> {{ veh.nombre_ruta }} · {{ veh.nombre_servicio }}
-            </span>
-            } @else {
-            <span class="asignacion-linea sin-dato"><i class="fa-solid fa-route"></i> Sin ruta asignada</span>
+          <div class="route-list">
+            <div class="route-list-title"><i class="fa-solid fa-route"></i> Rutas asignadas</div>
+            @if (veh.rutas.length) {
+            @for (r of veh.rutas; track r.id_ruta) {
+            <div class="route-chip">
+              <div>
+                <strong>{{ r.nombre_ruta }}</strong>
+                <small>{{ r.nombre_servicio }}</small>
+              </div>
+            </div>
             }
+            } @else {
+            <div class="empty-route">Sin rutas asignadas</div>
+            }
+          </div>
 
-            @if (veh.id_chofer) {
-            <span class="asignacion-linea">
-              <i class="fa-solid fa-id-card"></i> {{ veh.nombre_chofer }} {{ veh.apellido_chofer }}
-            </span>
-            } @else if (veh.id_ruta) {
-            <span class="asignacion-linea sin-dato"><i class="fa-solid fa-id-card"></i> Sin chofer asignado</span>
+          <div class="route-list">
+            <div class="route-list-title"><i class="fa-solid fa-id-card"></i> Choferes</div>
+            @if (choferesDe(veh).length) {
+            @for (ch of choferesDe(veh); track ch.id_chofer) {
+            <div class="route-chip">
+              <div>
+                <strong>{{ ch.nombre }}</strong>
+              </div>
+            </div>
+            }
+            } @else {
+            <div class="empty-route">Sin choferes asignados</div>
             }
           </div>
 
           <div class="vehiculo-acciones">
+            <button class="btn-secondary" type="button" (click)="abrirAsignarRuta(veh)">
+              <i class="fa-solid fa-route"></i> Administrar rutas
+            </button>
             <button class="btn-icon" type="button" (click)="abrirModalEditar(veh)" aria-label="Editar vehículo">
               <i class="fa-solid fa-pen"></i>
             </button>
-            <button class="btn-icon danger" type="button" (click)="pedirConfirmacionEliminar(veh)" aria-label="Eliminar vehículo">
+            <button class="btn-icon danger" type="button" (click)="pedirConfirmacionEliminar(veh)"
+              aria-label="Eliminar vehículo">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
@@ -120,15 +137,15 @@
             <span><i class="fa-solid fa-camera"></i> {{ fotoUrlForm ? 'Cambiar foto' : 'Subir foto' }}</span>
             }
           </label>
-          <input id="foto-input" type="file" accept="image/*" hidden
-                 [disabled]="subiendoFoto()" (change)="onFotoSeleccionada($event)" />
+          <input id="foto-input" type="file" accept="image/*" hidden [disabled]="subiendoFoto()"
+            (change)="onFotoSeleccionada($event)" />
         </div>
       </div>
 
       <div class="form-field">
         <label for="placa">Placa</label>
-        <input id="placa" type="text" class="text-input" [(ngModel)]="placaForm"
-               placeholder="Ej. P-123ABC" maxlength="20" />
+        <input id="placa" type="text" class="text-input" [(ngModel)]="placaForm" placeholder="Ej. P-123ABC"
+          maxlength="20" />
       </div>
 
       @if (modoEdicion()) {
@@ -143,12 +160,105 @@
 
       <div class="modal-actions">
         <button class="btn-secondary" type="button" (click)="cerrarModal()">Cancelar</button>
-        <button class="btn-primary" type="button" (click)="guardarVehiculo()" [disabled]="guardando() || subiendoFoto()">
+        <button class="btn-primary" type="button" (click)="guardarVehiculo()"
+          [disabled]="guardando() || subiendoFoto()">
           @if (guardando()) {
           <span><i class="fa-solid fa-spinner fa-spin"></i> Guardando...</span>
           } @else {
           <span>{{ modoEdicion() ? 'Guardar cambios' : 'Registrar vehículo' }}</span>
           }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- ===================== Modal administrar rutas (igual estilo que choferes) ===================== -->
+  @if (modalRuta()) {
+  <div class="modal-overlay" (click)="cerrarAsignarRuta()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h3>Administrar rutas</h3>
+        <button class="btn-icon" type="button" (click)="cerrarAsignarRuta()" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      @if (errorRuta) {<div class="alert error">{{ errorRuta }}</div>}
+      <p>Administra las rutas de <strong>{{ modalRuta()!.placa }}</strong>.</p>
+
+      <div class="field">
+        <label>Rutas actualmente asignadas</label>
+        <div class="route-selection-list">
+          @for (r of modalRuta()!.rutas; track r.id_ruta) {
+          <label class="route-select">
+            <input type="checkbox" [checked]="rutaSeleccionada(r.id_ruta)" (change)="toggleRutaSeleccionada(r.id_ruta)">
+            <span>
+              <strong>{{ r.nombre_ruta }}</strong>
+              <small>{{ r.nombre_servicio }}</small>
+            </span>
+          </label>
+          } @empty {
+          <div class="empty-route">Sin rutas asignadas</div>
+          }
+        </div>
+        <small class="field-help">Marca una o más rutas y pulsa <strong>Quitar seleccionadas</strong> para
+          desasignarlas.</small>
+      </div>
+
+      <div class="field">
+        <label>Ruta</label>
+        <select class="input" [(ngModel)]="ruta">
+          <option [ngValue]="0">Selecciona una ruta</option>
+          @for (r of rutasDisponibles(modalRuta()); track r.id_ruta) {
+          <option [ngValue]="r.id_ruta">{{ r.nombre }} · {{ r.nombre_servicio ?? ('Servicio #' + r.id_servicio) }}
+          </option>
+          }
+        </select>
+      </div>
+      <div class="route-remove-summary">
+        <strong>{{ rutasSeleccionadas().length }}</strong> ruta(s) seleccionada(s) para quitar.
+      </div>
+      <div class="modal-actions modal-actions-split">
+        <button class="btn-danger-outline" type="button" (click)="abrirConfirmarQuitarRutas()"
+          [disabled]="!rutasSeleccionadas().length || quitandoRutas()">
+          <i class="fa-solid fa-link-slash"></i> Quitar seleccionadas
+        </button>
+        <div>
+          <button class="btn-secondary" type="button" (click)="cerrarAsignarRuta()">Cancelar</button>
+          <button class="btn-primary" type="button" (click)="guardarRuta()" [disabled]="asignandoRuta()">
+            {{ asignandoRuta() ? 'Asignando...' : 'Asignar ruta' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  @if (confirmarQuitarRutas()) {
+  <div class="modal-overlay" (click)="cancelarQuitarRutas()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h3>Quitar rutas</h3>
+        <button class="btn-icon" type="button" (click)="cancelarQuitarRutas()" aria-label="Cerrar">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <p>¿Deseas quitar las siguientes rutas de <strong>{{ modalRuta()!.placa }}</strong>?</p>
+      <div class="selected-route-list">
+        @for (r of vehiculoRutasPendientes; track r.id_ruta) {
+        <div class="selected-route-item">
+          <i class="fa-solid fa-route"></i>
+          <div><strong>{{ r.nombre_ruta }}</strong><small>{{ r.nombre_servicio }}</small></div>
+        </div>
+        }
+      </div>
+      <div class="alert error">Esta acción solo desasigna las rutas del vehículo. No elimina las rutas del sistema ni
+        el vehículo.</div>
+      <div class="modal-actions">
+        <button class="btn-secondary" type="button" (click)="cancelarQuitarRutas()">Cancelar</button>
+        <button class="btn-danger" type="button" (click)="confirmarQuitarRutasSeleccionadas()"
+          [disabled]="quitandoRutas()">
+          {{ quitandoRutas() ? 'Quitando...' : 'Sí, quitar rutas' }}
         </button>
       </div>
     </div>
@@ -165,8 +275,8 @@
 
       <p>
         ¿Seguro que deseas eliminar el vehículo <strong>{{ vehiculoAEliminar()!.placa }}</strong>?
-        @if (vehiculoAEliminar()!.id_ruta) {
-        Está asignado a la ruta <strong>{{ vehiculoAEliminar()!.nombre_ruta }}</strong>, que quedará sin vehículo.
+        @if (vehiculoAEliminar()!.rutas.length) {
+        Quedará sin vehículo en {{ vehiculoAEliminar()!.rutas.length }} ruta(s) asignada(s).
         }
       </p>
 
