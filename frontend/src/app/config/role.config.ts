@@ -116,10 +116,67 @@ const choferSidebar: SidebarSection[] = [
 ];
 
 const usuarioSidebar: SidebarSection[] = [
-    { items: [{ label: 'Dashboard', icon: 'gauge', route: '/dashboard/usuario', exact: true, description: 'Resumen de tu servicio' }] },
-    { title: 'Mi Familia', items: [{ label: 'Mis Estudiantes', icon: 'graduation-cap', route: '/estudiantes', description: 'Alumnos registrados a tu cargo' }] },
-    { title: 'Seguimiento', items: [{ label: 'Notificaciones', icon: 'bell', route: '/notificaciones', description: 'Alertas de ruta y avisos' }] },
-    { title: 'Pagos', items: [{ label: 'Mis Pagos', icon: 'credit-card', route: '/pagosUser', description: 'Consulta y realiza pagos del transporte' }] }
+
+    {
+        items: [
+            {
+                label: 'Dashboard',
+                icon: 'gauge',
+                route: '/dashboard/usuario',
+                exact: true,
+                description: 'Resumen de tu servicio'
+            }
+        ]
+    },
+
+    {
+        title: 'Mi Familia',
+        items: [
+            {
+                label: 'Mis Estudiantes',
+                icon: 'graduation-cap',
+                route: '/mis-estudiantes',
+                description: 'Estudiantes registrados a tu cargo'
+            }
+        ]
+    },
+
+    {
+        title: 'Seguimiento',
+        items: [
+            {
+                label: 'Mis Viajes',
+                icon: 'bus',
+                route: '/mis-viajes',
+                description: 'Consulta los viajes activos de tus estudiantes'
+            },
+            {
+                label: 'Mis Paradas',
+                icon: 'location-dot',
+                route: '/mis-paradas',
+                description: 'Consulta las paradas asignadas a tus estudiantes'
+            },
+            {
+                label: 'Notificaciones',
+                icon: 'bell',
+                route: '/notificaciones',
+                description: 'Alertas de ruta y avisos'
+            }
+        ]
+    },
+
+    {
+        title: 'Pagos',
+        items: [
+            {
+                label: 'Mis Pagos',
+                icon: 'credit-card',
+                route: '/pagosUser',
+                description: 'Consulta y realiza pagos del transporte'
+            }
+        ]
+    }
+
 ];
 
 const SIDEBAR_CONFIG_BY_ROLE: Record<AppRole, SidebarSection[]> = {
