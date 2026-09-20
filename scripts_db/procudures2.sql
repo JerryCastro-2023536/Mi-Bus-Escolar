@@ -1,3 +1,7 @@
+-- ============================================================
+-- PROCEDIMIENTOS ESPECÍFICOS / PROVEEDOR
+-- ============================================================
+
 -- ============================================
 -- KPIs: usuarios
 -- ============================================
@@ -1186,55 +1190,51 @@ $$;
 --    Si un vehículo tuviera más de una ruta, se prioriza la
 --    ruta ACTIVA más reciente.
 -- ------------------------------------------------------------
+DROP FUNCTION IF EXISTS sp_proveedor_vehiculos_listar(INTEGER);
 CREATE OR REPLACE FUNCTION sp_proveedor_vehiculos_listar(
     p_id_usuario INTEGER
 )
 RETURNS TABLE (
-    id_vehiculo     INTEGER,
-    placa           VARCHAR(20),
-    foto_vehiculo   TEXT,
-    estado          VARCHAR(10),
-    id_ruta         INTEGER,
-    nombre_ruta     VARCHAR(150),
-    id_servicio     INTEGER,
-    nombre_servicio VARCHAR(150),
-    id_chofer       INTEGER,
-    nombre_chofer   VARCHAR(100),
-    apellido_chofer VARCHAR(100)
+    id_vehiculo   INTEGER,
+    id_proveedor  INTEGER,
+    placa         VARCHAR(20),
+    foto_vehiculo TEXT,
+    estado        VARCHAR(10),
+    rutas         JSONB
 )
-LANGUAGE plpgsql
+LANGUAGE sql
 STABLE
 AS $$
-BEGIN
-    RETURN QUERY
     SELECT
-        v.id_vehiculo, v.placa, v.foto_vehiculo, v.estado,
-        ra.id_ruta, ra.nombre_ruta, ra.id_servicio, ra.nombre_servicio,
-        ra.id_chofer, ra.nombre_chofer, ra.apellido_chofer
+        v.id_vehiculo,
+        v.id_proveedor,
+        v.placa,
+        v.foto_vehiculo,
+        v.estado,
+        COALESCE(
+            jsonb_agg(
+                jsonb_build_object(
+                    'id_ruta', r.id_ruta,
+                    'nombre_ruta', r.nombre,
+                    'id_servicio', s.id_servicio,
+                    'nombre_servicio', s.nombre,
+                    'id_chofer', c.id_chofer,
+                    'nombre_chofer', u.nombre,
+                    'apellido_chofer', u.apellido
+                ) ORDER BY r.nombre
+            ) FILTER (WHERE r.id_ruta IS NOT NULL),
+            '[]'::jsonb
+        ) AS rutas
     FROM Vehiculos v
-    JOIN Proveedores pr ON pr.id_proveedor = v.id_proveedor
-    LEFT JOIN LATERAL (
-        SELECT
-            r.id_ruta,
-            r.nombre AS nombre_ruta,
-            s.id_servicio,
-            s.nombre AS nombre_servicio,
-            c.id_chofer,
-            u.nombre AS nombre_chofer,
-            u.apellido AS apellido_chofer
-        FROM Rutas r
-        JOIN Servicios s ON s.id_servicio = r.id_servicio
-        LEFT JOIN Choferes c ON c.id_chofer = r.id_chofer
-        LEFT JOIN Usuarios u ON u.id_usuario = c.id_usuario
-        WHERE r.id_vehiculo = v.id_vehiculo
-        ORDER BY (r.estado = 'ACTIVO') DESC, r.id_ruta DESC
-        LIMIT 1
-    ) ra ON true
-    WHERE pr.id_usuario = p_id_usuario
+    JOIN Proveedores p ON p.id_proveedor = v.id_proveedor
+    LEFT JOIN Rutas r ON r.id_vehiculo = v.id_vehiculo
+    LEFT JOIN Servicios s ON s.id_servicio = r.id_servicio
+    LEFT JOIN Choferes c ON c.id_chofer = r.id_chofer
+    LEFT JOIN Usuarios u ON u.id_usuario = c.id_usuario
+    WHERE p.id_usuario = p_id_usuario
+    GROUP BY v.id_vehiculo, v.id_proveedor, v.placa, v.foto_vehiculo, v.estado
     ORDER BY v.placa;
-END;
 $$;
-
 
 -- ------------------------------------------------------------
 -- 2. ¿La placa ya está en uso? (Vehiculos.placa es UNIQUE global,
@@ -1356,3 +1356,366 @@ BEGIN
     RETURN v_filas;
 END;
 $$;
+
+-- ------------------------------------------------------------
+-- Vehículos de un proveedor (por id_proveedor), sin datos de ruta.
+
+CREATE OR REPLACE FUNCTION sp_vehiculos_por_proveedor(
+    p_id_proveedor INTEGER
+)
+RETURNS SETOF Vehiculos
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT *
+    FROM Vehiculos
+    WHERE id_proveedor = p_id_proveedor
+    ORDER BY placa;
+$$;
+
+-- ============================================================
+-- PROVEEDOR · OPERACIONES (REEMPLAZOS / NUEVAS FUNCIONES)
+-- ============================================================
+
+-- ------------------------------------------------------------
+-- VALORACIONES: listado del proveedor
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_valoraciones_listar(p_id_usuario_proveedor INTEGER)
+RETURNS TABLE(
+    id_valoracion INTEGER,
+    id_usuario INTEGER,
+    nombre_usuario VARCHAR(100),
+    apellido_usuario VARCHAR(100),
+    foto_usuario TEXT,
+    comentario TEXT,
+    calificacion DOUBLE PRECISION
+)
+LANGUAGE sql STABLE AS $$
+    SELECT v.id_valoracion, v.id_usuario,
+           u.nombre, u.apellido, u.foto_usuario,
+           v.comentario, v.calificacion
+    FROM Valoraciones v
+    JOIN Proveedores p ON p.id_proveedor=v.id_proveedor
+    LEFT JOIN Usuarios u ON u.id_usuario=v.id_usuario
+    WHERE p.id_usuario=p_id_usuario_proveedor
+    ORDER BY v.id_valoracion DESC;
+$$;
+
+-- ------------------------------------------------------------
+-- CHOFERES: el proveedor es dueño directo del chofer; no requiere ruta inicial.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_usuarios_chofer_buscar(
+    p_id_usuario_proveedor INTEGER,
+    p_busqueda TEXT
+)
+RETURNS TABLE(id_usuario INTEGER,nombre VARCHAR(100),apellido VARCHAR(100),correo VARCHAR(150),telefono VARCHAR(20),foto_usuario TEXT,rol VARCHAR(20))
+LANGUAGE sql STABLE AS $$
+    SELECT u.id_usuario,u.nombre,u.apellido,u.correo,u.telefono,u.foto_usuario,u.rol
+    FROM Usuarios u
+    WHERE u.rol IN ('USUARIO','CHOFER')
+      AND NOT EXISTS (SELECT 1 FROM Choferes c WHERE c.id_usuario=u.id_usuario)
+      AND (u.nombre || ' ' || u.apellido) ILIKE '%' || TRIM(p_busqueda) || '%'
+    ORDER BY u.apellido,u.nombre
+    LIMIT 20;
+$$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_chofer_crear(
+    p_id_usuario_proveedor INTEGER,
+    p_id_usuario_chofer INTEGER
+)
+RETURNS TABLE(
+    id_chofer INTEGER,id_usuario INTEGER,nombre VARCHAR(100),apellido VARCHAR(100),foto_usuario TEXT,
+    telefono_contacto VARCHAR(20),estado VARCHAR(10)
+)
+LANGUAGE plpgsql AS $$
+DECLARE v_id_proveedor INTEGER; v_usuario Usuarios; v_chofer Choferes;
+BEGIN
+    SELECT id_proveedor INTO v_id_proveedor FROM Proveedores WHERE id_usuario=p_id_usuario_proveedor;
+    IF v_id_proveedor IS NULL THEN RAISE EXCEPTION 'El usuario no es un proveedor'; END IF;
+
+    SELECT * INTO v_usuario FROM Usuarios WHERE id_usuario=p_id_usuario_chofer FOR UPDATE;
+    IF NOT FOUND THEN RAISE EXCEPTION 'El usuario seleccionado no existe'; END IF;
+    IF v_usuario.rol NOT IN ('USUARIO','CHOFER') THEN RAISE EXCEPTION 'Solo se puede convertir un usuario normal en chofer'; END IF;
+    IF EXISTS (SELECT 1 FROM Choferes WHERE id_usuario=p_id_usuario_chofer) THEN RAISE EXCEPTION 'El usuario ya está registrado como chofer'; END IF;
+
+    UPDATE Usuarios SET rol='CHOFER' WHERE id_usuario=p_id_usuario_chofer;
+    INSERT INTO Choferes(id_usuario,id_proveedor,telefono_contacto,estado)
+    VALUES(p_id_usuario_chofer,v_id_proveedor,v_usuario.telefono,'ACTIVO')
+    RETURNING * INTO v_chofer;
+
+    RETURN QUERY SELECT v_chofer.id_chofer,v_chofer.id_usuario,v_usuario.nombre,v_usuario.apellido,v_usuario.foto_usuario,v_chofer.telefono_contacto,v_chofer.estado;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_choferes_listar(p_id_usuario_proveedor INTEGER)
+RETURNS TABLE(
+    id_chofer INTEGER,id_usuario INTEGER,nombre VARCHAR(100),apellido VARCHAR(100),foto_usuario TEXT,
+    telefono_contacto VARCHAR(20),estado VARCHAR(10),rutas JSONB
+)
+LANGUAGE sql STABLE AS $$
+    SELECT c.id_chofer,c.id_usuario,u.nombre,u.apellido,u.foto_usuario,c.telefono_contacto,c.estado,
+           COALESCE((SELECT jsonb_agg(jsonb_build_object(
+                'id_ruta',r.id_ruta,'id_servicio',s.id_servicio,'nombre_servicio',s.nombre,
+                'id_vehiculo',r.id_vehiculo,'placa_vehiculo',v.placa,
+                'id_chofer',r.id_chofer,'nombre_chofer',u2.nombre,'apellido_chofer',u2.apellido,
+                'nombre',r.nombre,'hora_inicio_estimada',r.hora_inicio_estimada,
+                'hora_fin_estimada',r.hora_fin_estimada,'estado',r.estado
+           ) ORDER BY r.nombre) FROM Rutas r
+             JOIN Servicios s ON s.id_servicio=r.id_servicio
+             LEFT JOIN Vehiculos v ON v.id_vehiculo=r.id_vehiculo
+             LEFT JOIN Choferes c2 ON c2.id_chofer=r.id_chofer
+             LEFT JOIN Usuarios u2 ON u2.id_usuario=c2.id_usuario
+             WHERE r.id_chofer=c.id_chofer), '[]'::jsonb) AS rutas
+    FROM Choferes c
+    JOIN Usuarios u ON u.id_usuario=c.id_usuario
+    JOIN Proveedores p ON p.id_proveedor=c.id_proveedor
+    WHERE p.id_usuario=p_id_usuario_proveedor
+    ORDER BY u.apellido,u.nombre;
+$$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_chofer_actualizar(
+    p_id_usuario_proveedor INTEGER,p_id_chofer INTEGER,p_telefono VARCHAR(20),p_estado VARCHAR(10)
+)
+RETURNS TABLE(id_chofer INTEGER,id_usuario INTEGER,nombre VARCHAR(100),apellido VARCHAR(100),foto_usuario TEXT,telefono_contacto VARCHAR(20),estado VARCHAR(10))
+LANGUAGE sql AS $$
+    UPDATE Choferes c SET telefono_contacto=p_telefono,estado=p_estado
+    FROM Proveedores p,Usuarios u
+    WHERE c.id_chofer=p_id_chofer AND c.id_proveedor=p.id_proveedor AND p.id_usuario=p_id_usuario_proveedor AND u.id_usuario=c.id_usuario
+    RETURNING c.id_chofer,c.id_usuario,u.nombre,u.apellido,u.foto_usuario,c.telefono_contacto,c.estado;
+$$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_chofer_eliminar(p_id_usuario_proveedor INTEGER,p_id_chofer INTEGER)
+RETURNS BOOLEAN LANGUAGE plpgsql AS $$
+DECLARE v_filas INTEGER;
+BEGIN
+    DELETE FROM Choferes c USING Proveedores p
+    WHERE c.id_chofer=p_id_chofer AND c.id_proveedor=p.id_proveedor AND p.id_usuario=p_id_usuario_proveedor;
+    GET DIAGNOSTICS v_filas=ROW_COUNT;
+    RETURN v_filas>0;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_chofer_desasignar_rutas(p_id_usuario_proveedor INTEGER,p_id_chofer INTEGER,p_rutas INTEGER[])
+RETURNS BOOLEAN LANGUAGE plpgsql AS $$
+DECLARE v_filas INTEGER;
+BEGIN
+    UPDATE Rutas r SET id_chofer=NULL
+    WHERE r.id_chofer=p_id_chofer AND r.id_ruta=ANY(p_rutas)
+      AND EXISTS (SELECT 1 FROM Choferes c JOIN Proveedores p ON p.id_proveedor=c.id_proveedor WHERE c.id_chofer=p_id_chofer AND p.id_usuario=p_id_usuario_proveedor);
+    GET DIAGNOSTICS v_filas=ROW_COUNT;
+    RETURN v_filas>0;
+END; $$;
+
+-- ------------------------------------------------------------
+-- RUTAS: datos completos para tarjetas del proveedor
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_rutas_listar(p_id_usuario_proveedor INTEGER)
+RETURNS TABLE(
+    id_ruta INTEGER,id_servicio INTEGER,nombre_servicio VARCHAR(150),id_vehiculo INTEGER,placa_vehiculo VARCHAR(20),
+    id_chofer INTEGER,nombre_chofer VARCHAR(100),apellido_chofer VARCHAR(100),nombre VARCHAR(150),
+    hora_inicio_estimada TIME,hora_fin_estimada TIME,estado VARCHAR(10)
+)
+LANGUAGE sql STABLE AS $$
+    SELECT r.id_ruta,s.id_servicio,s.nombre,v.id_vehiculo,v.placa,c.id_chofer,u.nombre,u.apellido,
+           r.nombre,r.hora_inicio_estimada,r.hora_fin_estimada,r.estado
+    FROM Rutas r JOIN Servicios s ON s.id_servicio=r.id_servicio
+    JOIN Proveedores p ON p.id_proveedor=s.id_proveedor
+    LEFT JOIN Vehiculos v ON v.id_vehiculo=r.id_vehiculo
+    LEFT JOIN Choferes c ON c.id_chofer=r.id_chofer
+    LEFT JOIN Usuarios u ON u.id_usuario=c.id_usuario
+    WHERE p.id_usuario=p_id_usuario_proveedor
+    ORDER BY s.nombre,r.nombre;
+$$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_ruta_crear(p_id_usuario_proveedor INTEGER,p_id_servicio INTEGER,p_nombre VARCHAR(150),p_hora_inicio TIME,p_hora_fin TIME)
+RETURNS SETOF Rutas LANGUAGE plpgsql AS $$
+DECLARE v_ruta Rutas;
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM Servicios s JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE s.id_servicio=p_id_servicio AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'El servicio no pertenece al proveedor'; END IF;
+    INSERT INTO Rutas(id_servicio,nombre,hora_inicio_estimada,hora_fin_estimada,estado) VALUES(p_id_servicio,p_nombre,p_hora_inicio,p_hora_fin,'ACTIVO') RETURNING * INTO v_ruta;
+    RETURN NEXT v_ruta;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_ruta_actualizar(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER,p_id_servicio INTEGER,p_nombre VARCHAR(150),p_hora_inicio TIME,p_hora_fin TIME,p_estado VARCHAR(10))
+RETURNS SETOF Rutas LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM Rutas r JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE r.id_ruta=p_id_ruta AND p.id_usuario=p_id_usuario_proveedor) THEN RETURN; END IF;
+    IF NOT EXISTS(SELECT 1 FROM Servicios s JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE s.id_servicio=p_id_servicio AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'El servicio no pertenece al proveedor'; END IF;
+    RETURN QUERY UPDATE Rutas SET id_servicio=p_id_servicio,nombre=p_nombre,hora_inicio_estimada=p_hora_inicio,hora_fin_estimada=p_hora_fin,estado=p_estado WHERE id_ruta=p_id_ruta RETURNING *;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_ruta_asignar_chofer(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER,p_id_chofer INTEGER)
+RETURNS TABLE(id_ruta INTEGER,id_servicio INTEGER,nombre_servicio VARCHAR(150),id_vehiculo INTEGER,placa_vehiculo VARCHAR(20),id_chofer INTEGER,nombre_chofer VARCHAR(100),apellido_chofer VARCHAR(100),nombre VARCHAR(150),hora_inicio_estimada TIME,hora_fin_estimada TIME,estado VARCHAR(10))
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM Rutas r JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE r.id_ruta=p_id_ruta AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'La ruta no pertenece al proveedor'; END IF;
+    IF p_id_chofer IS NOT NULL AND NOT EXISTS(SELECT 1 FROM Choferes c JOIN Proveedores p ON p.id_proveedor=c.id_proveedor WHERE c.id_chofer=p_id_chofer AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'El chofer no pertenece al proveedor'; END IF;
+    UPDATE Rutas SET id_chofer=p_id_chofer WHERE id_ruta=p_id_ruta;
+    RETURN QUERY SELECT x.* FROM sp_proveedor_rutas_listar(p_id_usuario_proveedor) x WHERE x.id_ruta=p_id_ruta;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_ruta_asignar_vehiculo(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER,p_id_vehiculo INTEGER)
+RETURNS TABLE(id_ruta INTEGER,id_servicio INTEGER,nombre_servicio VARCHAR(150),id_vehiculo INTEGER,placa_vehiculo VARCHAR(20),id_chofer INTEGER,nombre_chofer VARCHAR(100),apellido_chofer VARCHAR(100),nombre VARCHAR(150),hora_inicio_estimada TIME,hora_fin_estimada TIME,estado VARCHAR(10))
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM Rutas r JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE r.id_ruta=p_id_ruta AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'La ruta no pertenece al proveedor'; END IF;
+    IF p_id_vehiculo IS NOT NULL AND NOT EXISTS(SELECT 1 FROM Vehiculos v JOIN Proveedores p ON p.id_proveedor=v.id_proveedor WHERE v.id_vehiculo=p_id_vehiculo AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'El vehículo no pertenece al proveedor'; END IF;
+    UPDATE Rutas SET id_vehiculo=p_id_vehiculo WHERE id_ruta=p_id_ruta;
+    RETURN QUERY SELECT x.* FROM sp_proveedor_rutas_listar(p_id_usuario_proveedor) x WHERE x.id_ruta=p_id_ruta;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_ruta_eliminar(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER)
+RETURNS BOOLEAN LANGUAGE plpgsql AS $$
+DECLARE v_filas INTEGER;
+BEGIN
+    DELETE FROM Rutas r USING Servicios s,Proveedores p
+    WHERE r.id_ruta=p_id_ruta AND r.id_servicio=s.id_servicio AND s.id_proveedor=p.id_proveedor AND p.id_usuario=p_id_usuario_proveedor;
+    GET DIAGNOSTICS v_filas=ROW_COUNT;
+    RETURN v_filas>0;
+END; $$;
+
+-- ------------------------------------------------------------
+-- ASIGNACIÓN DE ESTUDIANTES: sigue el flujo servicio -> ruta.
+-- Las paradas quedan opcionales al asignar; pueden completarse después.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_asignaciones_ruta_listar(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER)
+RETURNS TABLE(id_asignacion INTEGER,id_estudiante INTEGER,id_ruta INTEGER,nombre_estudiante VARCHAR(100),apellido_estudiante VARCHAR(100),grado VARCHAR(50),foto_estudiante TEXT,direccion_parada_recogida VARCHAR(255),direccion_parada_descenso VARCHAR(255))
+LANGUAGE sql STABLE AS $$
+    SELECT a.id_asignacion,e.id_estudiante,a.id_ruta,e.nombre,e.apellido,e.grado,e.foto_estudiante,pr.direccion,pd.direccion
+    FROM Asignaciones_Ruta a JOIN Estudiantes e ON e.id_estudiante=a.id_estudiante
+    JOIN Rutas r ON r.id_ruta=a.id_ruta JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor
+    LEFT JOIN Paradas pr ON pr.id_parada=a.id_parada_recogida LEFT JOIN Paradas pd ON pd.id_parada=a.id_parada_descenso
+    WHERE p.id_usuario=p_id_usuario_proveedor AND r.id_ruta=p_id_ruta ORDER BY e.apellido,e.nombre;
+$$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_estudiantes_ruta_buscar(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER,p_busqueda TEXT)
+RETURNS TABLE(id_estudiante INTEGER,nombre VARCHAR(100),apellido VARCHAR(100),grado VARCHAR(50),nombre_colegio VARCHAR(200),foto_estudiante TEXT)
+LANGUAGE sql STABLE AS $$
+    SELECT e.id_estudiante,e.nombre,e.apellido,e.grado,c.nombre,e.foto_estudiante
+    FROM Estudiantes e LEFT JOIN Colegios c ON c.id_colegio=e.id_colegio
+    WHERE (e.nombre || ' ' || e.apellido) ILIKE '%'||TRIM(p_busqueda)||'%' 
+      AND NOT EXISTS(SELECT 1 FROM Asignaciones_Ruta a WHERE a.id_estudiante=e.id_estudiante)
+      AND EXISTS(SELECT 1 FROM Rutas r JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE r.id_ruta=p_id_ruta AND p.id_usuario=p_id_usuario_proveedor)
+    ORDER BY e.apellido,e.nombre LIMIT 20;
+$$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_asignar_estudiante_ruta(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER,p_id_estudiante INTEGER)
+RETURNS TABLE(id_asignacion INTEGER,id_estudiante INTEGER,id_ruta INTEGER,nombre_estudiante VARCHAR(100),apellido_estudiante VARCHAR(100),grado VARCHAR(50),foto_estudiante TEXT,direccion_parada_recogida VARCHAR(255),direccion_parada_descenso VARCHAR(255))
+LANGUAGE plpgsql AS $$
+DECLARE v_id INTEGER;
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM Rutas r JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE r.id_ruta=p_id_ruta AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'La ruta no pertenece al proveedor'; END IF;
+    IF NOT EXISTS(SELECT 1 FROM Estudiantes WHERE id_estudiante=p_id_estudiante) THEN RAISE EXCEPTION 'El estudiante no existe'; END IF;
+    IF EXISTS(SELECT 1 FROM Asignaciones_Ruta WHERE id_estudiante=p_id_estudiante) THEN RAISE EXCEPTION 'El estudiante ya está asignado a una ruta'; END IF;
+    INSERT INTO Asignaciones_Ruta(id_estudiante,id_ruta,id_parada_recogida,id_parada_descenso) VALUES(p_id_estudiante,p_id_ruta,NULL,NULL) RETURNING id_asignacion INTO v_id;
+    RETURN QUERY SELECT x.* FROM sp_proveedor_asignaciones_ruta_listar(p_id_usuario_proveedor,p_id_ruta) x WHERE x.id_asignacion=v_id;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_retirar_estudiante_ruta(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER,p_id_asignacion INTEGER)
+RETURNS BOOLEAN LANGUAGE plpgsql AS $$
+DECLARE v_filas INTEGER;
+BEGIN
+    DELETE FROM Asignaciones_Ruta a USING Rutas r,Servicios s,Proveedores p
+    WHERE a.id_asignacion=p_id_asignacion AND a.id_ruta=p_id_ruta AND r.id_ruta=a.id_ruta AND s.id_servicio=r.id_servicio AND p.id_proveedor=s.id_proveedor AND p.id_usuario=p_id_usuario_proveedor;
+    GET DIAGNOSTICS v_filas=ROW_COUNT; RETURN v_filas>0;
+END; $$;
+
+-- ------------------------------------------------------------
+-- VIAJES e INCIDENCIAS: nombres legibles para el proveedor.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_viajes_listar(p_id_usuario_proveedor INTEGER)
+RETURNS TABLE(id_viaje INTEGER,id_ruta INTEGER,nombre_ruta VARCHAR(150),nombre_chofer VARCHAR(100),apellido_chofer VARCHAR(100),placa_vehiculo VARCHAR(20),fecha_viaje DATE,hora_inicio TIME,hora_fin TIME,estado VARCHAR(12))
+LANGUAGE sql STABLE AS $$
+    SELECT v.id_viaje,v.id_ruta,r.nombre,u.nombre,u.apellido,ve.placa,v.fecha_viaje,v.hora_inicio,v.hora_fin,v.estado
+    FROM Viajes v LEFT JOIN Rutas r ON r.id_ruta=v.id_ruta
+    LEFT JOIN Choferes c ON c.id_chofer=v.id_chofer LEFT JOIN Usuarios u ON u.id_usuario=c.id_usuario
+    LEFT JOIN Vehiculos ve ON ve.id_vehiculo=v.id_vehiculo
+    WHERE EXISTS(SELECT 1 FROM Rutas rr JOIN Servicios s ON s.id_servicio=rr.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE rr.id_ruta=v.id_ruta AND p.id_usuario=p_id_usuario_proveedor)
+    ORDER BY v.fecha_viaje DESC,v.id_viaje DESC;
+$$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_incidencias_listar(p_id_usuario_proveedor INTEGER)
+RETURNS TABLE(id_incidencia INTEGER,id_ruta INTEGER,nombre_ruta VARCHAR(150),titulo VARCHAR(40),descripcion TEXT,fecha_hora TIMESTAMP,estado VARCHAR(7))
+LANGUAGE sql STABLE AS $$
+    SELECT i.id_incidencia,i.id_ruta,r.nombre,i.titulo,i.descripcion,i.fecha_hora,i.estado
+    FROM Incidencias i JOIN Rutas r ON r.id_ruta=i.id_ruta JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor
+    WHERE p.id_usuario=p_id_usuario_proveedor
+    ORDER BY i.fecha_hora DESC,i.id_incidencia DESC;
+$$;
+
+-- ------------------------------------------------------------
+-- VEHÍCULOS para las tarjetas de rutas
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_vehiculos_por_proveedor_usuario(p_id_usuario_proveedor INTEGER)
+RETURNS SETOF Vehiculos LANGUAGE sql STABLE AS $$
+    SELECT v.* FROM Vehiculos v JOIN Proveedores p ON p.id_proveedor=v.id_proveedor WHERE p.id_usuario=p_id_usuario_proveedor ORDER BY v.placa;
+$$;
+
+-- HOTFIX errores 42702 (referencias ambiguas PL/pgSQL)
+-- Ejecutar sobre la base existente. No modifica tablas ni datos.
+
+
+CREATE OR REPLACE FUNCTION sp_proveedor_chofer_crear(
+    p_id_usuario_proveedor INTEGER,
+    p_id_usuario_chofer INTEGER
+)
+RETURNS TABLE(
+    id_chofer INTEGER,id_usuario INTEGER,nombre VARCHAR(100),apellido VARCHAR(100),foto_usuario TEXT,
+    telefono_contacto VARCHAR(20),estado VARCHAR(10)
+)
+LANGUAGE plpgsql AS $$
+DECLARE v_id_proveedor INTEGER; v_usuario Usuarios; v_chofer Choferes;
+BEGIN
+    SELECT p.id_proveedor INTO v_id_proveedor FROM Proveedores p WHERE p.id_usuario=p_id_usuario_proveedor;
+    IF v_id_proveedor IS NULL THEN RAISE EXCEPTION 'El usuario no es un proveedor'; END IF;
+
+    SELECT u.* INTO v_usuario FROM Usuarios u WHERE u.id_usuario=p_id_usuario_chofer FOR UPDATE;
+    IF NOT FOUND THEN RAISE EXCEPTION 'El usuario seleccionado no existe'; END IF;
+    IF v_usuario.rol NOT IN ('USUARIO','CHOFER') THEN RAISE EXCEPTION 'Solo se puede convertir un usuario normal en chofer'; END IF;
+    IF EXISTS (SELECT 1 FROM Choferes c WHERE c.id_usuario=p_id_usuario_chofer) THEN RAISE EXCEPTION 'El usuario ya está registrado como chofer'; END IF;
+
+    UPDATE Usuarios u SET rol='CHOFER' WHERE u.id_usuario=p_id_usuario_chofer;
+    INSERT INTO Choferes AS c(id_usuario,id_proveedor,telefono_contacto,estado)
+    VALUES(p_id_usuario_chofer,v_id_proveedor,v_usuario.telefono,'ACTIVO')
+    RETURNING c.* INTO v_chofer;
+
+    RETURN QUERY SELECT v_chofer.id_chofer,v_chofer.id_usuario,v_usuario.nombre,v_usuario.apellido,v_usuario.foto_usuario,v_chofer.telefono_contacto,v_chofer.estado;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_ruta_actualizar(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER,p_id_servicio INTEGER,p_nombre VARCHAR(150),p_hora_inicio TIME,p_hora_fin TIME,p_estado VARCHAR(10))
+RETURNS SETOF Rutas LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM Rutas r JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE r.id_ruta=p_id_ruta AND p.id_usuario=p_id_usuario_proveedor) THEN RETURN; END IF;
+    IF NOT EXISTS(SELECT 1 FROM Servicios s JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE s.id_servicio=p_id_servicio AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'El servicio no pertenece al proveedor'; END IF;
+    RETURN QUERY UPDATE Rutas r SET id_servicio=p_id_servicio,nombre=p_nombre,hora_inicio_estimada=p_hora_inicio,hora_fin_estimada=p_hora_fin,estado=p_estado WHERE r.id_ruta=p_id_ruta RETURNING r.*;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_ruta_asignar_chofer(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER,p_id_chofer INTEGER)
+RETURNS TABLE(id_ruta INTEGER,id_servicio INTEGER,nombre_servicio VARCHAR(150),id_vehiculo INTEGER,placa_vehiculo VARCHAR(20),id_chofer INTEGER,nombre_chofer VARCHAR(100),apellido_chofer VARCHAR(100),nombre VARCHAR(150),hora_inicio_estimada TIME,hora_fin_estimada TIME,estado VARCHAR(10))
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM Rutas r JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE r.id_ruta=p_id_ruta AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'La ruta no pertenece al proveedor'; END IF;
+    IF p_id_chofer IS NOT NULL AND NOT EXISTS(SELECT 1 FROM Choferes c JOIN Proveedores p ON p.id_proveedor=c.id_proveedor WHERE c.id_chofer=p_id_chofer AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'El chofer no pertenece al proveedor'; END IF;
+    UPDATE Rutas r SET id_chofer=p_id_chofer WHERE r.id_ruta=p_id_ruta;
+    RETURN QUERY SELECT x.* FROM sp_proveedor_rutas_listar(p_id_usuario_proveedor) x WHERE x.id_ruta=p_id_ruta;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_ruta_asignar_vehiculo(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER,p_id_vehiculo INTEGER)
+RETURNS TABLE(id_ruta INTEGER,id_servicio INTEGER,nombre_servicio VARCHAR(150),id_vehiculo INTEGER,placa_vehiculo VARCHAR(20),id_chofer INTEGER,nombre_chofer VARCHAR(100),apellido_chofer VARCHAR(100),nombre VARCHAR(150),hora_inicio_estimada TIME,hora_fin_estimada TIME,estado VARCHAR(10))
+LANGUAGE plpgsql AS $$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM Rutas r JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE r.id_ruta=p_id_ruta AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'La ruta no pertenece al proveedor'; END IF;
+    IF p_id_vehiculo IS NOT NULL AND NOT EXISTS(SELECT 1 FROM Vehiculos v JOIN Proveedores p ON p.id_proveedor=v.id_proveedor WHERE v.id_vehiculo=p_id_vehiculo AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'El vehículo no pertenece al proveedor'; END IF;
+    UPDATE Rutas r SET id_vehiculo=p_id_vehiculo WHERE r.id_ruta=p_id_ruta;
+    RETURN QUERY SELECT x.* FROM sp_proveedor_rutas_listar(p_id_usuario_proveedor) x WHERE x.id_ruta=p_id_ruta;
+END; $$;
+
+CREATE OR REPLACE FUNCTION sp_proveedor_asignar_estudiante_ruta(p_id_usuario_proveedor INTEGER,p_id_ruta INTEGER,p_id_estudiante INTEGER)
+RETURNS TABLE(id_asignacion INTEGER,id_estudiante INTEGER,id_ruta INTEGER,nombre_estudiante VARCHAR(100),apellido_estudiante VARCHAR(100),grado VARCHAR(50),foto_estudiante TEXT,direccion_parada_recogida VARCHAR(255),direccion_parada_descenso VARCHAR(255))
+LANGUAGE plpgsql AS $$
+DECLARE v_id INTEGER;
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM Rutas r JOIN Servicios s ON s.id_servicio=r.id_servicio JOIN Proveedores p ON p.id_proveedor=s.id_proveedor WHERE r.id_ruta=p_id_ruta AND p.id_usuario=p_id_usuario_proveedor) THEN RAISE EXCEPTION 'La ruta no pertenece al proveedor'; END IF;
+    IF NOT EXISTS(SELECT 1 FROM Estudiantes e WHERE e.id_estudiante=p_id_estudiante) THEN RAISE EXCEPTION 'El estudiante no existe'; END IF;
+    IF EXISTS(SELECT 1 FROM Asignaciones_Ruta ar WHERE ar.id_estudiante=p_id_estudiante) THEN RAISE EXCEPTION 'El estudiante ya está asignado a una ruta'; END IF;
+    INSERT INTO Asignaciones_Ruta AS ar(id_estudiante,id_ruta,id_parada_recogida,id_parada_descenso) VALUES(p_id_estudiante,p_id_ruta,NULL,NULL) RETURNING ar.id_asignacion INTO v_id;
+    RETURN QUERY SELECT x.* FROM sp_proveedor_asignaciones_ruta_listar(p_id_usuario_proveedor,p_id_ruta) x WHERE x.id_asignacion=v_id;
+END; $$;
