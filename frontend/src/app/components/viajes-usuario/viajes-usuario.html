@@ -1,0 +1,310 @@
+<section class="viajes-view">
+
+    @if (mensajeError) {
+
+        <div class="alert-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            {{ mensajeError }}
+        </div>
+
+    }
+
+
+    @if (!estudianteSeleccionado()) {
+
+        @if (cargandoEstudiantes()) {
+
+            <div class="state-card">
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                <p>Cargando estudiantes...</p>
+
+            </div>
+
+        } @else {
+
+            <div class="section-intro">
+
+                <div>
+                    <span class="eyebrow">
+                        Selecciona un estudiante
+                    </span>
+
+                    <h2>
+                        ¿De quién deseas consultar el viaje?
+                    </h2>
+
+                    <p>
+                        Selecciona un estudiante para mostrar
+                        sus viajes que se encuentran activos.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="students-grid">
+
+                @for (
+                    estudiante of estudiantes();
+                    track estudiante.id_estudiante
+                ) {
+
+                    <button
+                        type="button"
+                        class="student-card"
+                        (click)="seleccionarEstudiante(estudiante)"
+                    >
+
+                        <div class="student-photo">
+
+                            @if (estudiante.foto_estudiante) {
+
+                                <img
+                                    [src]="estudiante.foto_estudiante"
+                                    [alt]="estudiante.nombre"
+                                />
+
+                            } @else {
+
+                                <i class="fa-solid fa-user-graduate"></i>
+
+                            }
+
+                        </div>
+
+
+                        <div class="student-data">
+
+                            <span>Estudiante</span>
+
+                            <h3>
+                                {{ estudiante.nombre }}
+                                {{ estudiante.apellido }}
+                            </h3>
+
+                            <p>
+                                {{ estudiante.nombre_colegio || 'Sin colegio' }}
+                            </p>
+
+                            <small>
+                                {{ estudiante.grado || 'Sin grado' }}
+                            </small>
+
+                        </div>
+
+
+                        <i
+                            class="fa-solid fa-chevron-right arrow"
+                        ></i>
+
+                    </button>
+
+                } @empty {
+
+                    <div class="state-card">
+
+                        <i class="fa-solid fa-user-graduate"></i>
+
+                        <h3>
+                            No tienes estudiantes registrados
+                        </h3>
+
+                    </div>
+
+                }
+
+            </div>
+
+        }
+
+    } @else {
+
+
+        <div class="selected-header">
+
+            <button
+                type="button"
+                class="back-button"
+                (click)="volver()"
+            >
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Volver
+            </button>
+
+
+            <div>
+
+                <span>Viajes activos de</span>
+
+                <h2>
+                    {{ estudianteSeleccionado()?.nombre }}
+                    {{ estudianteSeleccionado()?.apellido }}
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        @if (cargandoViajes()) {
+
+            <div class="state-card">
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                <p>Cargando viajes activos...</p>
+
+            </div>
+
+        } @else {
+
+            <div class="trips-grid">
+
+                @for (
+                    viaje of viajes();
+                    track viaje.id_viaje
+                ) {
+
+                    <article class="trip-card">
+
+                        <div class="trip-header">
+
+                            <div class="bus-icon">
+
+                                <i class="fa-solid fa-bus"></i>
+
+                            </div>
+
+                            <div>
+
+                                <span class="trip-label">
+                                    Viaje #{{ viaje.id_viaje }}
+                                </span>
+
+                                <h3>
+                                    {{ viaje.nombre_ruta || ('Ruta #' + viaje.id_ruta) }}
+                                </h3>
+
+                            </div>
+
+
+                            <span class="status-active">
+
+                                <span class="status-dot"></span>
+
+                                Activo
+
+                            </span>
+
+                        </div>
+
+
+                        <div class="trip-information">
+
+                            <div>
+
+                                <i class="fa-solid fa-calendar"></i>
+
+                                <span>
+                                    {{ viaje.fecha_viaje | date:'dd/MM/yyyy' }}
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <i class="fa-solid fa-clock"></i>
+
+                                <span>
+                                    Inicio:
+                                    {{ viaje.hora_inicio || 'Sin registrar' }}
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <i class="fa-solid fa-id-card"></i>
+
+                                <span>
+                                    Chofer #{{ viaje.id_chofer || 'N/A' }}
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <i class="fa-solid fa-bus-simple"></i>
+
+                                <span>
+                                    Vehículo #{{ viaje.id_vehiculo || 'N/A' }}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!--
+                            ======================================
+                            PENDIENTE - NO IMPLEMENTAR
+
+                            Aquí tendrá acceso posteriormente
+                            a la ubicación en tiempo real
+                            del viaje seleccionado.
+                            ======================================
+                        -->
+
+                        <div class="future-feature">
+
+                            <i class="fa-solid fa-location-dot"></i>
+
+                            <div>
+
+                                <strong>
+                                    Ubicación en tiempo real
+                                </strong>
+
+                                <span>
+                                    Funcionalidad pendiente
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                } @empty {
+
+                    <div class="state-card">
+
+                        <i class="fa-solid fa-bus"></i>
+
+                        <h3>
+                            No hay viajes activos
+                        </h3>
+
+                        <p>
+                            Este estudiante no tiene viajes
+                            activos en este momento.
+                        </p>
+
+                    </div>
+
+                }
+
+            </div>
+
+        }
+
+    }
+
+</section>
