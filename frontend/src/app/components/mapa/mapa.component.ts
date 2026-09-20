@@ -158,13 +158,29 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   private trazarRuta(puntos: PuntoRuta[]): void {
-    if (!puntos || puntos.length === 0 || !this.L || !this.mapa) return;
+    if (!this.L || !this.mapa) return;
+
+    if (!puntos || puntos.length === 0) {
+      if (this.controlRuta) {
+        this.mapa.removeControl(this.controlRuta);
+        this.controlRuta = null;
+      }
+      return;
+    }
 
     let waypoints = puntos.map(p => this.L.latLng(Number(p.lat), Number(p.lng)));
     
-    // Engancha el inicio de la ruta a la posición GPS del chofer
+    
     if (this.marcadorChofer && this.rol === 'chofer') {
       waypoints.unshift(this.marcadorChofer.getLatLng());
+    }
+
+    if (waypoints.length < 2) {
+      if (this.controlRuta) {
+        this.mapa.removeControl(this.controlRuta);
+        this.controlRuta = null;
+      }
+      return;
     }
 
     if (this.controlRuta) {
