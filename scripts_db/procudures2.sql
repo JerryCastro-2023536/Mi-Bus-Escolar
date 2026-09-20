@@ -759,3 +759,158 @@ BEGIN
     RETURNING Notificaciones.id_notificacion;
 END;
 $$ LANGUAGE plpgsql;
+
+-- ============================================================
+-- PAGOS · VISTA DEL PROVEEDOR
+-- ============================================================
+
+-- ------------------------------------------------------------
+-- 1. ¿El servicio pertenece al proveedor (identificado por id_usuario)?
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_es_dueno_servicio(
+    p_id_usuario  INTEGER,
+    p_id_servicio INTEGER
+)
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT EXISTS (
+        SELECT 1
+        FROM Servicios s
+        JOIN Proveedores p ON p.id_proveedor = s.id_proveedor
+        WHERE s.id_servicio = p_id_servicio
+          AND p.id_usuario  = p_id_usuario
+    );
+$$;
+
+
+-- ------------------------------------------------------------
+-- 2. Servicios del proveedor + total de estudiantes asignados
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_servicios_listar(
+    p_id_usuario INTEGER
+)
+RETURNS TABLE (
+    id_servicio       INTEGER,
+    nombre            VARCHAR(150),
+    descripcion       TEXT,
+    precio_mensual    DECIMAL(10,2),
+    estado            VARCHAR(10),
+    total_estudiantes INTEGER
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        s.id_servicio,
+        s.nombre,
+        s.descripcion,
+        s.precio_mensual,
+        s.estado,
+        (
+            SELECT COUNT(DISTINCT a.id_estudiante)::INTEGER
+            FROM Rutas r
+            JOIN Asignaciones_Ruta a ON a.id_ruta = r.id_ruta
+            WHERE r.id_servicio = s.id_servicio
+        ) AS total_estudiantes
+    FROM Servicios s
+    JOIN Proveedores p ON p.id_proveedor = s.id_proveedor
+    WHERE p.id_usuario = p_id_usuario
+    ORDER BY s.nombre;
+END;
+$$;
+
+
+-- ------------------------------------------------------------
+-- 3. Estudiantes asignados a alguna ruta del servicio
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_estudiantes_por_servicio(
+    p_id_servicio INTEGER
+)
+RETURNS TABLE (
+    id_estudiante   INTEGER,
+    nombre          VARCHAR(100),
+    apellido        VARCHAR(100),
+    grado           VARCHAR(50),
+    nombre_colegio  VARCHAR(200),
+    foto_estudiante TEXT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT DISTINCT
+        e.id_estudiante,
+        e.nombre,
+        e.apellido,
+        e.grado,
+        c.nombre,
+        e.foto_estudiante
+    FROM Rutas r
+    JOIN Asignaciones_Ruta a ON a.id_ruta = r.id_ruta
+    JOIN Estudiantes e       ON e.id_estudiante = a.id_estudiante
+    LEFT JOIN Colegios c     ON c.id_colegio = e.id_colegio
+    WHERE r.id_servicio = p_id_servicio
+    ORDER BY e.apellido, e.nombre;
+END;
+$$;
+
+
+-- ------------------------------------------------------------
+-- 4. Meses de pago de un estudiante para UN servicio.
+-- ------------------------------------------------------------
+CREATE OR REPLACE FUNCTION sp_proveedor_meses_estudiante(
+    p_id_estudiante INTEGER,
+    p_id_servicio   INTEGER
+)
+RETURNS TABLE (
+    id_servicio       INTEGER,
+    nombre_servicio   VARCHAR,
+    precio_mensual    DECIMAL(10,2),
+    periodo_mes       INTEGER,
+    periodo_anio      INTEGER,
+    id_pago           INTEGER,
+    estado            VARCHAR,
+    monto             DECIMAL(10,2),
+    metodo_pago       VARCHAR,
+    referencia_pago   VARCHAR,
+    foto_comprobante  TEXT,
+    fecha_pago_limite DATE,
+    fecha_verificacion DATE
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- El estudiante debe estar asignado a una ruta de ese servicio
+    IF NOT EXISTS (
+        SELECT 1
+        FROM Asignaciones_Ruta a
+        JOIN Rutas r ON r.id_ruta = a.id_ruta
+        WHERE a.id_estudiante = p_id_estudiante
+          AND r.id_servicio   = p_id_servicio
+    ) THEN
+        RETURN;
+    END IF;
+
+    RETURN QUERY
+    SELECT
+        m.id_servicio::INTEGER,
+        m.nombre_servicio::VARCHAR,
+        m.precio_mensual::DECIMAL(10,2),
+        m.periodo_mes::INTEGER,
+        m.periodo_anio::INTEGER,
+        m.id_pago::INTEGER,
+        m.estado::VARCHAR,
+        m.monto::DECIMAL(10,2),
+        m.metodo_pago::VARCHAR,
+        m.referencia_pago::VARCHAR,
+        m.foto_comprobante::TEXT,
+        m.fecha_pago_limite::DATE,
+        m.fecha_verificacion::DATE
+    FROM sp_pagos_meses_pendientes(p_id_estudiante) m
+    WHERE m.id_servicio = p_id_servicio
+    ORDER BY m.periodo_anio, m.periodo_mes;
+END;
+$$;
