@@ -6,6 +6,8 @@ const valoracionSchema = z.object({
 
     id_proveedor: zUtils.requiredPositiveInt("ID del proveedor"),
 
+    id_usuario: zUtils.requiredPositiveInt("ID del usuario"),
+
     comentario: z.string({
         error: (issue) => {
             if (issue.input === undefined) {
