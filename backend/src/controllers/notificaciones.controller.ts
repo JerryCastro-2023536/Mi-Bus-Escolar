@@ -4,7 +4,11 @@ import { listarNotificaciones, agregarNotificacion, buscarNotificacionById, edit
 
 export async function getNotificaciones(req: Request, res: Response, next: NextFunction){
     try{
-        const datos = await listarNotificaciones();
+        const idUsuario = Number(req.user?.id);
+        const datos = await listarNotificaciones(
+            Number.isInteger(idUsuario) && idUsuario > 0 ? idUsuario : undefined,
+            req.user?.email
+        );
         return res.status(200).json({
             success: true,
             message: "Notificaciones cargadas",

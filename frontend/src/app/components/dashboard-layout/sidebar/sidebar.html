@@ -1,0 +1,97 @@
+<aside class="sidebar-wrapper" [class.collapsed]="collapsed()">
+
+  <button type="button" class="edge-toggle-btn" (click)="toggle()"
+    [title]="collapsed() ? 'Expandir barra lateral' : 'Contraer barra lateral'"
+    [attr.aria-label]="collapsed() ? 'Expandir barra lateral' : 'Contraer barra lateral'">
+    <i [class]="'fa-solid ' + (collapsed() ? 'fa-chevron-right' : 'fa-chevron-left')"></i>
+  </button>
+
+  <div class="sidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-left">
+        <div class="brand-icon-box">
+          <img src="/logo-mi-bus-escolar.png" alt="Logo Mi Bus Escolar" class="sidebar-logo-img" />
+        </div>
+        @if (!collapsed()) {
+        <div class="brand-text">
+          <span class="brand-name">{{ brand().name }}</span>
+          @if (brand().tagline) {
+          <span class="brand-tagline">{{ brand().tagline }}</span>
+          }
+        </div>
+        }
+      </div>
+
+      @if (!collapsed()) {
+      <button type="button" class="header-toggle-btn" (click)="toggle()" title="Contraer menú">
+        <i class="fa-solid fa-angles-left"></i>
+      </button>
+      }
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (section of sections(); track section.title ?? $index) {
+      <div class="nav-section">
+        @if (section.title && !collapsed()) {
+        <span class="section-title">{{ section.title }}</span>
+        } @else if (section.title && collapsed()) {
+        <div class="section-divider"></div>
+        }
+
+        @for (item of section.items; track item.route) {
+        <a class="nav-item" [routerLink]="item.route" routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }" [title]="item.label"
+          [attr.data-tooltip]="item.label">
+          <div class="nav-icon-wrap">
+            <i [class]="'fa-solid fa-' + item.icon + ' nav-icon'"></i>
+          </div>
+          @if (!collapsed()) {
+          <span class="nav-label">{{ item.label }}</span>
+          <i class="fa-solid fa-chevron-right nav-arrow"></i>
+          }
+        </a>
+        }
+      </div>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      @if (user(); as u) {
+      <a routerLink="/cuenta" class="user-mini user-link" [title]="'Ver perfil y cuenta de ' + u.name">
+        <div class="user-avatar">
+          @if (u.foto) {
+          <img [src]="u.foto" alt="Foto de perfil" class="avatar-img" />
+          } @else {
+          {{ u.name.charAt(0).toUpperCase() }}
+          }
+        </div>
+        @if (!collapsed()) {
+        <div class="user-info">
+          <span class="user-name">{{ u.name }}</span>
+          @if (u.role) {
+          <span class="user-role">{{ u.role }}</span>
+          }
+        </div>
+        <i class="fa-solid fa-gear user-gear-icon" title="Mi Cuenta"></i>
+        }
+      </a>
+      }
+
+      <div class="footer-actions">
+        <button type="button" class="action-btn logout-btn" (click)="onLogout()" title="Cerrar sesión">
+          <i class="fa-solid fa-right-from-bracket"></i>
+          @if (!collapsed()) { <span>Cerrar sesión</span> }
+        </button>
+
+        @if (collapsed()) {
+        <button type="button" class="action-btn expand-footer-btn" (click)="toggle()" title="Expandir menú">
+          <i class="fa-solid fa-angles-right"></i>
+        </button>
+        }
+      </div>
+    </div>
+
+  </div>
+
+</aside>

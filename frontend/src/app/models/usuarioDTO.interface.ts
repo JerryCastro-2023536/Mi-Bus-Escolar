@@ -1,0 +1,49 @@
+export interface UsuarioDTO{
+    id_usuario?: number;
+    nombre: string;
+    apellido: string;
+    correo: string;
+    password: string;
+    telefono: string;
+    foto_usuario: string | null;
+    rol: userRol;
+    correo_verificado: boolean;
+    fecha_creacion?: Date;
+    fecha_actualizacion?: Date;
+}
+
+export interface UsuarioLoginDTO{
+    correo: string;
+    password: string;
+}
+
+export interface UsuarioRegisterDTO{
+    nombre: string;
+    apellido: string;
+    correo: string;
+    password: string;
+    telefono: string;
+    foto_usuario: string | null;
+}
+
+export enum userRol {
+    ADMINISTRADOR = 'ADMINISTRADOR',
+    PROVEEDOR = 'PROVEEDOR',
+    CHOFER = 'CHOFER',
+    USUARIO = 'USUARIO'
+}
+
+
+export interface UsuarioLoginDTO{
+    correo: string;
+    password: string;
+}
+
+export interface UsuarioRegisterDTO{
+    nombre: string;
+    apellido: string;
+    correo: string;
+    password: string;
+    telefono: string;
+    foto_usuario: string | null;
+}

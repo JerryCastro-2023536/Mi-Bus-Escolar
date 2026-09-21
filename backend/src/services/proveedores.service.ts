@@ -56,7 +56,7 @@ export async function eliminarProveedor(id: number){
     try{
         const consulta = await pool.query("select sp_proveedores_eliminar($1)", [id]);
         
-        if(consulta.rowCount === 0){
+        if (!consulta.rows[0].eliminado){
             throw new NotFoundError("no se pudo eliminar el proveedor porque el id no existe")
         }
 

@@ -66,3 +66,20 @@ export async function eliminarViajeById(id: number) {
         errorThrower(error);
     }
 }
+
+export async function listarViajesActivosPorEstudiante(
+    idEstudiante: number
+) {
+    try {
+
+        const resultado = await pool.query(
+            "SELECT * FROM sp_viajes_activos_por_estudiante($1)",
+            [idEstudiante]
+        );
+
+        return resultado.rows;
+
+    } catch (error) {
+        errorThrower(error);
+    }
+}

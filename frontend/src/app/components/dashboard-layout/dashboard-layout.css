@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  font-family: var(--font-body);
+  background: var(--color-neutral);
+}
+
+.dashboard-shell {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.dashboard-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.dashboard {
+  padding: 32px 40px;
+}
+
+@media (max-width: 900px) {
+  .dashboard {
+    padding: 20px;
+  }
+}

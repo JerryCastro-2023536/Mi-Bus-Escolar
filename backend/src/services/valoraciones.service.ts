@@ -80,7 +80,7 @@ export async function eliminarValoracion(id: number) {
             [id]
         );
 
-        if (resultado.rowCount === 0) {
+        if (!resultado.rows[0].eliminado) {
             throw new NotFoundError(`No se puede eliminar: La valoración con ID ${id} no existe.`);
         }
 

@@ -1,0 +1,119 @@
+<section class="estudiantes-view">
+
+    @if (mensajeError) {
+        <div class="alert alert-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            {{ mensajeError }}
+        </div>
+    }
+
+    @if (cargando()) {
+
+        <div class="loading-state">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+
+            <p>Cargando estudiantes...</p>
+        </div>
+
+    } @else {
+
+        @if (estudiantes().length > 0) {
+
+            <div class="students-grid">
+
+                @for (estudiante of estudiantes(); track estudiante.id_estudiante) {
+
+                    <article class="student-card">
+
+                        <div class="student-photo">
+
+                            @if (estudiante.foto_estudiante) {
+
+                                <img
+                                    [src]="estudiante.foto_estudiante"
+                                    [alt]="estudiante.nombre + ' ' + estudiante.apellido"
+                                />
+
+                            } @else {
+
+                                <div class="photo-placeholder">
+                                    <i class="fa-solid fa-user-graduate"></i>
+                                </div>
+
+                            }
+
+                        </div>
+
+                        <div class="student-info">
+
+                            <span class="student-label">
+                                Estudiante
+                            </span>
+
+                            <h3>
+                                {{ estudiante.nombre }}
+                                {{ estudiante.apellido }}
+                            </h3>
+
+                            <div class="student-details">
+
+                                <div class="detail">
+
+                                    <i class="fa-solid fa-school"></i>
+
+                                    <div>
+                                        <span>Colegio</span>
+
+                                        <strong>
+                                            {{ estudiante.nombre_colegio || 'Sin colegio registrado' }}
+                                        </strong>
+                                    </div>
+
+                                </div>
+
+                                <div class="detail">
+
+                                    <i class="fa-solid fa-graduation-cap"></i>
+
+                                    <div>
+                                        <span>Grado</span>
+
+                                        <strong>
+                                            {{ estudiante.grado || 'Sin grado registrado' }}
+                                        </strong>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                }
+
+            </div>
+
+        } @else {
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+
+                <h3>No tienes estudiantes registrados</h3>
+
+                <p>
+                    Actualmente no hay estudiantes asociados
+                    a tu cuenta.
+                </p>
+
+            </div>
+
+        }
+
+    }
+
+</section>

@@ -84,7 +84,7 @@ export const pagosConfig = {
         {
             key: 'fecha_verificacion',
             label: 'Fecha verificación',
-            type: 'date'
+            type: 'datetime'
         },
         {
             key: 'verificado_por',
@@ -158,12 +158,12 @@ export const pagosConfig = {
                     label: 'Pendiente'
                 },
                 {
-                    value: 'VERIFICADO',
-                    label: 'Verificado'
+                    value: 'PAGADO',
+                    label: 'Pagado'
                 },
                 {
-                    value: 'RECHAZADO',
-                    label: 'Rechazado'
+                    value: 'CANCELADO',
+                    label: 'Cancelado'
                 }
             ]
         },
@@ -176,17 +176,20 @@ export const pagosConfig = {
         {
             key: 'fecha_verificacion',
             label: 'Fecha de verificación',
-            type: 'date'
+            type: 'date',
+            required: true
         },
         {
             key: 'verificado_por',
             label: 'Verificado por',
-            type: 'number'
+            type: 'number',
+            required: true
         },
         {
             key: 'observaciones',
             label: 'Observaciones',
-            type: 'text'
+            type: 'text',
+            required: true
         }
     ],
 
@@ -250,12 +253,12 @@ export const pagosConfig = {
                     label: 'Pendiente'
                 },
                 {
-                    value: 'VERIFICADO',
-                    label: 'Verificado'
+                    value: 'PAGADO',
+                    label: 'Pagado'
                 },
                 {
-                    value: 'RECHAZADO',
-                    label: 'Rechazado'
+                    value: 'CANCELADO',
+                    label: 'Cancelado'
                 }
             ]
         },
@@ -268,17 +271,54 @@ export const pagosConfig = {
         {
             key: 'fecha_verificacion',
             label: 'Fecha de verificación',
-            type: 'date'
+            type: 'date',
+            required: true
         },
         {
             key: 'verificado_por',
             label: 'Verificado por',
-            type: 'number'
+            type: 'number',
+            required: true
         },
         {
             key: 'observaciones',
             label: 'Observaciones',
-            type: 'text'
+            type: 'text',
+            required: true
         }
     ]
 };
+export interface MesPago {
+    id_servicio: number;
+    nombre_servicio: string;
+    precio_mensual: number;
+    periodo_mes: number;
+    periodo_anio: number;
+    id_pago: number | null;
+    estado: 'PENDIENTE' | 'PAGADO' | 'CANCELADO';
+    monto: number | null;
+    metodo_pago: string | null;
+    referencia_pago: string | null;
+    foto_comprobante: string | null;
+    fecha_pago_limite: string | null;
+    fecha_verificacion: string | null;
+}
+
+export interface EstudianteResumen {
+    id_estudiante: number;
+    nombre: string;
+    apellido: string;
+    foto_estudiante: string | null;
+    grado: string | null;
+    nombre_colegio: string | null;
+}
+
+export interface RegistrarPagoPayload {
+    id_estudiante: number;
+    id_servicio: number;
+    periodo_mes: number;
+    periodo_anio: number;
+    metodo_pago: string;
+    referencia_pago?: string;
+    foto_comprobante?: string;
+}
