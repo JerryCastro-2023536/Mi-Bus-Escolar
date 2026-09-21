@@ -5,6 +5,7 @@ import { catchError, map, timeout } from 'rxjs/operators';
 import { PuntoRuta } from '../models/mapas.type';
 import { Incidencias } from '../models/incidencias';
 import { environment } from '../../environments/enviroments';
+import { NotificacionDTO } from '../models/asistenciasDTO.interface';
 
 export interface EstudianteAsistenciaDTO {
   id_estudiante: number;
@@ -29,6 +30,14 @@ export class rutasService {
   /** Resuelve id_chofer a partir del id_usuario autenticado */
   resolverChofer(idUsuario: number): Observable<{ id_chofer: number } | null> {
     return this.http.get<{ id_chofer: number }>(`${this.apiUrl}/chofer/usuario/${idUsuario}`).pipe(
+      timeout(8000),
+      catchError(() => of(null))
+    );
+  }
+
+  /** Obtiene el id_proveedor del chofer */
+  obtenerProveedorChofer(idChofer: number): Observable<{ id_proveedor: number } | null> {
+    return this.http.get<{ id_proveedor: number }>(`${this.apiUrl}/choferes/${idChofer}/proveedor`).pipe(
       timeout(8000),
       catchError(() => of(null))
     );
@@ -111,4 +120,14 @@ export class rutasService {
       estado: reporte.estado
     });
   }
+
+  enviarNotificacion(notificacion: NotificacionDTO): Observable<any> {
+    return this.http.post(
+      `${this.apiUrl}/notificaciones`,
+      notificacion
+    );
+  }
+
 }
+
+

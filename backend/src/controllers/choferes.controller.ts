@@ -44,6 +44,22 @@ export async function getChoferById(req: Request, res: Response, next: NextFunct
     }
 }
 
+export async function getProveedorChofer(req: Request, res: Response, next: NextFunction) {
+    try{
+        const id = Number(req.params.id);
+        const choferEncontrado = await buscarChoferById(id);
+        return res.status(200).json({
+            success: true,
+            message: `Proveedor del chofer con id: ${id} encontrado`,
+            data: {
+                id_proveedor: choferEncontrado?.id_proveedor
+            }
+        });
+    }catch(error){
+        next(error);
+    }
+}
+
 export async function putChofer(req: Request, res: Response, next: NextFunction) {
     try{
         const id = Number(req.params.id);
