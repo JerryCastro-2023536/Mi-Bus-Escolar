@@ -84,19 +84,33 @@ export const routes: Routes = [
                         .then(m => m.ParadasUsuario),
             },
 
-{
-    path: 'mis-paradas',
-    title: 'Mis Paradas | MiBusEscolar',
-    canActivate: [roleGuard],
-    data: {
-        roles: ['USUARIO'],
-        title: 'Mis Paradas',
-        subtitle: 'Consulta los estudiantes que tienen asignaciones de transporte.'
-    },
-    loadComponent: () =>
-        import('./components/paradas-usuario/paradas-usuario')
-            .then(m => m.ParadasUsuario),
-},
+            {
+                path: 'mis-viajes',
+                title: 'Mis Viajes | MiBusEscolar',
+                canActivate: [roleGuard],
+                data: {
+                    roles: ['USUARIO'],
+                    title: 'Mis viajes',
+                    subtitle: 'Consulta los viajes de los estudiantes asignados.'
+                },
+                loadComponent: () =>
+                    import('./components/viajes-usuario/viajes-usuario')
+                        .then(m => m.ViajesUsuario),
+            },
+
+            {
+                path: 'mis-paradas',
+                title: 'Mis Paradas | MiBusEscolar',
+                canActivate: [roleGuard],
+                data: {
+                    roles: ['USUARIO'],
+                    title: 'Mis Paradas',
+                    subtitle: 'Consulta los estudiantes que tienen asignaciones de transporte.'
+                },
+                loadComponent: () =>
+                    import('./components/paradas-usuario/paradas-usuario')
+                        .then(m => m.ParadasUsuario),
+            },
             
             {
                 path: 'cuenta',
