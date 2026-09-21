@@ -72,7 +72,7 @@ export class ValoracionesService {
     return this.http.get<
       ApiResponse<Valoracion[]>
     >(
-      `${this.apiUrl}/valoraciones`
+      `${this.apiUrl}/landing/valoraciones`
     );
 
   }
