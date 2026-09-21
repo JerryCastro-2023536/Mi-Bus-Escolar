@@ -6,6 +6,7 @@ import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angula
 import { rutasService, EstudianteAsistenciaDTO } from '../../services/rutas.service';
 import { Incidencias } from '../../models/incidencias';
 import { LoginService } from '../../services/login';
+import { TipoNoti } from '../../models/asistenciasDTO.interface';
 
 @Component({
   imports: [CommonModule, MapaComponent, ReactiveFormsModule],
@@ -27,6 +28,7 @@ export class ChoferDashboardComponents implements OnInit {
   // IDs resueltos desde el usuario autenticado
   idUsuarioActual: number = 0;
   idChoferActual: number = 0;
+  idProveedorActual: number = 0;
   cargandoChofer = true;
 
   viajeActual: any = null;
@@ -68,6 +70,7 @@ export class ChoferDashboardComponents implements OnInit {
       this.idUsuarioActual = userId || 1;
       this.idChoferActual = Number(user.id_chofer);
       this.cargandoChofer = false;
+      this.obtenerProveedorDelChofer();
       this.cargarViajeDelDia();
       return;
     }
@@ -82,12 +85,26 @@ export class ChoferDashboardComponents implements OnInit {
           this.loginService.saveUser({ ...user, id_chofer: this.idChoferActual });
         }
         this.cargandoChofer = false;
+        this.obtenerProveedorDelChofer();
         this.cargarViajeDelDia();
       },
       error: () => {
         this.idChoferActual = 1;
         this.cargandoChofer = false;
+        this.obtenerProveedorDelChofer();
         this.cargarViajeDelDia();
+      }
+    });
+  }
+
+  /** Obtiene el id_proveedor del chofer */
+  obtenerProveedorDelChofer(): void {
+    this.viajesService.obtenerProveedorChofer(this.idChoferActual).subscribe({
+      next: (res) => {
+        this.idProveedorActual = res?.id_proveedor || 1;
+      },
+      error: () => {
+        this.idProveedorActual = 1;
       }
     });
   }
@@ -443,13 +460,40 @@ export class ChoferDashboardComponents implements OnInit {
       };
 
       this.viajesService.enviarReporte(newReporte).subscribe({
-        next: () => {
-          alert('¡El reporte ha sido enviado con éxito con la ubicación actual del chofer!');
-          this.cerrarModalReporte();
-          this.cdr.detectChanges();
+        next: (res) => {
+          const idIncidencia = Number(res.id_incidencia);
+
+          const notificacion = {
+            id_usuario: this.idProveedorActual,
+            id_incidencia: idIncidencia,
+            id_asistencia: null,
+            tipo: 'INCIDENTE' as TipoNoti,
+            titulo: 'Nuevo reporte de incidencia',
+            mensaje: `El chofer ha registrado un nuevo reporte: ${newReporte.titulo}`,
+            leida: false,
+            fecha_envio: new Date()
+          };
+
+          this.viajesService.enviarNotificacion(notificacion).subscribe({
+            next: () => {
+              alert('¡El reporte y la notificación fueron enviados correctamente!');
+              this.cerrarModalReporte();
+              this.cdr.detectChanges();
+            },
+            error: (error) => {
+              console.error('Reporte creado, pero no se pudo enviar la notificación:', error);
+              alert('El reporte fue creado, pero no se pudo enviar la notificación.');
+              this.cerrarModalReporte();
+              this.cdr.detectChanges();
+            }
+          });
         },
         error: (error) => {
-          alert(error?.error?.error || error?.error?.message || 'No se pudo enviar el reporte. Por favor inténtalo de nuevo.');
+          alert(
+            error?.error?.error ||
+            error?.error?.message ||
+            'No se pudo enviar el reporte. Por favor inténtalo de nuevo.'
+          );
           this.cdr.detectChanges();
         }
       });
