@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, timeout } from 'rxjs/operators';
 import { PuntoRuta } from '../models/mapas.type';
 import { Incidencias } from '../models/incidencias';
-import { environment } from '../../environments/environment';
+import { environment } from '../../environments/enviroments';
 
 export interface EstudianteAsistenciaDTO {
   id_estudiante: number;
