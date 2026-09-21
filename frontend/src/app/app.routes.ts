@@ -44,13 +44,20 @@ export const routes: Routes = [
                 loadComponent: () => import('../app/components/proveedores-view/proveedores-view').then(m => m.ProveedoresView),
             },
             {
-                path: "dashboard-chofer",
-                title: "Dashboard Chofer | MiBusEscolar",
-                loadComponent: () => import('./components/dashboard-chofer/dashboard-chofer.components').then(d => d.DashboardChoferComponents),
+                path: 'dashboard/chofer',
+                title: 'Dashboard Chofer | MiBusEscolar',
+                canActivate: [roleGuard],
                 data: {
-                    title: "Gestión de acciones del Chofer",
-                    subtitle: "Administracion de Rutas, Estudiantes, Buses y Reportes del chofer asignado."
-                }
+                    roles: ['CHOFER'],
+                    title: 'Gestión de acciones del Chofer',
+                    subtitle: 'Administracion de Rutas, Estudiantes, Buses y Reportes del chofer asignado.'
+                },
+                loadComponent: () => import('./components/dashboard-chofer/dashboard-chofer.components').then(d => d.DashboardChoferComponents),
+            },
+            {
+                path: 'dashboard-chofer',
+                redirectTo: 'dashboard/chofer',
+                pathMatch: 'full'
             },
             {
                 path: 'dashboard/usuario',
@@ -87,6 +94,7 @@ export const routes: Routes = [
                     subtitle: "Ver las rutas, tomar asistencias, iniciar viaje, anotar abordaje y finalizar ruta."
                 }
             },
+            {
                 path: 'pagosUser',
                 title: 'Mis Pagos | MiBusEscolar',
                 canActivate: [roleGuard],
