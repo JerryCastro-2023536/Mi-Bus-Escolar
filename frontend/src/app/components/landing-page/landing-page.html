@@ -622,6 +622,51 @@
 
                       <div class="review-item">
 
+                        <!-- USUARIO DE LA VALORACIÓN -->
+
+                            @if (
+                              obtenerUsuarioValoracion(
+                                valoracion.id_valoracion
+                              );
+                              as detalle
+                            ) {
+
+                              <div class="review-user">
+
+                                <div class="review-avatar">
+
+                                  {{
+                                    detalle.nombre_usuario
+                                      ?.charAt(0)
+                                      ?.toUpperCase()
+                                      || '?'
+                                  }}
+
+                                </div>
+
+                                <div class="review-user-info">
+
+                                  @if (detalle.nombre_usuario) {
+
+                                    <strong>
+                                      {{ detalle.nombre_usuario }}
+                                      {{ detalle.apellido_usuario }}
+                                    </strong>
+
+                                  } @else {
+
+                                    <strong>
+                                      Usuario
+                                    </strong>
+
+                                  }
+
+                                </div>
+
+                              </div>
+
+                            }
+
                         <div class="review-rating">
 
                           @for (
