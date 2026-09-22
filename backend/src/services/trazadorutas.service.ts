@@ -204,6 +204,7 @@ export class ViajesService {
       query = `
         SELECT
           e.id_estudiante,
+          e.id_usuario_tutor,
           e.nombre,
           e.apellido,
           e.grado,
@@ -225,6 +226,7 @@ export class ViajesService {
       query = `
         SELECT
           e.id_estudiante,
+          e.id_usuario_tutor,
           e.nombre,
           e.apellido,
           e.grado,
@@ -248,6 +250,7 @@ export class ViajesService {
       const fallbackQuery = `
         SELECT
           e.id_estudiante,
+          e.id_usuario_tutor,
           e.nombre,
           e.apellido,
           e.grado,
@@ -268,7 +271,7 @@ export class ViajesService {
     return rows;
   }
 
-  // 7. Marcar abordaje PRESENTE
+  // 7. Marcar abordaje PRESENTE (Asistió) y notificar al tutor
   static async marcarAbordaje(idViaje: number, idEstudiante: number) {
     const timestampNow = new Date();
     const { rows } = await pool.query(
@@ -279,10 +282,47 @@ export class ViajesService {
        RETURNING *`,
       [idViaje, idEstudiante, timestampNow]
     );
-    return rows[0];
+    const asistencia = rows[0];
+
+    // Enviar notificación al tutor del estudiante (Asistió) solo si no se ha enviado aún para este viaje
+    try {
+      const estRes = await pool.query(
+        `SELECT id_usuario_tutor, nombre, apellido FROM Estudiantes WHERE id_estudiante = $1`,
+        [idEstudiante]
+      );
+      const est = estRes.rows[0];
+      if (est && est.id_usuario_tutor && asistencia?.id_asistencia) {
+        const yaExiste = await pool.query(
+          `SELECT id_notificacion FROM notificaciones 
+           WHERE id_usuario = $1 AND id_asistencia = $2 AND tipo = 'ASISTENCIA' AND titulo LIKE 'Estudiante a bordo:%'
+           LIMIT 1`,
+          [est.id_usuario_tutor, asistencia.id_asistencia]
+        );
+
+        if (yaExiste.rows.length === 0) {
+          await pool.query(
+            `SELECT * FROM sp_notificaciones_agregar($1, $2, $3, $4, $5, $6, $7, $8)`,
+            [
+              est.id_usuario_tutor,
+              null,
+              asistencia.id_asistencia,
+              'ASISTENCIA',
+              `Estudiante a bordo: ${est.nombre} ${est.apellido}`,
+              `El estudiante ${est.nombre} ${est.apellido} ha abordado el bus escolar y se encuentra en ruta.`,
+              false,
+              timestampNow
+            ]
+          );
+        }
+      }
+    } catch (notiErr) {
+      console.error('Error enviando notificación de asistencia/abordaje:', notiErr);
+    }
+
+    return asistencia;
   }
 
-  // 8. Marcar descenso PRESENTE
+  // 8. Marcar descenso PRESENTE y notificar al tutor
   static async marcarDescenso(idViaje: number, idEstudiante: number) {
     const timestampNow = new Date();
     const { rows } = await pool.query(
@@ -290,11 +330,49 @@ export class ViajesService {
        WHERE id_viaje = $1 AND id_estudiante = $2 RETURNING *`,
       [idViaje, idEstudiante, timestampNow]
     );
-    return rows[0];
+    const asistencia = rows[0];
+
+    // Enviar notificación al tutor del estudiante (Descenso) solo si no se ha enviado aún para este viaje
+    try {
+      const estRes = await pool.query(
+        `SELECT id_usuario_tutor, nombre, apellido FROM Estudiantes WHERE id_estudiante = $1`,
+        [idEstudiante]
+      );
+      const est = estRes.rows[0];
+      if (est && est.id_usuario_tutor && asistencia?.id_asistencia) {
+        const yaExiste = await pool.query(
+          `SELECT id_notificacion FROM notificaciones 
+           WHERE id_usuario = $1 AND id_asistencia = $2 AND tipo = 'ASISTENCIA' AND titulo LIKE 'Descenso confirmado:%'
+           LIMIT 1`,
+          [est.id_usuario_tutor, asistencia.id_asistencia]
+        );
+
+        if (yaExiste.rows.length === 0) {
+          await pool.query(
+            `SELECT * FROM sp_notificaciones_agregar($1, $2, $3, $4, $5, $6, $7, $8)`,
+            [
+              est.id_usuario_tutor,
+              null,
+              asistencia.id_asistencia,
+              'ASISTENCIA',
+              `Descenso confirmado: ${est.nombre} ${est.apellido}`,
+              `El estudiante ${est.nombre} ${est.apellido} ha descendido del bus escolar en su destino.`,
+              false,
+              timestampNow
+            ]
+          );
+        }
+      }
+    } catch (notiErr) {
+      console.error('Error enviando notificación de descenso:', notiErr);
+    }
+
+    return asistencia;
   }
 
-  // 9. Marcar estudiante como AUSENTE
+  // 9. Marcar estudiante como AUSENTE (No asistió) y notificar al tutor
   static async marcarAusente(idViaje: number, idEstudiante: number) {
+    const timestampNow = new Date();
     const { rows } = await pool.query(
       `INSERT INTO Asistencias (id_viaje, id_estudiante, estado_abordaje)
        VALUES ($1, $2, 'AUSENTE')
@@ -303,7 +381,44 @@ export class ViajesService {
        RETURNING *`,
       [idViaje, idEstudiante]
     );
-    return rows[0];
+    const asistencia = rows[0];
+
+    // Enviar notificación al tutor del estudiante (No Asistió / Inasistencia) solo si no se ha enviado aún
+    try {
+      const estRes = await pool.query(
+        `SELECT id_usuario_tutor, nombre, apellido FROM Estudiantes WHERE id_estudiante = $1`,
+        [idEstudiante]
+      );
+      const est = estRes.rows[0];
+      if (est && est.id_usuario_tutor && asistencia?.id_asistencia) {
+        const yaExiste = await pool.query(
+          `SELECT id_notificacion FROM notificaciones 
+           WHERE id_usuario = $1 AND id_asistencia = $2 AND tipo = 'INASISTENCIA'
+           LIMIT 1`,
+          [est.id_usuario_tutor, asistencia.id_asistencia]
+        );
+
+        if (yaExiste.rows.length === 0) {
+          await pool.query(
+            `SELECT * FROM sp_notificaciones_agregar($1, $2, $3, $4, $5, $6, $7, $8)`,
+            [
+              est.id_usuario_tutor,
+              null,
+              asistencia.id_asistencia,
+              'INASISTENCIA',
+              `Inasistencia registrada: ${est.nombre} ${est.apellido}`,
+              `Se ha registrado que el estudiante ${est.nombre} ${est.apellido} no asistió / no abordó la unidad en esta ruta.`,
+              false,
+              timestampNow
+            ]
+          );
+        }
+      }
+    } catch (notiErr) {
+      console.error('Error enviando notificación de inasistencia:', notiErr);
+    }
+
+    return asistencia;
   }
 }
 
