@@ -1,11 +1,17 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CanActivateFn, Router } from '@angular/router';
 import { LoginService } from '../../services/login';
 import { normalizeRole, getDashboardRoute } from '../../config/role.config';
 
 export const roleGuard: CanActivateFn = (route, state) => {
+    const platformId = inject(PLATFORM_ID);
     const loginService = inject(LoginService);
     const router = inject(Router);
+
+    if (!isPlatformBrowser(platformId)) {
+        return true;
+    }
 
     const user = loginService.getUser();
 
@@ -33,10 +39,13 @@ export const roleGuard: CanActivateFn = (route, state) => {
 };
 
 export const dashboardRedirectGuard: CanActivateFn = () => {
+    const platformId = inject(PLATFORM_ID);
     const loginService = inject(LoginService);
     const router = inject(Router);
 
-    return router.createUrlTree([
-        getDashboardRoute(loginService.getUser()?.rol)
-    ]);
+    if (!isPlatformBrowser(platformId)) {
+        return true;
+    }
+
+    return router.createUrlTree([getDashboardRoute(loginService.getUser()?.rol)]);
 };

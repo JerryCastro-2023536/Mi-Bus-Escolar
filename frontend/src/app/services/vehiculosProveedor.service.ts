@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { environment } from '../../environments/enviroments';
+import { environment } from '../../environments/enviroment';
 import { ActualizarVehiculoProveedor, NuevoVehiculoProveedor, VehiculoProveedor } from './../models/vehiculoProveedor.interface';
 
 interface ApiResponse<T> {

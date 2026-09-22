@@ -3,6 +3,7 @@ import { loginUsuario, registerUsuario } from '../controllers/usuario.controller
 import { validateSchema } from '../utils/middleware/schemaValidator';
 import { loginUserSchema, registerUserSchema } from '../validators/user.validator';
 import { getValoraciones1, obtenerProveedores1, obtenerRutas1, obtenerServicios1 } from '../controllers/valoraciones-landing.controller';
+import { getValoracionesDetalle } from '../controllers/valoraciones.controller';
 
 const router = Router();
 
@@ -12,5 +13,6 @@ router.get('/landing/proveedores', obtenerProveedores1);
 router.get('/landing/rutas', obtenerRutas1);
 router.get('/landing/servicios', obtenerServicios1);
 router.get('/landing/valoraciones', getValoraciones1);
+router.get('/landing/valoracionesDetalle', getValoracionesDetalle);
 
 export default router;
