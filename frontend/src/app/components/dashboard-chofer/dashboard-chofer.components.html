@@ -63,7 +63,7 @@
         <div class="card-header">
           <div class="card-title">
             <span class="card-icon"><i class="bi bi-geo-alt-fill"></i></span>
-            <h3>Mapa y Trazado de Ruta</h3>
+            <h3>Rutas Asignadas</h3>
           </div>
         </div>
         <p class="card-desc">Visualiza las paradas, la ruta sugerida y la navegación GPS en tiempo real.</p>
@@ -79,111 +79,37 @@
             <h3>Lista de Estudiantes</h3>
           </div>
         </div>
-        <p class="card-desc">Lista de los estudiantes asignados al chofer.</p>
-
-        <button class="toggle-btn2" type="button" (click)="toggleEstudiantes()">
-          {{ estudiantesAbierto ? 'Ocultar Lista' : 'Ver Lista de Estudiantes' }}
+        <p class="card-desc">Visualiza y gestiona el padrón completo de estudiantes asignados.</p>
+        <button class="toggle-btn2" type="button" (click)="irAComponente('/asistencias-chofer')">
+          Ir a Estudiantes
         </button>
-
-        @if (estudiantesAbierto) {
-          <div class="table-panel">
-            <div class="table-header-row">
-              <span>ID</span>
-              <span>Nombre</span>
-              <span>Grado</span>
-              <span>Colegio</span>
-            </div>
-
-            @for (estudiante of estudiantes; track estudiante.id_estudiante) {
-              <div class="table-row">
-                <span>{{ estudiante.id_estudiante }}</span>
-                <span>{{ estudiante.nombre }} {{ estudiante.apellido }}</span>
-                <span>{{ estudiante.grado || 'N/D' }}</span>
-                <span>{{ estudiante.colegio || 'N/D' }}</span>
-              </div>
-            }
-          </div>
-        }
       </article>
 
       <article class="info-card vehicles-card">
         <div class="card-header">
           <div class="card-title">
             <span class="card-icon"><i class="bi bi-bus-front-fill"></i></span>
-            <h3>Mis Vehículos</h3>
+            <h3>Vehículos del Chofer</h3>
           </div>
         </div>
-        <p class="card-desc">Información de los vehículos asignados al chofer.</p>
-
-        <button class="toggle-btn secondary" type="button" (click)="toggleVehiculos()">
-          {{ vehiculosAbierto ? 'Ocultar Vehículos' : 'Ver Vehículos' }}
+        <p class="card-desc">Detalles técnicos, placas y modelos de los vehículos a tu cargo.</p>
+        <button class="toggle-btn secondary" type="button" (click)="irAComponente('/vehiculos')">
+          Ir a Vehículos
         </button>
-
-        @if (vehiculosAbierto) {
-          <div class="table-panel">
-            <div class="table-header-row">
-              <span>ID</span>
-              <span>Placa</span>
-              <span>Proveedor</span>
-              <span>Estado</span>
-            </div>
-
-            @for (vehiculo of vehiculos; track vehiculo.id_vehiculo) {
-              <div class="table-row">
-                <span>{{ vehiculo.id_vehiculo }}</span>
-                <span>{{ vehiculo.placa }}</span>
-                <span>{{ vehiculo.proveedor || 'Sin proveedor' }}</span>
-                <span>
-                  <span class="status-tag" [class.inactive]="vehiculo.estado !== 'ACTIVO'">{{ vehiculo.estado }}</span>
-                </span>
-              </div>
-            }
-          </div>
-        }
       </article>
 
+      <!-- Tarjeta 4: Incidencias -->
       <article class="info-card reports-card">
         <div class="card-header">
           <div class="card-title">
             <span class="card-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
-            <h3>Ver Reportes Generados</h3>
+            <h3>Incidencias</h3>
           </div>
         </div>
-        <p class="card-desc">Ver los reportes generados de incidentes que han pasado en el camino.</p>
-
-        <button class="toggle-btn danger" type="button" (click)="toggleReportes()">
-          {{ reportesAbierto ? 'Ocultar Reportes' : 'Ver Reportes' }}
+        <p class="card-desc">Visualiza y reporta emergencias, averías o retrasos en el trayecto.</p>
+        <button class="toggle-btn danger" type="button" (click)="irAComponente('/incidencias')">
+          Ir a Incidencias
         </button>
-
-        @if (reportesAbierto) {
-          <div class="table-panel">
-            <div class="table-header-row reports-header-row">
-              <span>ID</span>
-              <span>Título</span>
-              <span>Estado</span>
-            </div>
-
-            @if (!reportes.length) {
-              <div class="table-row reports-row">
-                <span>—</span>
-                <span>No hay reportes generados</span>
-                <span>
-                  <span class="status-tag neutral">SIN DATOS</span>
-                </span>
-              </div>
-            }
-
-            @for (reporte of reportes; track reporte.id_incidencia) {
-              <div class="table-row reports-row">
-                <span>{{ reporte.id_incidencia ?? '—' }}</span>
-                <span>{{ reporte.titulo || 'Reporte sin título' }}</span>
-                <span>
-                  <span class="status-tag warning" [class.success]="(reporte.estado || 'ABIERTA').toString().toUpperCase() === 'CERRADA'" [class.neutral]="(reporte.estado || 'ABIERTA').toString().toUpperCase() === 'EN REVISION'">{{ (reporte.estado || 'ABIERTA').toString().toUpperCase() }}</span>
-                </span>
-              </div>
-            }
-          </div>
-        }
       </article>
     </section>
   </main>
