@@ -1265,6 +1265,67 @@ label {
   line-height: 1.5;
 }
 
+/* ========================================
+   USUARIO DE LA VALORACIÓN
+======================================== */
+
+.review-user {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  margin-bottom: 9px;
+}
+
+
+.review-avatar {
+  width: 32px;
+
+  height: 32px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--primary);
+
+  color: white;
+
+  font-family: "Montserrat", sans-serif;
+
+  font-size: 12px;
+
+  font-weight: 700;
+}
+
+
+.review-user-info {
+  min-width: 0;
+
+  display: flex;
+
+  flex-direction: column;
+}
+
+
+.review-user-info strong {
+  color: var(--primary);
+
+  font-family: "Montserrat", sans-serif;
+
+  font-size: 11px;
+
+  font-weight: 700;
+}
+
 
 /* ========================================
    TEXTO SIN INFORMACIÓN
