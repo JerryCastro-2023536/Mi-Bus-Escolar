@@ -92,6 +92,17 @@ export const postUbicacionGPS = async (req: Request, res: Response) => {
   }
 };
 
+export const getUltimaUbicacionViaje = async (req: Request, res: Response) => {
+  try {
+    const { idViaje } = req.params;
+    const data = await ViajesService.obtenerUltimaUbicacion(Number(idViaje));
+    res.json({ success: true, data });
+  } catch (error: any) {
+    console.error('Error al obtener última ubicación:', error);
+    res.status(500).json({ error: 'Error al obtener última ubicación del viaje' });
+  }
+};
+
 export const getEstudiantesConAsistencia = async (req: Request, res: Response) => {
   try {
     const { idChofer } = req.params;
