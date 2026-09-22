@@ -18,6 +18,43 @@ export const routes: Routes = [
         canActivate: [guestGuard],
         loadComponent: () => import('./components/login/login').then(m => m.Login),
     },
+
+    {
+        path: 'error/404',
+        title: 'Página no encontrada | MiBusEscolar',
+        data: { code: 404 },
+        loadComponent: () => import('./components/errors/errors').then(m => m.ErrorView),
+    },
+    {
+        path: 'error/403',
+        title: 'Acceso restringido | MiBusEscolar',
+        data: { code: 403 },
+        loadComponent: () => import('./components/errors/errors').then(m => m.ErrorView),
+    },
+    {
+        path: 'error/401',
+        title: 'Sesión expirada | MiBusEscolar',
+        data: { code: 401 },
+        loadComponent: () => import('./components/errors/errors').then(m => m.ErrorView),
+    },
+    {
+        path: 'error/500',
+        title: 'Error del servidor | MiBusEscolar',
+        data: { code: 500 },
+        loadComponent: () => import('./components/errors/errors').then(m => m.ErrorView),
+    },
+    {
+        path: 'error/503',
+        title: 'En mantenimiento | MiBusEscolar',
+        data: { code: 503 },
+        loadComponent: () => import('./components/errors/errors').then(m => m.ErrorView),
+    },
+    {
+        path: 'error/sin-conexion',
+        title: 'Sin conexión | MiBusEscolar',
+        data: { code: 0 },
+        loadComponent: () => import('./components/errors/errors').then(m => m.ErrorView),
+    },
     {
         path: 'landing',
         title: ' Landing Page| MiBusEscolar',
@@ -42,5 +79,5 @@ export const routes: Routes = [
         ],
     },
 
-    { path: '**', redirectTo: 'login' },
+    { path: '**', redirectTo: 'error/404' },
 ];
