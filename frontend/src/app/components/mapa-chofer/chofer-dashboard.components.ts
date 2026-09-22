@@ -1,5 +1,6 @@
 import { Component, OnInit, PLATFORM_ID, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import Swal from 'sweetalert2';
 import { PuntoRuta } from '../../models/mapas.type';
 import { MapaComponent } from '../mapa/mapa.component';
 import { ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
@@ -25,10 +26,10 @@ export class ChoferDashboardComponents implements OnInit {
   mostrarModalReporte = false;
   reporteForm: FormGroup;
 
-  // IDs resueltos desde el usuario autenticado
   idUsuarioActual: number = 0;
   idChoferActual: number = 0;
   idProveedorActual: number = 0;
+  idUsuarioProveedor: number = 0;
   cargandoChofer = true;
 
   viajeActual: any = null;
@@ -40,7 +41,6 @@ export class ChoferDashboardComponents implements OnInit {
   tipoRutaActual: 'IDA' | 'VUELTA' = 'IDA';
   ubicacionActualChofer: PuntoRuta | null = null;
 
-  // --- Flujo de Asistencia ---
   mostrarModalAsistencia = false;
   tipoAsistenciaModal: 'IDA' | 'VUELTA' = 'IDA';
   estudiantesAsistencia: EstudianteAsistenciaDTO[] = [];
@@ -61,7 +61,6 @@ export class ChoferDashboardComponents implements OnInit {
     this.resolverIdentidadChofer();
   }
 
-  /** Paso 1: Obtener id_chofer a partir del usuario autenticado */
   resolverIdentidadChofer(): void {
     const user = this.loginService.getUser();
     const userId = user?.id_usuario || user?.id;
@@ -97,19 +96,19 @@ export class ChoferDashboardComponents implements OnInit {
     });
   }
 
-  /** Obtiene el id_proveedor del chofer */
   obtenerProveedorDelChofer(): void {
     this.viajesService.obtenerProveedorChofer(this.idChoferActual).subscribe({
       next: (res) => {
         this.idProveedorActual = res?.id_proveedor || 1;
+        this.idUsuarioProveedor = res?.id_usuario_proveedor || 0;
       },
       error: () => {
         this.idProveedorActual = 1;
+        this.idUsuarioProveedor = 0;
       }
     });
   }
 
-  /** Paso 2: Cargar la ruta y viaje activo directamente desde la base de datos */
   cargarViajeDelDia(): void {
     this.errorViaje = '';
     const idChofer = Number(this.idChoferActual) || 1;
@@ -122,7 +121,6 @@ export class ChoferDashboardComponents implements OnInit {
           if (data.estado === 'ACTIVO' && data.id_viaje) {
             this.viajeActual = data;
             
-            // LÍNEAS NUEVAS: Fuerza el estado IDA_COMPLETADA si ya lo habías logrado localmente
             const viajeGuardado = localStorage.getItem('viajeActualGuardado');
             if (viajeGuardado) {
               const parsed = JSON.parse(viajeGuardado);
@@ -166,14 +164,12 @@ export class ChoferDashboardComponents implements OnInit {
     });
   }
 
-  /** Paso 3: Cargar paradas y coordenadas de la base de datos */
   cargarTrazadoMapa(idRuta: number): void {
     this.viajesService.obtenerTrazadoRuta(idRuta).subscribe({
       next: (coordenadas) => {
         if (coordenadas && coordenadas.length > 0) {
           this.trazadoBase = coordenadas;
           
-          // SOLUCIÓN: Leer el progreso guardado en memoria
           const puntosGuardados = localStorage.getItem('rutaPuntosGuardados');
           
           if (puntosGuardados && this.viajeActual?.estado === 'ACTIVO') {
@@ -192,8 +188,6 @@ export class ChoferDashboardComponents implements OnInit {
       }
     });
   }
-
-  // ─── FLUJO DE ASISTENCIA ────────────────────────────────────────────
 
   tomarAsistencia(tipo: 'IDA' | 'VUELTA'): void {
     if (!this.rutaInfo) return;
@@ -251,10 +245,15 @@ export class ChoferDashboardComponents implements OnInit {
     const presentes = this.estudiantesAsistencia.filter(e => e.marcaLocal === 'PRESENTE');
     const ausentes = this.estudiantesAsistencia.filter(e => e.marcaLocal === 'AUSENTE');
 
-    const ops = [
-      ...presentes.map(e => this.viajesService.marcarAbordaje(idViaje, e.id_estudiante)),
-      ...ausentes.map(e => this.viajesService.marcarAusente(idViaje, e.id_estudiante))
-    ];
+    const ops = this.tipoAsistenciaModal === 'IDA'
+      ? [
+          ...presentes.map(e => this.viajesService.marcarAbordaje(idViaje, e.id_estudiante)),
+          ...ausentes.map(e => this.viajesService.marcarAusente(idViaje, e.id_estudiante))
+        ]
+      : [
+          ...presentes.map(e => this.viajesService.marcarDescenso(idViaje, e.id_estudiante)),
+          ...ausentes.map(e => this.viajesService.marcarAusente(idViaje, e.id_estudiante))
+        ];
 
     const finalizarConfirmacion = () => {
       this.guardandoAsistencia = false;
@@ -305,8 +304,6 @@ export class ChoferDashboardComponents implements OnInit {
     this.cdr.detectChanges();
   }
 
-  // ─── FLUJO DE RUTA ──────────────────────────────────────────────────
-
   iniciarRuta(tipo: 'IDA' | 'VUELTA' = 'IDA'): void {
     if (!this.rutaInfo) return;
 
@@ -320,9 +317,6 @@ export class ChoferDashboardComponents implements OnInit {
     localStorage.setItem('rutaPuntosGuardados', JSON.stringify(this.rutaRutaAsignada));
     localStorage.setItem('tipoRutaGuardada', this.tipoRutaActual);
 
-    // SOLUCIÓN: Quitamos el 'if' que bloqueaba el llamado al servicio.
-    // Ahora el backend siempre sabrá en qué fase de la ruta estamos.
-    
     this.viajesService.iniciarRutaViaje(this.idChoferActual, tipo).subscribe({
       next: (res) => {
         this.viajeActual = { ...res, estado: 'ACTIVO', tipo_ruta: tipo };
@@ -337,7 +331,17 @@ export class ChoferDashboardComponents implements OnInit {
       },
       error: (err) => {
         console.error('Error al iniciar la ruta:', err);
-        alert(err.error?.error || 'Hubo un error al iniciar la ruta');
+        Swal.fire({
+          icon: 'error',
+          title: 'No se pudo iniciar la ruta',
+          text: err?.error?.error || 'Hubo un error al iniciar la ruta.',
+          showCancelButton: false,
+          confirmButtonText: 'Aceptar',
+          confirmButtonColor: '#1A456B',
+          customClass: {
+            confirmButton: 'swal-brand-btn'
+          }
+        });
         this.cdr.detectChanges();
       }
     });
@@ -345,13 +349,6 @@ export class ChoferDashboardComponents implements OnInit {
 
   registrarAbordaje(): void {
     if (this.viajeActual?.estado !== 'ACTIVO' || this.tipoRutaActual !== 'IDA') return;
-
-    if (this.viajeActual?.id_viaje && this.estudiantesAsistencia.length > 0) {
-      const presentes = this.estudiantesAsistencia.filter(e => e.marcaLocal === 'PRESENTE' || e.estado_abordaje === 'PRESENTE');
-      presentes.forEach(e => {
-        this.viajesService.marcarAbordaje(this.viajeActual.id_viaje, e.id_estudiante).subscribe();
-      });
-    }
 
     if (this.rutaRutaAsignada.length > 1) { 
       this.rutaRutaAsignada = [...this.rutaRutaAsignada.slice(1)];
@@ -371,19 +368,24 @@ export class ChoferDashboardComponents implements OnInit {
         localStorage.removeItem('asistenciaIda_' + idViaje);
       }
       this.cdr.detectChanges();
-      alert('¡Abordaje de ida completado! Ahora puedes iniciar la ruta de vuelta.');
+      Swal.fire({
+        icon: 'success',
+        title: 'Abordaje completado',
+        text: '¡Abordaje de ida completado! Ahora puedes iniciar la ruta de vuelta.',
+        showCancelButton: false,
+        confirmButtonText: 'Continuar',
+        confirmButtonColor: '#1A456B',
+        customClass: {
+          confirmButton: 'swal-brand-btn',
+          title: 'swal-brand-title',
+          popup: 'swal-brand-popup',
+        }
+      });
     }
   }
 
   registrarDescenso(): void {
     if (this.viajeActual?.estado !== 'ACTIVO' || this.tipoRutaActual !== 'VUELTA') return;
-
-    if (this.viajeActual?.id_viaje && this.estudiantesAsistencia.length > 0) {
-      const presentes = this.estudiantesAsistencia.filter(e => e.marcaLocal === 'PRESENTE' || e.estado_abordaje === 'PRESENTE');
-      presentes.forEach(e => {
-        this.viajesService.marcarDescenso(this.viajeActual.id_viaje, e.id_estudiante).subscribe();
-      });
-    }
 
     if (this.rutaRutaAsignada.length > 1) { 
       this.rutaRutaAsignada = [...this.rutaRutaAsignada.slice(1)];
@@ -391,6 +393,13 @@ export class ChoferDashboardComponents implements OnInit {
       localStorage.setItem('tipoRutaGuardada', this.tipoRutaActual);
       this.cdr.detectChanges();
     } else {
+      if (this.viajeActual?.id_viaje && this.estudiantesAsistencia.length > 0) {
+        const presentes = this.estudiantesAsistencia.filter(e => e.marcaLocal === 'PRESENTE' && e.estado_abordaje !== 'AUSENTE');
+        presentes.forEach(e => {
+          this.viajesService.marcarDescenso(this.viajeActual.id_viaje, e.id_estudiante).subscribe();
+        });
+      }
+
       const idFinalizado = this.viajeActual?.id_viaje;
       this.viajesService.finalizarRutaViaje(this.viajeActual.id_viaje).subscribe({
         next: (res) => {
@@ -400,7 +409,6 @@ export class ChoferDashboardComponents implements OnInit {
             estado: 'FINALIZADO'
           };
           
-          // SOLUCIÓN: Eliminada la línea this.cargarViajeDelDia(); de aquí
           this.errorViaje = 'Ruta finalizada correctamente.';
           
           localStorage.removeItem('viajeActualGuardado');
@@ -411,11 +419,33 @@ export class ChoferDashboardComponents implements OnInit {
             localStorage.removeItem('asistenciaVuelta_' + idFinalizado);
           }
           this.cdr.detectChanges();
-          alert('¡Descenso y ruta de vuelta completados! El viaje ha finalizado con éxito.');
+          Swal.fire({
+            icon: 'success',
+            title: 'Ruta finalizada',
+            text: '¡Descenso y ruta de vuelta completados! El viaje ha finalizado con éxito.',
+            showCancelButton: false,
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#1A456B',
+            customClass: {
+              confirmButton: 'swal-brand-btn',
+              popup: 'swal-brand-popup',
+              title: 'swal-brand-title',
+            }
+          });
         },
         error: (err) => {
           console.error('Error al finalizar el viaje:', err);
-          alert(err.error?.error || 'Hubo un error al finalizar la ruta en el servidor.');
+          Swal.fire({
+            icon: 'error',
+            title: 'No se pudo finalizar la ruta',
+            text: err?.error?.error || 'Hubo un error al finalizar la ruta en el servidor.',
+            showCancelButton: false,
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#1A456B',
+            customClass: {
+              confirmButton: 'swal-brand-btn'
+            }
+          });
           this.cdr.detectChanges();
         }
       });
@@ -432,7 +462,6 @@ export class ChoferDashboardComponents implements OnInit {
     }
   }
 
-  // --- Modal de Reportes ---
   abrirModalReporte(): void { this.mostrarModalReporte = true; }
   cerrarModalReporte(): void { 
     this.mostrarModalReporte = false; 
@@ -463,8 +492,26 @@ export class ChoferDashboardComponents implements OnInit {
         next: (res) => {
           const idIncidencia = Number(res.id_incidencia);
 
+          if (!this.idUsuarioProveedor || this.idUsuarioProveedor <= 0) {
+              console.error('No se pudo resolver el id_usuario del proveedor para la notificación.');
+              Swal.fire({
+                icon: 'warning',
+                title: 'Reporte guardado',
+                text: 'El reporte fue creado, pero no se pudo notificar al proveedor (usuario no encontrado).',
+                showCancelButton: false,
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#1A456B',
+                customClass: {
+                  confirmButton: 'swal-brand-btn'
+                }
+              });
+              this.cerrarModalReporte();
+              this.cdr.detectChanges();
+              return;
+          }
+
           const notificacion = {
-            id_usuario: this.idProveedorActual,
+            id_usuario: this.idUsuarioProveedor,
             id_incidencia: idIncidencia,
             id_asistencia: null,
             tipo: 'INCIDENTE' as TipoNoti,
@@ -476,24 +523,50 @@ export class ChoferDashboardComponents implements OnInit {
 
           this.viajesService.enviarNotificacion(notificacion).subscribe({
             next: () => {
-              alert('¡El reporte y la notificación fueron enviados correctamente!');
+              Swal.fire({
+                icon: 'success',
+                title: 'Reporte enviado',
+                text: '¡El reporte y la notificación fueron enviados correctamente!',
+                showCancelButton: false,
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#1A456B',
+                customClass: {
+                  confirmButton: 'swal-brand-btn'
+                }
+              });
               this.cerrarModalReporte();
               this.cdr.detectChanges();
             },
             error: (error) => {
               console.error('Reporte creado, pero no se pudo enviar la notificación:', error);
-              alert('El reporte fue creado, pero no se pudo enviar la notificación.');
+              Swal.fire({
+                icon: 'warning',
+                title: 'Reporte creado',
+                text: 'El reporte fue creado, pero no se pudo enviar la notificación.',
+                showCancelButton: false,
+                confirmButtonText: 'Aceptar',
+                confirmButtonColor: '#1A456B',
+                customClass: {
+                  confirmButton: 'swal-brand-btn'
+                }
+              });
               this.cerrarModalReporte();
               this.cdr.detectChanges();
             }
           });
         },
         error: (error) => {
-          alert(
-            error?.error?.error ||
-            error?.error?.message ||
-            'No se pudo enviar el reporte. Por favor inténtalo de nuevo.'
-          );
+          Swal.fire({
+            icon: 'error',
+            title: 'No se pudo enviar el reporte',
+            text: error?.error?.error || error?.error?.message || 'No se pudo enviar el reporte. Por favor inténtalo de nuevo.',
+            showCancelButton: false,
+            confirmButtonText: 'Aceptar',
+            confirmButtonColor: '#1A456B',
+            customClass: {
+              confirmButton: 'swal-brand-btn'
+            }
+          });
           this.cdr.detectChanges();
         }
       });
