@@ -15,36 +15,25 @@
 .student-card {
     display: flex;
     gap: 20px;
-
     padding: 22px;
-
     background: #ffffff;
-
     border: 1px solid #E2E8EC;
     border-radius: 18px;
-
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease,
-        border-color 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    position: relative;
 }
 
 .student-card:hover {
     transform: translateY(-3px);
-
     border-color: #CBD9E3;
-
-    box-shadow:
-        0 12px 30px rgba(26, 69, 107, 0.08);
+    box-shadow: 0 12px 30px rgba(26, 69, 107, 0.08);
 }
-
 
 /* FOTO */
 
 .student-photo {
     width: 85px;
     height: 85px;
-
     flex-shrink: 0;
 }
 
@@ -52,7 +41,6 @@
 .photo-placeholder {
     width: 100%;
     height: 100%;
-
     border-radius: 16px;
 }
 
@@ -64,14 +52,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-
     background: #EAF1F6;
-
     color: #1A456B;
-
     font-size: 28px;
 }
-
 
 /* INFORMACIÓN */
 
@@ -82,171 +66,188 @@
 .student-label {
     font-size: 10px;
     font-weight: 700;
-
     color: #6D7D87;
-
     text-transform: uppercase;
-
     letter-spacing: 0.8px;
 }
 
 .student-info h3 {
     margin: 4px 0 15px;
-
     color: #193044;
-
     font-size: 18px;
 }
 
 .student-details {
     display: flex;
     flex-direction: column;
-
     gap: 10px;
 }
 
 .detail {
     display: flex;
     align-items: center;
-
     gap: 10px;
-
     color: #6D7D87;
 }
 
 .detail > i {
     width: 18px;
-
     color: #1A456B;
-
     text-align: center;
 }
 
 .detail div {
     display: flex;
     flex-direction: column;
-
     gap: 2px;
 }
 
 .detail span {
     font-size: 10px;
-
     color: #84939C;
 }
 
 .detail strong {
     color: #344B5E;
-
     font-size: 12px;
     font-weight: 600;
 }
 
+/* BOTONES DE ACCIÓN */
+
+.student-card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+.btn-card-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #E2E8EC;
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-card-action.edit {
+    color: #1A456B;
+}
+
+.btn-card-action.edit:hover {
+    background: #EAF1F6;
+    border-color: #1A456B;
+}
+
+.btn-card-action.delete {
+    color: #dc2626;
+}
+
+.btn-card-action.delete:hover {
+    background: #FDECEC;
+    border-color: #f87171;
+}
 
 /* ESTADOS */
 
 .loading-state,
 .empty-state {
     min-height: 300px;
-
     display: flex;
     flex-direction: column;
-
     align-items: center;
     justify-content: center;
-
     padding: 40px;
-
     text-align: center;
-
     background: #ffffff;
-
     border: 1px solid #E2E8EC;
     border-radius: 18px;
-
     color: #6D7D87;
 }
 
 .loading-state i {
     margin-bottom: 12px;
-
     color: #1A456B;
-
     font-size: 28px;
 }
 
 .empty-icon {
     width: 65px;
     height: 65px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     margin-bottom: 15px;
-
     border-radius: 50%;
-
     background: #EAF1F6;
-
     color: #1A456B;
-
     font-size: 25px;
 }
 
 .empty-state h3 {
     margin: 0 0 6px;
-
     color: #193044;
 }
 
 .empty-state p {
     margin: 0;
-
     font-size: 13px;
 }
-
 
 /* ERROR */
 
 .alert {
     display: flex;
     align-items: center;
-
     gap: 10px;
-
     margin-bottom: 18px;
-
     padding: 13px 16px;
-
     border-radius: 10px;
-
     font-size: 13px;
 }
 
 .alert-error {
     background: #FDECEC;
-
     color: #A72828;
-
     border: 1px solid #F4CCCC;
+}
+
+/* MODAL */
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #84939C;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.btn-close-modal:hover {
+    color: #193044;
 }
 
 
 /* RESPONSIVE */
 
 @media (max-width: 900px) {
-
     .students-grid {
         grid-template-columns: 1fr;
     }
-
 }
 
 @media (max-width: 520px) {
-
     .student-card {
         flex-direction: column;
     }
 
+    .student-card-actions {
+        flex-direction: row;
+    }
 }
