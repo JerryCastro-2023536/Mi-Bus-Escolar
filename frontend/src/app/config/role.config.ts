@@ -33,7 +33,7 @@ const adminSidebar: SidebarSection[] = [
         items: [
             { label: 'Usuarios', icon: 'users', route: '/usuarios', description: 'Cuentas de acceso, contraseñas y asignación de roles' },
             { label: 'Estudiantes', icon: 'graduation-cap', route: '/estudiantes', description: 'Padrón de alumnos, tutores y colegios asignados' },
-            { label: 'Choferes', icon: 'id-card', route: '/mis-choferes', description: 'Conductores y rutas asignadas' },
+            { label: 'Choferes', icon: 'id-card', route: '/choferes', description: 'Conductores y rutas asignadas' },
             { label: 'Colegios', icon: 'school', route: '/colegios', description: 'Sedes escolares afiliadas, convenios y horarios' }
         ]
     },
