@@ -1,0 +1,228 @@
+<div class="op-container">
+    @if(exito) {
+    <div class="alert success">{{ exito }}</div>
+    }
+
+    @if(error) {
+    <div class="alert error">{{ error }}</div>
+    }
+
+    <div class="op-card">
+        <div class="op-head">
+            <div>
+                <h3>Asignación de ruta</h3>
+                <p class="op-sub">Selecciona un servicio y después una ruta para administrar sus estudiantes.</p>
+            </div>
+        </div>
+
+        <div class="selector services">
+            @for(s of servicios(); track s.id_servicio) {
+            <button [class.active]="servicioSeleccionado() === s.id_servicio"
+                (click)="seleccionarServicio(s.id_servicio)">
+                <strong>{{ s.nombre }}</strong>
+                <span class="op-muted">Servicio</span>
+            </button>
+            }
+        </div>
+
+        @if(servicioSeleccionado()) {
+        <div class="selector routes">
+            @for(r of rutasFiltradas(); track r.id_ruta) {
+            <button [class.active]="ruta()?.id_ruta === r.id_ruta" (click)="seleccionar(r)">
+                <strong>{{ r.nombre }}</strong>
+                <span class="op-muted">{{ r.hora_inicio_estimada?.slice(0, 5) || 'Sin horario' }}</span>
+            </button>
+            } @empty {
+            <div class="empty selector-empty">Este servicio no tiene rutas registradas.</div>
+            }
+        </div>
+        } @else if(!servicios().length) {
+        <div class="empty">No tienes servicios disponibles.</div>
+        }
+    </div>
+
+    @if(ruta(); as r) {
+    <div class="op-card">
+        <div class="op-head">
+            <div>
+                <h3>{{ r.nombre }}</h3>
+                <p class="op-sub">{{ r.nombre_servicio }} · Estudiantes asignados a esta ruta.</p>
+            </div>
+            <button class="btn-primary" (click)="abrirBuscar()">
+                <i class="fa-solid fa-user-plus"></i> Asignar estudiante
+            </button>
+        </div>
+
+        @if(cargando()) {
+        <div class="loading">Cargando estudiantes...</div>
+        } @else if(!asignaciones().length) {
+        <div class="empty">Esta ruta todavía no tiene estudiantes asignados.</div>
+        } @else {
+        <div class="op-grid">
+            @for(a of asignaciones(); track a.id_asignacion) {
+            <article class="op-item student-card">
+                <div class="student-main">
+                    @if(a.foto_estudiante) {
+                    <img class="student-avatar" [src]="a.foto_estudiante" [alt]="a.nombre_estudiante">
+                    } @else {
+                    <div class="student-avatar">{{ a.nombre_estudiante[0] }}</div>
+                    }
+                    <div>
+                        <div class="op-title">{{ a.nombre_estudiante }} {{ a.apellido_estudiante }}</div>
+                        <div class="op-muted">{{ a.grado || 'Grado no indicado' }}</div>
+                    </div>
+                </div>
+
+                <div class="stop-grid">
+                    <div class="stop-item">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <div>
+                            <span>Recogida</span>
+                            <strong>{{ a.direccion_parada_recogida || 'No asignado' }}</strong>
+                        </div>
+                    </div>
+                    <div class="stop-item">
+                        <i class="fa-solid fa-location-arrow"></i>
+                        <div>
+                            <span>Descenso</span>
+                            <strong>{{ a.direccion_parada_descenso || 'No asignado' }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="op-actions">
+                    <button class="btn-danger" (click)="pedirRetirar(a)">
+                        <i class="fa-solid fa-user-minus"></i> Retirar
+                    </button>
+                </div>
+            </article>
+            }
+        </div>
+        }
+    </div>
+    }
+
+    @if(modal()) {
+    <div class="modal-overlay" (click)="cerrarBuscar()">
+        <div class="modal modal-search" (click)="$event.stopPropagation()">
+            <div class="modal-head">
+                <div>
+                    <h3>Buscar estudiante</h3>
+                    <p class="op-sub modal-sub">Busca por nombre y apellido. Se mostrará el colegio asociado al estudiante.</p>
+                </div>
+                <button class="btn-icon" (click)="cerrarBuscar()" aria-label="Cerrar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="toolbar">
+                <input class="input" [(ngModel)]="busqueda" (keyup.enter)="buscar()"
+                    placeholder="Ej. Ana López">
+                <button class="btn-primary" (click)="buscar()" [disabled]="buscando() || busqueda.trim().length < 2">
+                    @if(buscando()) { Buscando... } @else { Buscar }
+                </button>
+            </div>
+
+            @if(buscando()) {
+            <div class="loading">Buscando estudiantes...</div>
+            } @else if(busqueda.trim().length >= 2 && !resultados().length) {
+            <div class="empty">No se encontraron estudiantes disponibles.</div>
+            }
+
+            <div class="student-results">
+                @for(e of resultados(); track e.id_estudiante) {
+                <article class="student-result">
+                    <div class="student-main result-main">
+                        @if(e.foto_estudiante) {
+                        <img class="student-avatar result-avatar" [src]="e.foto_estudiante" [alt]="e.nombre">
+                        } @else {
+                        <div class="student-avatar result-avatar">{{ e.nombre[0] }}</div>
+                        }
+                        <div class="student-result-info">
+                            <div class="op-title">{{ e.nombre }} {{ e.apellido }}</div>
+                            <div class="result-meta">
+                                <span><i class="fa-solid fa-graduation-cap"></i> {{ e.grado || 'Grado no indicado' }}</span>
+                                <span><i class="fa-solid fa-school"></i> {{ e.nombre_colegio || 'No asignado' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-primary result-action" (click)="seleccionarEstudiante(e)">Asignar</button>
+                </article>
+                }
+            </div>
+        </div>
+    </div>
+    }
+
+    @if(confirmar(); as e) {
+    <div class="modal-overlay">
+        <div class="modal modal-confirm">
+            <div class="modal-head">
+                <h3>Confirmar asignación</h3>
+            </div>
+
+            <p>¿Deseas asignar este estudiante a <strong>{{ ruta()?.nombre }}</strong>?</p>
+
+            <div class="confirm-student">
+                @if(e.foto_estudiante) {
+                <img class="student-avatar confirm-avatar" [src]="e.foto_estudiante" [alt]="e.nombre">
+                } @else {
+                <div class="student-avatar confirm-avatar">{{ e.nombre[0] }}</div>
+                }
+                <div>
+                    <strong>{{ e.nombre }} {{ e.apellido }}</strong>
+                    <div class="op-muted">{{ e.grado || 'Grado no indicado' }}</div>
+                    <div class="school-line"><i class="fa-solid fa-school"></i> {{ e.nombre_colegio || 'No asignado' }}</div>
+                </div>
+            </div>
+
+            <div class="info-note">
+                <i class="fa-solid fa-circle-info"></i>
+                Las paradas de recogida y descenso quedarán como <strong>No asignado</strong> hasta que el padre las configure.
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" (click)="cancelarConfirmacion()" [disabled]="guardando()">Cancelar</button>
+                <button class="btn-primary" (click)="confirmarAsignacion()" [disabled]="guardando()">
+                    {{ guardando() ? 'Asignando...' : 'Confirmar asignación' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+    @if(aRetirar(); as a) {
+    <div class="modal-overlay">
+        <div class="modal modal-confirm">
+            <div class="modal-head">
+                <h3>Retirar estudiante</h3>
+            </div>
+
+            <div class="confirm-student danger-summary">
+                @if(a.foto_estudiante) {
+                <img class="student-avatar confirm-avatar" [src]="a.foto_estudiante" [alt]="a.nombre_estudiante">
+                } @else {
+                <div class="student-avatar confirm-avatar">{{ a.nombre_estudiante[0] }}</div>
+                }
+                <div>
+                    <strong>{{ a.nombre_estudiante }} {{ a.apellido_estudiante }}</strong>
+                    <div class="op-muted">{{ a.grado || 'Grado no indicado' }}</div>
+                </div>
+            </div>
+
+            <p class="confirm-text">¿Deseas retirar a este estudiante de <strong>{{ ruta()?.nombre }}</strong>?</p>
+            <div class="warning-note">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Esta acción elimina únicamente la asignación del estudiante a la ruta.
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" (click)="cancelarRetirar()" [disabled]="retirando()">Cancelar</button>
+                <button class="btn-danger" (click)="confirmarRetirar()" [disabled]="retirando()">
+                    {{ retirando() ? 'Retirando...' : 'Sí, retirar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+</div>

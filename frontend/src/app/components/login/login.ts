@@ -6,6 +6,7 @@ import { LoginService } from '../../services/login';
 import { UsuarioLoginDTO, UsuarioRegisterDTO } from '../../models/usuarioDTO.interface';
 import { RegisterService } from '../../services/register';
 import { CloudinaryService } from '../../services/cloudinary.service';
+import { getDashboardRoute } from '../../config/role.config';
 
 @Component({
   selector: 'app-login',
@@ -125,7 +126,8 @@ export class Login implements OnInit {
           this.loginService.saveUser(res.usuario);
           this.currentUser.set(res.usuario);
           this.currentToken.set(res.token);
-          this.router.navigateByUrl('/dashboard');
+          const targetRoute = getDashboardRoute(this.currentUser()?.rol);
+          this.router.navigateByUrl(targetRoute || '/dashboard');
         } else {
           this.successMessage.set(res.message || 'Login exitoso');
         }

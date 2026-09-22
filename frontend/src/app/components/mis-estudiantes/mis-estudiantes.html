@@ -1,5 +1,13 @@
 <section class="estudiantes-view">
 
+    <div class="toolbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+        <div></div>
+        <button type="button" class="btn-card-action" (click)="abrirFormularioCrear()">
+            <i class="fa-solid fa-plus"></i>
+            Agregar estudiante
+        </button>
+    </div>
+
     @if (mensajeError) {
         <div class="alert alert-error">
             <i class="fa-solid fa-circle-exclamation"></i>
@@ -11,7 +19,6 @@
 
         <div class="loading-state">
             <i class="fa-solid fa-spinner fa-spin"></i>
-
             <p>Cargando estudiantes...</p>
         </div>
 
@@ -26,26 +33,19 @@
                     <article class="student-card">
 
                         <div class="student-photo">
-
                             @if (estudiante.foto_estudiante) {
-
                                 <img
                                     [src]="estudiante.foto_estudiante"
                                     [alt]="estudiante.nombre + ' ' + estudiante.apellido"
                                 />
-
                             } @else {
-
                                 <div class="photo-placeholder">
                                     <i class="fa-solid fa-user-graduate"></i>
                                 </div>
-
                             }
-
                         </div>
 
                         <div class="student-info">
-
                             <span class="student-label">
                                 Estudiante
                             </span>
@@ -56,37 +56,48 @@
                             </h3>
 
                             <div class="student-details">
-
                                 <div class="detail">
-
                                     <i class="fa-solid fa-school"></i>
-
                                     <div>
                                         <span>Colegio</span>
-
                                         <strong>
                                             {{ estudiante.nombre_colegio || 'Sin colegio registrado' }}
                                         </strong>
                                     </div>
-
                                 </div>
 
                                 <div class="detail">
-
                                     <i class="fa-solid fa-graduation-cap"></i>
-
                                     <div>
                                         <span>Grado</span>
-
                                         <strong>
                                             {{ estudiante.grado || 'Sin grado registrado' }}
                                         </strong>
                                     </div>
-
                                 </div>
-
                             </div>
+                        </div>
 
+                        <div class="student-card-actions">
+                            <button 
+                                type="button" 
+                                class="btn-card-action edit"
+                                (click)="editarEstudiante(estudiante)"
+                                title="Editar estudiante"
+                            >
+                                <i class="fa-solid fa-pen"></i>
+                                <span>Editar</span>
+                            </button>
+
+                            <button 
+                                type="button" 
+                                class="btn-card-action delete"
+                                (click)="eliminarEstudiante(estudiante)"
+                                title="Eliminar estudiante"
+                            >
+                                <i class="fa-solid fa-trash-can"></i>
+                                <span>Eliminar</span>
+                            </button>
                         </div>
 
                     </article>
@@ -98,7 +109,6 @@
         } @else {
 
             <div class="empty-state">
-
                 <div class="empty-icon">
                     <i class="fa-solid fa-user-graduate"></i>
                 </div>
@@ -109,11 +119,22 @@
                     Actualmente no hay estudiantes asociados
                     a tu cuenta.
                 </p>
-
             </div>
 
         }
 
     }
+
+    <!-- Modal para crear o editar estudiante -->
+    @if (mostrarFormulario()) {
+        <app-crud-form
+            [fields]="formFields"
+            [item]="estudianteAEditar()"
+            imageFolder="estudiantes"
+            (save)="guardarEstudiante($event)"
+            (cancel)="cerrarModalForm()"
+        ></app-crud-form>
+    }
+    
 
 </section>

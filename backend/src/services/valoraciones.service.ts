@@ -45,12 +45,13 @@ export async function agregarValoraciones(p_valoraciones: Valoraciones) {
     try {
         const valores = [
             p_valoraciones.id_proveedor,
+            p_valoraciones.id_usuario,
             p_valoraciones.comentario,
             p_valoraciones.calificacion
         ];
 
         const consulta = `
-            select * from sp_valoraciones_crear($1, $2, $3)
+            select * from sp_valoraciones_crear($1, $2, $3, $4)
         `;
 
         const resultado = await pool.query(consulta, valores);
@@ -65,12 +66,13 @@ export async function actualizarValoracion(p_valoraciones: Valoraciones, id: num
         const valores = [
             id,
             p_valoraciones.id_proveedor,
+            p_valoraciones.id_usuario,
             p_valoraciones.comentario,
             p_valoraciones.calificacion
         ];
 
         const consulta = `
-            select * from sp_valoraciones_editar($1, $2, $3, $4)
+            select * from sp_valoraciones_editar($1, $2, $3, $4, $5)
         `;
 
         const resultado = await pool.query(consulta, valores);

@@ -1,0 +1,140 @@
+<div class="pagos-container">
+
+    @if (mensajeExito) {
+    <div class="alert-box success">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>{{ mensajeExito }}</span>
+        <button class="btn-close-alert" (click)="mensajeExito = ''" type="button" aria-label="Cerrar alerta"><i
+                class="fa-solid fa-xmark"></i></button>
+    </div>
+    }
+    @if (mensajeError) {
+    <div class="alert-box error">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>{{ mensajeError }}</span>
+        <button class="btn-close-alert" (click)="mensajeError = ''" type="button" aria-label="Cerrar alerta"><i
+                class="fa-solid fa-xmark"></i></button>
+    </div>
+    }
+
+    <!-- Lista de servicios -->
+    @if (!servicioSeleccionado()) {
+    <div class="step-card">
+        <div class="list-header">
+            <div>
+                <h3>Mis servicios</h3>
+                <p class="step-subtitle">Selecciona un servicio para ver su información.</p>
+            </div>
+            <button type="button" class="btn-primary-action" (click)="abrirFormulario()">
+                <i class="fa-solid fa-plus"></i>
+                <span>Añadir servicio</span>
+            </button>
+        </div>
+
+        @if (cargandoServicios()) {
+        <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Cargando servicios...</div>
+        } @else if (servicios().length === 0) {
+        <div class="empty-state">Aún no has registrado servicios. Añade el primero para que los tutores puedan encontrarte.</div>
+        } @else {
+        <div class="servicios-grid">
+            @for (serv of servicios(); track serv.id_servicio) {
+            <button type="button" class="servicio-card" (click)="seleccionarServicio(serv)">
+                <div class="servicio-icono"><i class="fa-solid fa-bus"></i></div>
+                <div class="servicio-info">
+                    <span class="servicio-nombre">{{ serv.nombre }}</span>
+                    <span class="servicio-meta">Q{{ serv.precio_mensual | number: '1.2-2' }} / mes · {{ serv.total_estudiantes }}
+                        {{ serv.total_estudiantes === 1 ? 'estudiante' : 'estudiantes' }}</span>
+                    <span class="servicio-estado" [class.inactivo]="serv.estado !== 'ACTIVO'">
+                        {{ serv.estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
+                    </span>
+                </div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            }
+        </div>
+        }
+    </div>
+    }
+
+    <!-- Información del servicio -->
+    @if (servicioSeleccionado(); as serv) {
+    <div class="step-card">
+        <div class="step-header-row">
+            <button class="btn-back" type="button" (click)="volverAServicios()" aria-label="Volver a mis servicios"><i
+                    class="fa-solid fa-arrow-left"></i></button>
+            <div>
+                <h3>{{ serv.nombre }}</h3>
+                <p class="step-subtitle">Información del servicio.</p>
+            </div>
+        </div>
+
+        <div class="resumen-pago">
+            <div class="resumen-fila"><span>Descripción</span><span>{{ serv.descripcion || 'Sin descripción' }}</span></div>
+            <div class="resumen-fila"><span>Precio mensual</span><span>Q{{ serv.precio_mensual | number: '1.2-2' }}</span></div>
+            <div class="resumen-fila">
+                <span>Estado</span>
+                <span class="estado-texto" [class.inactivo]="serv.estado !== 'ACTIVO'">
+                    <i [class]="'fa-solid ' + (serv.estado === 'ACTIVO' ? 'fa-circle-check' : 'fa-circle-pause')"></i>
+                    {{ serv.estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
+                </span>
+            </div>
+            <div class="resumen-fila"><span>Rutas</span><span>{{ serv.total_rutas }}</span></div>
+            <div class="resumen-fila"><span>Estudiantes</span><span>{{ serv.total_estudiantes }}</span></div>
+            <div class="resumen-fila"><span>Fecha de creación</span><span>{{ serv.fecha_creacion | date: 'dd/MM/yyyy' }}</span></div>
+        </div>
+
+        <div class="acciones-row">
+            <button type="button" class="btn-secondary-action" (click)="abrirEdicion(serv)">
+                <i class="fa-solid fa-pen"></i>
+                <span>Editar</span>
+            </button>
+
+            <button type="button" class="btn-secondary-action" [disabled]="cambiandoEstado()"
+                (click)="alternarEstado(serv)">
+                @if (cambiandoEstado()) {
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Guardando...</span>
+                } @else {
+                <i [class]="'fa-solid ' + (serv.estado === 'ACTIVO' ? 'fa-toggle-off' : 'fa-toggle-on')"></i>
+                <span>{{ serv.estado === 'ACTIVO' ? 'Desactivar' : 'Activar' }}</span>
+                }
+            </button>
+
+            <button type="button" class="btn-danger-action" [disabled]="serv.total_rutas > 0 || confirmandoEliminar()"
+                (click)="pedirConfirmacionEliminar()">
+                <i class="fa-solid fa-trash"></i>
+                <span>Eliminar</span>
+            </button>
+        </div>
+
+        @if (serv.total_rutas > 0) {
+        <p class="help-hint">Este servicio tiene rutas, por eso no se puede eliminar. Puedes desactivarlo para dejar de ofrecerlo.</p>
+        }
+
+        @if (confirmandoEliminar()) {
+        <div class="alert-box error confirm-box">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>¿Eliminar "{{ serv.nombre }}"? Esta acción no se puede deshacer.</span>
+            <button type="button" class="btn-secondary-action" [disabled]="eliminando()"
+                (click)="cancelarEliminar()">Cancelar</button>
+            <button type="button" class="btn-danger-action" [disabled]="eliminando()"
+                (click)="eliminarServicio(serv)">
+                @if (eliminando()) {
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Eliminando...</span>
+                } @else {
+                <span>Sí, eliminar</span>
+                }
+            </button>
+        </div>
+        }
+    </div>
+    }
+
+</div>
+
+<!-- Formulario de alta / edición (mismo componente que usan los CRUD) -->
+@if (mostrarFormulario()) {
+<app-crud-form [fields]="camposServicio" [item]="servicioEnEdicion()" [errors]="erroresForm()"
+    (save)="guardarServicio($event)" (cancel)="cerrarFormulario()" />
+}

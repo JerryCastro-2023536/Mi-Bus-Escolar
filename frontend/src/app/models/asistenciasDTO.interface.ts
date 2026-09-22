@@ -50,10 +50,13 @@ export interface ReporteResultadoDTO {
 }
 
 export interface NotificacionDTO {
-    id_notificacion: number;               
+    id_notificacion?: number;               
+    id_usuario?: number;
+    id_incidencia?: number;
+    id_asistencia?: number | null;
     tipo: TipoNoti;
     titulo: string;
     mensaje: string;
     leida: boolean;
-    fecha_envio: string;                   
+    fecha_envio?: string | Date;                   
 }

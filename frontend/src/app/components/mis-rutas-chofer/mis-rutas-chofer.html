@@ -1,0 +1,83 @@
+<div class="container">
+  <div class="card">
+    <div class="head">
+      <div>
+        <h3>Mis Rutas</h3>
+        <p>Consulta los trayectos y horarios de tus rutas asignadas.</p>
+      </div>
+
+      <div class="head-controls">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input 
+            type="text" 
+            placeholder="Buscar por nombre de ruta, vehículo..." 
+            [ngModel]="busqueda()" 
+            (ngModelChange)="busqueda.set($event)"
+          />
+        </div>
+
+        <div class="filters">
+          <button [class.active]="filtro() === 'TODAS'" (click)="filtro.set('TODAS')">Todas</button>
+          <button [class.active]="filtro() === 'ACTIVO'" (click)="filtro.set('ACTIVO')">Activas</button>
+          <button [class.active]="filtro() === 'INACTIVO'" (click)="filtro.set('INACTIVO')">Inactivas</button>
+        </div>
+      </div>
+    </div>
+
+    @if (error()) {
+    <div class="alert error">{{ error() }}</div>
+    }
+
+    @if (cargando()) {
+    <div class="empty"><i class="fa-solid fa-spinner fa-spin"></i> Cargando rutas...</div>
+    } @else if (!filtradas().length) {
+    <div class="empty">
+      <i class="fa-solid fa-route empty-icon"></i>
+      <p>No tienes rutas asignadas actualmente{{ busqueda() ? ' para esta búsqueda' : '' }}.</p>
+    </div>
+    } @else {
+    <div class="grid">
+      @for (r of filtradas(); track r.id_ruta) {
+      <article class="item">
+        <div class="top">
+          <div class="route-title-wrap">
+            <strong>{{ r.nombre }}</strong>
+          </div>
+          <span class="badge" [class.active]="r.estado?.toUpperCase() === 'ACTIVO' || r.estado?.toUpperCase() === 'ACTIVA'">
+            {{ labelEstado(r.estado) }}
+          </span>
+        </div>
+
+        <div class="data">
+          <span>
+            <i class="fa-regular fa-clock"></i>
+            {{ r.hora_inicio_estimada || '--:--' }} - {{ r.hora_fin_estimada || '--:--' }}
+          </span>
+          <span>
+            <i class="fa-solid fa-bus"></i>
+            {{ r.vehiculo_placa || 'Sin vehículo asignado' }}
+          </span>
+          <span>
+            <i class="fa-solid fa-users"></i>
+            {{ r.total_estudiantes || 0 }} estudiantes asignados
+          </span>
+          @if (r.servicio_nombre) {
+          <span>
+            <i class="fa-solid fa-tag"></i>
+            {{ r.servicio_nombre }}
+          </span>
+          }
+        </div>
+
+        <div class="card-action">
+          <button class="btn-map" (click)="irAlMapa()">
+            <i class="fa-solid fa-location-arrow"></i> Ver / Iniciar en Mapa
+          </button>
+        </div>
+      </article>
+      }
+    </div>
+    }
+  </div>
+</div>

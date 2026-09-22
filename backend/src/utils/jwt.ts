@@ -8,6 +8,7 @@ interface JwtPayload {
     id: string | number;
     email: string;
     rol: userRol;
+    id_chofer?: number | null;
 }
 
 export const generarToken = (payload: JwtPayload): string => {

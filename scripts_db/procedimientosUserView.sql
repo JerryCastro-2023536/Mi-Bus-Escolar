@@ -5,8 +5,10 @@ RETURNS TABLE (
     id_estudiante INTEGER,
     nombre VARCHAR,
     apellido VARCHAR,
+    fecha_nacimiento DATE,
     foto_estudiante TEXT,
     grado VARCHAR,
+    id_colegio INTEGER,
     nombre_colegio VARCHAR
 )
 LANGUAGE plpgsql
@@ -17,8 +19,10 @@ BEGIN
         e.id_estudiante,
         e.nombre,
         e.apellido,
+        e.fecha_nacimiento,
         e.foto_estudiante,
         e.grado,
+        c.id_colegio,
         c.nombre AS nombre_colegio
     FROM estudiantes e
     LEFT JOIN colegios c

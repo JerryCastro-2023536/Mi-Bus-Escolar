@@ -1,0 +1,193 @@
+<div class="pagos-container">
+
+    @if (mensajeError) {
+    <div class="alert-box error">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>{{ mensajeError }}</span>
+        <button class="btn-close-alert" (click)="mensajeError = ''" type="button" aria-label="Cerrar alerta"><i
+                class="fa-solid fa-xmark"></i></button>
+    </div>
+    }
+
+
+    @if (!servicioSeleccionado()) {
+    <div class="step-card">
+        <h3>Selecciona un servicio</h3>
+        <p class="step-subtitle">Elige uno de tus servicios para ver los pagos de sus estudiantes.</p>
+
+        @if (cargandoServicios()) {
+        <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Cargando servicios...</div>
+        } @else if (servicios().length === 0) {
+        <div class="empty-state">No tienes servicios registrados.</div>
+        } @else {
+        <div class="servicios-grid">
+            @for (serv of servicios(); track serv.id_servicio) {
+            <button type="button" class="servicio-card" (click)="seleccionarServicio(serv)">
+                <div class="servicio-icono"><i class="fa-solid fa-bus"></i></div>
+                <div class="servicio-info">
+                    <span class="servicio-nombre">{{ serv.nombre }}</span>
+                    <span class="servicio-meta">Q{{ serv.precio_mensual }} / mes · {{ serv.total_estudiantes }}
+                        {{ serv.total_estudiantes === 1 ? 'estudiante' : 'estudiantes' }}</span>
+                    <span class="servicio-estado" [class.inactivo]="serv.estado !== 'ACTIVO'">
+                        {{ serv.estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
+                    </span>
+                </div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            }
+        </div>
+        }
+    </div>
+    }
+
+
+    @if (servicioSeleccionado() && !estudianteSeleccionado()) {
+    <div class="step-card">
+        <div class="step-header-row">
+            <button class="btn-back" type="button" (click)="volverAServicios()" aria-label="Volver a servicios"><i
+                    class="fa-solid fa-arrow-left"></i></button>
+            <div>
+                <h3>{{ servicioSeleccionado()!.nombre }}</h3>
+                <p class="step-subtitle">Selecciona un estudiante para ver sus pagos.</p>
+            </div>
+        </div>
+
+        @if (cargandoEstudiantes()) {
+        <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Cargando estudiantes...</div>
+        } @else if (estudiantes().length === 0) {
+        <div class="empty-state">Este servicio no tiene estudiantes asignados.</div>
+        } @else {
+        <div class="search-field">
+            <input type="text" class="search-input" placeholder="Buscar estudiante por nombre"
+                aria-label="Buscar estudiante" [value]="busqueda()" (input)="onBuscar($event)" />
+        </div>
+
+        @if (estudiantesFiltrados().length === 0) {
+        <div class="empty-state">Ningún estudiante coincide con tu búsqueda.</div>
+        } @else {
+        <div class="estudiantes-grid">
+            @for (est of estudiantesFiltrados(); track est.id_estudiante) {
+            <button type="button" class="estudiante-card" (click)="seleccionarEstudiante(est)">
+                @if (est.foto_estudiante) {
+                <img [src]="est.foto_estudiante" alt="Foto" class="estudiante-foto" />
+                } @else {
+                <div class="estudiante-foto-placeholder">{{ est.nombre.charAt(0) }}</div>
+                }
+                <div class="estudiante-info">
+                    <span class="estudiante-nombre">{{ est.nombre }} {{ est.apellido }}</span>
+                    <span class="estudiante-meta">{{ est.grado || 'Sin grado' }} · {{ est.nombre_colegio || 'Sin colegio' }}
+                    </span>
+                </div>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            }
+        </div>
+        }
+        }
+    </div>
+    }
+
+    @if (estudianteSeleccionado() && !mesSeleccionado()) {
+    <div class="step-card">
+        <div class="step-header-row">
+            <button class="btn-back" type="button" (click)="volverAEstudiantes()" aria-label="Volver a estudiantes"><i
+                    class="fa-solid fa-arrow-left"></i></button>
+            <div>
+                <h3>Pagos de {{ estudianteSeleccionado()!.nombre }} {{ estudianteSeleccionado()!.apellido }}</h3>
+                <p class="step-subtitle">
+                    {{ servicioSeleccionado()!.nombre }}
+                    @if (!cargandoMeses() && meses().length > 0) {
+                    · {{ mesesPagados() }} de {{ meses().length }} meses pagados
+                    }
+                </p>
+            </div>
+        </div>
+
+        @if (cargandoMeses()) {
+        <div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i> Cargando meses...</div>
+        } @else if (meses().length === 0) {
+        <div class="empty-state">No hay meses de pago para este estudiante en este servicio.</div>
+        } @else {
+        <div class="meses-grid">
+            @for (mes of meses(); track mes.periodo_anio + '-' + mes.periodo_mes) {
+            <button type="button" class="mes-card" [class.pagado]="mes.estado === 'PAGADO'"
+                (click)="seleccionarMes(mes)">
+                <span class="mes-nombre">{{ nombreMes(mes.periodo_mes) }} {{ mes.periodo_anio }}</span>
+                <span class="mes-precio">Q{{ mes.precio_mensual }}</span>
+                <span class="mes-badge" [class.pagado]="mes.estado === 'PAGADO'">
+                    <i [class]="'fa-solid ' + (mes.estado === 'PAGADO' ? 'fa-circle-check' : 'fa-clock')"></i>
+                    {{ mes.estado === 'PAGADO' ? 'Pagado' : 'Pendiente' }}
+                </span>
+            </button>
+            }
+        </div>
+        }
+    </div>
+    }
+
+    <!-- Detalle: mes pagado -->
+    @if (mesSeleccionado() && mesSeleccionado()!.estado === 'PAGADO') {
+    <div class="step-card">
+        <div class="step-header-row">
+            <button class="btn-back" type="button" (click)="volverAMeses()" aria-label="Volver a meses"><i
+                    class="fa-solid fa-arrow-left"></i></button>
+            <div>
+                <h3>{{ nombreMes(mesSeleccionado()!.periodo_mes) }} {{ mesSeleccionado()!.periodo_anio }}</h3>
+                <p class="step-subtitle">Este mes ya fue pagado.</p>
+            </div>
+        </div>
+
+        <div class="resumen-pago">
+            <div class="resumen-fila"><span>Estudiante</span><span>{{ estudianteSeleccionado()!.nombre }}
+                    {{ estudianteSeleccionado()!.apellido }}</span></div>
+            <div class="resumen-fila"><span>Servicio</span><span>{{ mesSeleccionado()!.nombre_servicio }}</span></div>
+            <div class="resumen-fila"><span>Monto</span><span>Q{{ mesSeleccionado()!.monto }}</span></div>
+            <div class="resumen-fila"><span>Método de pago</span><span>{{ mesSeleccionado()!.metodo_pago }}</span></div>
+            @if (mesSeleccionado()!.referencia_pago) {
+            <div class="resumen-fila"><span>Referencia</span><span>{{ mesSeleccionado()!.referencia_pago }}</span></div>
+            }
+            <div class="resumen-fila"><span>Fecha de verificación</span><span>{{ mesSeleccionado()!.fecha_verificacion | date: 'dd/MM/yyyy' }}</span></div>
+
+            @if (mesSeleccionado()!.foto_comprobante) {
+            <div class="comprobante-preview">
+                <span class="comprobante-label">Comprobante</span>
+                <a [href]="mesSeleccionado()!.foto_comprobante!" target="_blank" rel="noopener"
+                    title="Abrir en tamaño completo">
+                    <img [src]="mesSeleccionado()!.foto_comprobante!" alt="Comprobante de pago" />
+                </a>
+            </div>
+            }
+        </div>
+    </div>
+    }
+
+    <!-- Detalle: mes pendiente -->
+    @if (mesSeleccionado() && mesSeleccionado()!.estado !== 'PAGADO') {
+    <div class="step-card">
+        <div class="step-header-row">
+            <button class="btn-back" type="button" (click)="volverAMeses()" aria-label="Volver a meses"><i
+                    class="fa-solid fa-arrow-left"></i></button>
+            <div>
+                <h3>{{ nombreMes(mesSeleccionado()!.periodo_mes) }} {{ mesSeleccionado()!.periodo_anio }}</h3>
+                <p class="step-subtitle">Este mes todavía no tiene un pago registrado.</p>
+            </div>
+        </div>
+
+        <div class="alert-box warning">
+            <i class="fa-solid fa-clock"></i>
+            <span>El tutor aún no ha registrado el pago de este mes.</span>
+        </div>
+
+        <div class="resumen-pago">
+            <div class="resumen-fila"><span>Estudiante</span><span>{{ estudianteSeleccionado()!.nombre }}
+                    {{ estudianteSeleccionado()!.apellido }}</span></div>
+            <div class="resumen-fila"><span>Servicio</span><span>{{ mesSeleccionado()!.nombre_servicio }}</span></div>
+            <div class="resumen-fila"><span>Monto a pagar</span><span>Q{{ mesSeleccionado()!.precio_mensual }}</span></div>
+            @if (mesSeleccionado()!.fecha_pago_limite) {
+            <div class="resumen-fila"><span>Fecha límite</span><span>{{ mesSeleccionado()!.fecha_pago_limite | date: 'dd/MM/yyyy' }}</span></div>
+            }
+        </div>
+    </div>
+    }
+
+</div>

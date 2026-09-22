@@ -1,0 +1,232 @@
+<div class="proveedor-container">
+    @if(mensajeExito) {
+    <div class="alert-box success">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>{{ mensajeExito }}</span>
+    </div>
+    }
+
+    @if(mensajeError) {
+    <div class="alert-box error">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>{{ mensajeError }}</span>
+    </div>
+    }
+
+    <div class="step-card">
+        <div class="header-row">
+            <div>
+                <h3>Mis choferes</h3>
+                <p class="step-subtitle">Administra los conductores de tu proveedor y las rutas que tienen asignadas.
+                </p>
+            </div>
+            <button class="btn-primary" (click)="abrirNuevo()">
+                <i class="fa-solid fa-user-plus"></i> Agregar chofer
+            </button>
+        </div>
+
+        @if(cargando()) {
+        <div class="loading-state">Cargando choferes...</div>
+        } @else if(!choferes().length) {
+        <div class="empty-state">Aún no tienes choferes registrados.</div>
+        } @else {
+        <div class="grid">
+            @for(c of choferes(); track c.id_chofer) {
+            <article class="card">
+                <div class="person">
+                    <div class="avatar">{{ c.nombre[0] }}</div>
+                    <div>
+                        <strong>{{ c.nombre }} {{ c.apellido }}</strong>
+                        <div class="muted">{{ c.telefono_contacto }}</div>
+                    </div>
+                    <span class="estado" [class.inactivo]="c.estado !== 'ACTIVO'">
+                        {{ c.estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
+                    </span>
+                </div>
+
+                <div class="routes">
+                    <div class="section-label">
+                        <i class="fa-solid fa-route"></i> Rutas asignadas
+                    </div>
+                    @if(!c.rutas.length) {
+                    <span class="muted">Sin rutas asignadas.</span>
+                    } @else {
+                    @for(r of c.rutas; track r.id_ruta) {
+                    <div class="route-line">
+                        <span>{{ r.nombre }}</span>
+                        <small>{{ r.nombre_servicio }}</small>
+                    </div>
+                    }
+                    }
+                </div>
+
+                <div class="actions">
+                    <button class="btn-secondary" (click)="abrirRutas(c)">
+                        <i class="fa-solid fa-route"></i> Administrar rutas
+                    </button>
+                    <button class="btn-icon" (click)="abrirEditar(c)">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="btn-icon danger" (click)="pedirEliminar(c)">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </article>
+            }
+        </div>
+        }
+    </div>
+</div>
+
+@if(modalUsuario()) {
+<div class="modal-overlay" (click)="cerrarNuevo()">
+    <div class="modal wide" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Agregar chofer</h3>
+            <button class="btn-icon" (click)="cerrarNuevo()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <p class="step-subtitle">Busca al usuario por nombre y apellido. Al seleccionarlo, su rol se convertirá en
+            CHOFER.</p>
+
+        @if(errorModal) {
+        <div class="alert-box error">{{ errorModal }}</div>
+        }
+
+        <div class="search">
+            <input class="text-input" [(ngModel)]="busqueda" (keyup.enter)="buscarUsuarios()"
+                placeholder="Ej. Ana López">
+            <button class="btn-primary" (click)="buscarUsuarios()">Buscar</button>
+        </div>
+
+        @if(buscando()) {
+        <div class="loading-state">Buscando...</div>
+        } @else if(busqueda && !usuarios().length) {
+        <div class="empty-state">No se encontraron usuarios disponibles.</div>
+        }
+
+        <div class="results">
+            @for(u of usuarios(); track u.id_usuario) {
+            <div class="result-row">
+                <div>
+                    <strong>{{ u.nombre }} {{ u.apellido }}</strong>
+                    <div class="muted">{{ u.correo }} · {{ u.telefono }}</div>
+                </div>
+                <button class="btn-primary" (click)="seleccionarUsuario(u)" [disabled]="creando()">Seleccionar</button>
+            </div>
+            }
+        </div>
+    </div>
+</div>
+}
+
+@if(modalEditar()) {
+<div class="modal-overlay" (click)="modalEditar.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Editar chofer</h3>
+            <button class="btn-icon" (click)="modalEditar.set(false)">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="form-field">
+            <label>Usuario</label>
+            <input class="text-input" [value]="editando()?.nombre + ' ' + editando()?.apellido" disabled>
+        </div>
+
+        <div class="form-field">
+            <label>Teléfono</label>
+            <input class="text-input" [(ngModel)]="telefono">
+        </div>
+
+        <div class="form-field">
+            <label>Estado</label>
+            <select class="text-input" [(ngModel)]="estado">
+                <option value="ACTIVO">Activo</option>
+                <option value="INACTIVO">Inactivo</option>
+            </select>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="modalEditar.set(false)">Cancelar</button>
+            <button class="btn-primary" (click)="guardarEdicion()" [disabled]="guardando()">Guardar</button>
+        </div>
+    </div>
+</div>
+}
+
+@if(modalRutas()) {
+<div class="modal-overlay" (click)="cerrarRutas()">
+    <div class="modal wide" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Rutas de {{ choferRutas()?.nombre }} {{ choferRutas()?.apellido }}</h3>
+            <button class="btn-icon" (click)="cerrarRutas()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        @if(errorModal) {
+        <div class="alert-box error">{{ errorModal }}</div>
+        }
+
+        <p class="muted">Asigna una ruta disponible o selecciona una o más rutas actuales para desasignarlas. La ruta no se elimina.</p>
+
+        <div class="form-field route-assign-field">
+            <label>Asignar nueva ruta</label>
+            <div class="route-assign-row">
+                <select class="text-input" [(ngModel)]="rutaAsignar">
+                    <option [ngValue]="null">Selecciona una ruta</option>
+                    @for(r of rutasDisponibles(choferRutas()); track r.id_ruta) {
+                    <option [ngValue]="r.id_ruta">{{ r.nombre }} · {{ r.nombre_servicio }}</option>
+                    }
+                </select>
+                <button class="btn-primary" type="button" (click)="asignarRuta()"
+                    [disabled]="!rutaAsignar || asignando()">
+                    {{ asignando() ? 'Asignando...' : 'Asignar ruta' }}
+                </button>
+            </div>
+        </div>
+
+        <div class="section-label">
+            <i class="fa-solid fa-link-slash"></i> Rutas actualmente asignadas
+        </div>
+        <div class="route-select">
+            @for(r of choferRutas()?.rutas ?? []; track r.id_ruta) {
+            <label>
+                <input type="checkbox" [checked]="seleccionadas().includes(r.id_ruta)" (change)="toggleRuta(r)">
+                <span>
+                    <strong>{{ r.nombre }}</strong>
+                    <small>{{ r.nombre_servicio }}</small>
+                </span>
+            </label>
+            }
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="cerrarRutas()">Cancelar</button>
+            <button class="btn-danger" (click)="pedirQuitar()" [disabled]="!seleccionadas().length || quitando()">
+                Quitar seleccionadas
+            </button>
+        </div>
+    </div>
+</div>
+}
+
+@if(eliminar()) {
+<div class="modal-overlay" (click)="cancelarEliminar()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Eliminar chofer</h3>
+        </div>
+        <p>¿Eliminar a <strong>{{ eliminar()?.nombre }} {{ eliminar()?.apellido }}</strong>? Sus rutas quedarán sin
+            chofer.</p>
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="cancelarEliminar()">Cancelar</button>
+            <button class="btn-danger" (click)="confirmarEliminar()" [disabled]="eliminando()">Sí, eliminar</button>
+        </div>
+    </div>
+</div>
+}
