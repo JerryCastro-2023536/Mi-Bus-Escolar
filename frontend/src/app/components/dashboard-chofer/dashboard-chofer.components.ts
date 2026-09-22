@@ -25,10 +25,6 @@ export class DashboardChoferComponents implements OnInit {
   selectedRutaId: number | null = null;
   flujoActual: 1 | 2 | 3 = 1;
 
-  vehiculosAbierto = false;
-  estudiantesAbierto = false;
-  reportesAbierto = false;
-
   get vehiculoActual(): any {
     return this.vehiculos[0] ?? null;
   }
@@ -204,15 +200,7 @@ export class DashboardChoferComponents implements OnInit {
     });
   }
 
-  toggleVehiculos(): void {
-    this.vehiculosAbierto = !this.vehiculosAbierto;
-  }
-
-  toggleEstudiantes(): void {
-    this.estudiantesAbierto = !this.estudiantesAbierto;
-  }
-
-  toggleReportes(): void {
-    this.reportesAbierto = !this.reportesAbierto;
+  irAComponente(ruta: string): void {
+  this.router.navigate([ruta]);
   }
 }
