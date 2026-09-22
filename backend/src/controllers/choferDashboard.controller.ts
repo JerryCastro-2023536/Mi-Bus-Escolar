@@ -2,7 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import {
   obtenerVehiculosPorChofer,
   obtenerEstudiantesPorChofer,
-  obtenerReportesPorChofer
+  obtenerReportesPorChofer,
+  obtenerRutasPorChofer
 } from "../services/choferDashboard.service";
 
 export async function getVehiculosPorChofer(req: Request, res: Response, next: NextFunction) {
@@ -44,6 +45,21 @@ export async function getReportesPorChofer(req: Request, res: Response, next: Ne
       success: true,
       message: "Reportes del chofer cargados",
       data: reportes
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getRutasPorChofer(req: Request, res: Response, next: NextFunction) {
+  try {
+    const idChofer = Number(req.params.id);
+    const rutas = await obtenerRutasPorChofer(idChofer);
+
+    return res.status(200).json({
+      success: true,
+      message: "Rutas del chofer cargadas",
+      data: rutas
     });
   } catch (error) {
     next(error);
