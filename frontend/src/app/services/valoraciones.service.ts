@@ -29,6 +29,22 @@ export interface Valoracion {
 
 
 /* ========================================
+   VALORACIÓN CON DATOS DEL USUARIO
+   NUEVO
+======================================== */
+
+export interface ValoracionDetalle extends Valoracion {
+
+  id_usuario: number | null;
+
+  nombre_usuario: string | null;
+
+  apellido_usuario: string | null;
+
+}
+
+
+/* ========================================
    RESPUESTA DEL BACKEND
 ======================================== */
 
@@ -64,6 +80,7 @@ export class ValoracionesService {
 
   /* ======================================
      VALORACIONES PÚBLICAS
+     EXISTENTE - NO TOCAR
   ====================================== */
 
   obtenerValoraciones():
@@ -73,6 +90,23 @@ export class ValoracionesService {
       ApiResponse<Valoracion[]>
     >(
       `${this.apiUrl}/landing/valoraciones`
+    );
+
+  }
+
+
+  /* ======================================
+     VALORACIONES CON USUARIO
+     NUEVO
+  ====================================== */
+
+  obtenerValoracionesDetalle():
+    Observable<ApiResponse<ValoracionDetalle[]>> {
+
+    return this.http.get<
+      ApiResponse<ValoracionDetalle[]>
+    >(
+      `${this.apiUrl}/valoraciones/detalle`
     );
 
   }
