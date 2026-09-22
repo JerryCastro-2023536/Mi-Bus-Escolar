@@ -88,7 +88,7 @@ const proveedorSidebar: SidebarSection[] = [
         items: [
             { label: 'Rutas', icon: 'route', route: '/mis-rutas', description: 'Rutas, horarios, choferes y vehículos' },
             { label: 'Asignación de Ruta', icon: 'link', route: '/asignacion-ruta-proveedor', description: 'Estudiantes asignados a cada ruta' },
-            { label: 'Viajes', icon: 'map', route: '/mis-viajes', description: 'Viajes en curso e historial' },
+            { label: 'Viajes', icon: 'map', route: '/mis-viajes-proveedor', description: 'Viajes en curso e historial' },
             { label: 'Incidencias', icon: 'triangle-exclamation', route: '/mis-incidencias', description: 'Incidencias de tus rutas' },
             { label: 'Valoraciones', icon: 'star', route: '/mis-valoraciones', description: 'Comentarios y calificaciones recibidas' }
         ]
