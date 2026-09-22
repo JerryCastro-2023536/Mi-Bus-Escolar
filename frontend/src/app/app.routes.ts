@@ -49,7 +49,7 @@ export const routes: Routes = [
                 canActivate: [roleGuard],
                 data: {
                     roles: ['CHOFER'],
-                    title: 'Gestión de acciones del Chofer',
+                    title: 'Gestión de acciones del chofer',
                     subtitle: 'Administracion de Rutas, Estudiantes, Buses y Reportes del chofer asignado.'
                 },
                 loadComponent: () => import('./components/dashboard-chofer/dashboard-chofer.components').then(d => d.DashboardChoferComponents),
@@ -136,6 +136,10 @@ export const routes: Routes = [
             { path: 'mis-viajes', title: 'Viajes | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/viajes-proveedor-view/viajes-proveedor-view').then(m => m.ViajesProveedorView), data: { roles: ['PROVEEDOR'], title: 'Viajes', subtitle: 'Consulta viajes en curso y finalizados.' } },
             { path: 'mis-valoraciones', title: 'Valoraciones | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/valoraciones-proveedor-view/valoraciones-proveedor-view').then(m => m.ValoracionesProveedorView), data: { roles: ['PROVEEDOR'], title: 'Valoraciones', subtitle: 'Consulta las valoraciones recibidas por tu proveedor.' } },
             { path: 'pagos-proveedor', title: 'Pagos | MiBusEscolar', canActivate: [roleGuard], loadComponent: () => import('./components/pagos-proveedor-view/pagos-proveedor-view').then(m => m.PagosProveedorView), data: { roles: ['PROVEEDOR'], title: 'Pagos', subtitle: 'Consulta los pagos de cada uno de los estudiantes asignados a tus servicios' } },
+            { path: "asistencias-chofer", title: "Asistencias - Chofer | MiBusEscolar", canActivate: [roleGuard], loadComponent: () => import("./components/mis-estudiantes-chofer/mis-asistencias-chofer").then(a => a.MisAsistenciasChofer), data: {roles: ['CHOFER'], title: 'Asistencias - Chofer', subtitle: 'Ver el historial de las asistencias de los alumnos por viaje'} },
+            { path: "reportes-chofer", title: "Reportes - Chofer | MiBusEscolar", canActivate: [roleGuard], loadComponent: () => import("./components/mis-incidencias-chofer/mis-incidencias-chofer").then(m => m.MisIncidenciasChofer), data: {roles: ['CHOFER'], title: 'Reportes - Chofer', subtitle: 'Ver el historial de los reportes hechos por el chofer'} },
+            { path: "misrutas-chofer", title: "Mis Rutas - Chofer | MiBusEscolar", canActivate: [roleGuard], loadComponent: () => import("./components/mis-rutas-chofer/mis-rutas-chofer").then(m => m.MisRutasChofer), data: {roles: ['CHOFER'], title: 'Mis Rutas - Chofer', subtitle: 'Ver las rutas asignadas del chofer'} },
+            { path: "buses-chofer", title: "Buses - Chofer | MiBusEscolar", canActivate: [roleGuard], loadComponent: () => import("./components/mis-buses-chofer/mis-buses-chofer").then(m => m.MisBusesChofer), data: {roles: ['CHOFER'], title: 'Buses - Chofer', subtitle: 'Ver los buses asignados por chofer'} },
 
             ...crudRoutes,
         ],
