@@ -1,0 +1,81 @@
+<div class="container">
+  <div class="card">
+    <div class="head">
+      <div>
+        <h3>Reportes e Incidencias</h3>
+        <p>Historial de incidentes reportados en tus rutas.</p>
+      </div>
+
+      <div class="head-controls">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input 
+            type="text" 
+            placeholder="Buscar por título, ruta o descripción..." 
+            [ngModel]="busqueda()" 
+            (ngModelChange)="busqueda.set($event)"
+          />
+        </div>
+
+        <div class="filters">
+          <button [class.active]="filtro() === 'TODOS'" (click)="filtro.set('TODOS')">Todos</button>
+          <button [class.active]="filtro() === 'ABIERTA'" (click)="filtro.set('ABIERTA')">Abiertas</button>
+          <button [class.active]="filtro() === 'CERRADA'" (click)="filtro.set('CERRADA')">Cerradas</button>
+        </div>
+      </div>
+    </div>
+
+    @if (error()) {
+    <div class="alert error">{{ error() }}</div>
+    }
+
+    @if (cargando()) {
+    <div class="empty"><i class="fa-solid fa-spinner fa-spin"></i> Cargando reportes...</div>
+    } @else if (!filtrados().length) {
+    <div class="empty">
+      <i class="fa-solid fa-triangle-exclamation empty-icon"></i>
+      <p>No hay reportes registrados{{ busqueda() ? ' para esta búsqueda' : '' }}.</p>
+    </div>
+    } @else {
+    <div class="grid">
+      @for (r of filtrados(); track r.id_incidencia) {
+      <article class="item">
+        <div class="top">
+          <div class="title-wrap">
+            <strong>{{ r.titulo }}</strong>
+          </div>
+          <span 
+            class="badge" 
+            [class.active]="r.estado?.toUpperCase() === 'ABIERTA' || r.estado?.toUpperCase() === 'ABIERTO'"
+            [class.closed]="r.estado?.toUpperCase() === 'CERRADA' || r.estado?.toUpperCase() === 'CERRADO'"
+          >
+            {{ labelEstado(r.estado) }}
+          </span>
+        </div>
+
+        @if (r.descripcion) {
+        <p class="description">{{ r.descripcion }}</p>
+        }
+
+        <div class="data">
+          <span>
+            <i class="fa-solid fa-route"></i>
+            {{ r.ruta || 'Ruta no especificada' }}
+          </span>
+          <span>
+            <i class="fa-regular fa-calendar"></i>
+            {{ r.fecha_hora | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+          @if (r.latitud && r.longitud) {
+          <span>
+            <i class="fa-solid fa-location-dot"></i>
+            GPS: {{ r.latitud | number:'1.4-4' }}, {{ r.longitud | number:'1.4-4' }}
+          </span>
+          }
+        </div>
+      </article>
+      }
+    </div>
+    }
+  </div>
+</div>
