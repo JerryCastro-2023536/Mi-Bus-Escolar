@@ -6,6 +6,7 @@ import {
   patchIniciarRuta,
   patchFinalizarRuta,
   postUbicacionGPS,
+  getUltimaUbicacionViaje,
   getChoferPorUsuario,
   getEstudiantesConAsistencia,
   patchAbordajeEstudiante,
@@ -17,6 +18,7 @@ const router = Router();
 
 
 router.get('/viajes/hoy/:idChofer', getViajeHoy);
+router.get('/viajes/:idViaje/ubicacion-actual', getUltimaUbicacionViaje);
 
 
 router.get('/rutas/:idRuta/paradas', getTrazado);
