@@ -65,8 +65,10 @@ export const estudiantesConfig = {
         },
         {
             key: 'id_colegio',
-            label: 'ID Colegio',
-            type: 'number'
+            label: 'Colegio',
+            type: 'select',
+            required: true,
+            options: []
         },
         {
             key: 'nombre',
@@ -107,8 +109,10 @@ export const estudiantesConfig = {
         },
         {
             key: 'id_colegio',
-            label: 'ID Colegio',
-            type: 'number'
+            label: 'Colegio',
+            type: 'select',
+            required: true,
+            options: []
         },
         {
             key: 'nombre',

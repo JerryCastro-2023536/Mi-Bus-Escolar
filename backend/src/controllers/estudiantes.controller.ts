@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { editarEstudianteById, agregarEstudiante, buscarEstudianteById, eliminarEstudianteById, listarEstudiantes } from "../services/estudiantes.service";
+import {listarEstudiantesPorTutor, editarEstudianteById, agregarEstudiante, buscarEstudianteById, eliminarEstudianteById, listarEstudiantes } from "../services/estudiantes.service";
 import { Estudiantes } from "../models/estudiantes";
 
 export async function getEstudiantes(req: Request, res: Response, next: NextFunction){
@@ -72,6 +72,27 @@ export async function deleteEstudiante(req: Request, res: Response, next: NextFu
             data: resultado
         })
     }catch(error){
+        next(error);
+    }
+}
+
+export async function getEstudiantesPorTutor(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    try {
+        const idUsuario = Number(req.params.idUsuario);
+
+        const estudiantes = await listarEstudiantesPorTutor(idUsuario);
+
+        return res.status(200).json({
+            success: true,
+            message: "Estudiantes del tutor cargados",
+            data: estudiantes
+        });
+
+    } catch (error) {
         next(error);
     }
 }

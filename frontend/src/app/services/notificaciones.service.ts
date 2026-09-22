@@ -48,17 +48,22 @@ export class NotificacionesService {
             return throwError(() => new Error('La notificación no tiene un identificador válido.'));
         }
 
-        return this.crud.getById<NotificacionesDTO>(this.endpoint, id).pipe(
+        return this.crud.getById<any>(this.endpoint, id).pipe(
             switchMap((res) => {
                 if (!res.success || !res.data) {
                     return throwError(() => new Error('No se pudo obtener la notificación.'));
                 }
 
-                const { id_notificaciones, ...notificacion } = res.data;
-                return this.crud.update<NotificacionesDTO>(this.endpoint, id, {
-                    ...notificacion,
-                    leida: true
-                });
+                const data = res.data;
+                const payload = {
+                    id_usuario: data.id_usuario,
+                    tipo: data.tipo,
+                    titulo: data.titulo,
+                    mensaje: data.mensaje,
+                    leida: true,
+                    fecha_envio: data.fecha_envio
+                };
+                return this.crud.update<NotificacionesDTO>(this.endpoint, id, payload);
             })
         );
     }
@@ -124,7 +129,10 @@ export class NotificacionesService {
         };
 
         this.putLeida(actual).subscribe({
-            next: (res) => { if (!res.success) revertir(); },
+            next: (res: any) => {
+                const ok = res.success || res.sucess;
+                if (!ok) revertir();
+            },
             error: () => revertir()
         });
     }
@@ -134,12 +142,12 @@ export class NotificacionesService {
             .filter(n => !n.leida && n.id_notificaciones !== undefined);
         if (pendientes.length === 0) return;
 
-        this.setLeida(pendientes.map(n => n.id_notificaciones!), true); // optimista
+        this.setLeida(pendientes.map(n => n.id_notificaciones!), true);
 
         forkJoin(
             pendientes.map(n =>
                 this.putLeida(n).pipe(
-                    map(res => ({ id: n.id_notificaciones!, ok: res.success })),
+                    map((res: any) => ({ id: n.id_notificaciones!, ok: !!(res.success || res.sucess) })),
                     catchError(() => of({ id: n.id_notificaciones!, ok: false }))
                 )
             )
@@ -163,7 +171,10 @@ export class NotificacionesService {
         };
 
         this.crud.delete(this.endpoint, id).subscribe({
-            next: (res) => { if (!res.success) fallo(); },
+            next: (res: any) => {
+                const ok = res.success || res.sucess;
+                if (!ok) fallo();
+            },
             error: () => fallo()
         });
     }

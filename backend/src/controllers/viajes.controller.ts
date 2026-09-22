@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { agregarViaje, buscarViajeById, editarViajeById, eliminarViajeById, listarViajes } from "../services/viajes.service";
+import { listarViajesActivosPorEstudiante, agregarViaje, buscarViajeById, editarViajeById, eliminarViajeById, listarViajes } from "../services/viajes.service";
 import { Viajes } from "../models/viajes";
 
 export async function getViajes(_req: Request, res: Response, next: NextFunction) {
@@ -73,6 +73,29 @@ export async function deleteViajeById(req: Request, res: Response, next: NextFun
             message: `Viaje con id: ${id} eliminado`,
             data: resultado
         });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function getViajesActivosPorEstudiante(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    try {
+
+        const idEstudiante = Number(req.params.idEstudiante);
+
+        const viajes =
+            await listarViajesActivosPorEstudiante(idEstudiante);
+
+        return res.status(200).json({
+            success: true,
+            message: "Viajes activos del estudiante cargados",
+            data: viajes
+        });
+
     } catch (error) {
         next(error);
     }
