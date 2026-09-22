@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LoginService } from '../../services/login';
 import { UsuarioLoginDTO, UsuarioRegisterDTO } from '../../models/usuarioDTO.interface';
 import { RegisterService } from '../../services/register';
@@ -20,6 +20,8 @@ export class Login implements OnInit {
   private registerService = inject(RegisterService);
   private cloudinaryService = inject(CloudinaryService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
 
   isLoginMode = signal(true);
   isLoading = signal(false);
@@ -126,8 +128,10 @@ export class Login implements OnInit {
           this.loginService.saveUser(res.usuario);
           this.currentUser.set(res.usuario);
           this.currentToken.set(res.token);
-          const targetRoute = getDashboardRoute(this.currentUser()?.rol);
-          this.router.navigateByUrl(targetRoute || '/dashboard');
+
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          const targetRoute = returnUrl || getDashboardRoute(this.currentUser()?.rol) || '/dashboard';
+          this.router.navigateByUrl(targetRoute);
         } else {
           this.successMessage.set(res.message || 'Login exitoso');
         }
