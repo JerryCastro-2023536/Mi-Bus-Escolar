@@ -46,7 +46,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.mapa && changes['rutaDefinida']) {
-      if (this.rutaDefinida && this.rutaDefinida.length >= 2) {
+      if (this.rutaDefinida && this.rutaDefinida.length > 0) {
         this.trazarRuta(this.rutaDefinida);
       }
     }
@@ -67,11 +67,14 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
     (window as any).L = this.L;
     await import('leaflet-routing-machine');
 
-    const centroInicial: [number, number] = this.puntoSeleccionado
-      ? [Number(this.puntoSeleccionado.lat), Number(this.puntoSeleccionado.lng)]
-      : this.rutaDefinida.length > 0
-        ? [Number(this.rutaDefinida[0].lat), Number(this.rutaDefinida[0].lng)]
-        : [14.6349, -90.5069]; 
+    const centroInicial: [number, number] = this.posicionChofer
+      ? [Number(this.posicionChofer.lat), Number(this.posicionChofer.lng)]
+      : this.puntoSeleccionado
+        ? [Number(this.puntoSeleccionado.lat), Number(this.puntoSeleccionado.lng)]
+        : this.rutaDefinida.length > 0
+          ? [Number(this.rutaDefinida[0].lat), Number(this.rutaDefinida[0].lng)]
+          : [14.6349, -90.5069]; 
+
     this.mapa = this.L.map('mapa').setView(centroInicial, 14);
 
     this.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -94,7 +97,11 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
       this.mapa?.invalidateSize();
     }, 300);
 
-    if (this.rutaDefinida && this.rutaDefinida.length >= 2) {
+    if (this.posicionChofer && (this.rol === 'usuario' || this.rol === 'proveedor')) {
+      this.actualizarPosicionRemotaChofer(this.posicionChofer);
+    }
+
+    if (this.rutaDefinida && this.rutaDefinida.length > 0) {
       this.trazarRuta(this.rutaDefinida);
     }
 
@@ -110,6 +117,28 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
       this.cambioUbicacion.emit(puntoInicial);
       this.habilitarSeleccionPunto();
     }
+  }
+
+  private crearIconoBus(): any {
+    return this.L.divIcon({
+      html: `<div style="
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #ffffff;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.8), 0 3px 6px rgba(0,0,0,0.3);
+        border: 2.5px solid #ffffff;
+        font-size: 16px;
+      "><i class="fa-solid fa-bus"></i></div>`,
+      className: 'bus-marker-custom',
+      iconSize: [38, 38],
+      iconAnchor: [19, 19],
+      popupAnchor: [0, -22]
+    });
   }
 
   private habilitarSeleccionPunto(): void {
@@ -169,10 +198,16 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
 
     let waypoints = puntos.map(p => this.L.latLng(Number(p.lat), Number(p.lng)));
-    
-    
-    if (this.marcadorChofer && this.rol === 'chofer') {
-      waypoints.unshift(this.marcadorChofer.getLatLng());
+
+    let choferLatLng: any = null;
+    if (this.posicionChofer && this.posicionChofer.lat && this.posicionChofer.lng) {
+      choferLatLng = this.L.latLng(Number(this.posicionChofer.lat), Number(this.posicionChofer.lng));
+    } else if (this.marcadorChofer) {
+      choferLatLng = this.marcadorChofer.getLatLng();
+    }
+
+    if (choferLatLng && (this.rol === 'chofer' || this.rol === 'proveedor' || this.rol === 'usuario')) {
+      waypoints.unshift(choferLatLng);
     }
 
     if (waypoints.length < 2) {
@@ -188,12 +223,17 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
     } else {
       this.controlRuta = (this.L as any).Routing.control({
         waypoints: waypoints,
-        lineOptions: { styles: [{ color: '#242c81', weight: 6, opacity: 0.8 }] },
+        lineOptions: { styles: [{ color: '#2563eb', weight: 6, opacity: 0.85 }] },
         routeWhileDragging: false,
         addWaypoints: false,
         draggableWaypoints: false,
+        fitSelectedRoutes: true,
         show: false,
         createMarker: (i: number, wp: any, n: number) => {
+          // Si el primer punto corresponde al chofer, omitir el marcador azul por defecto ya que tiene su icono de bus
+          if (i === 0 && choferLatLng && (this.rol === 'chofer' || this.rol === 'proveedor' || this.rol === 'usuario')) {
+            return null;
+          }
           return this.L.marker(wp.latLng, {
             icon: this.L.icon({
               iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -212,6 +252,8 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
       return;
     }
 
+    const iconoBus = this.crearIconoBus();
+
     this.seguimientoGPS = navigator.geolocation.watchPosition(
       (posicion) => {
         const lat = Number(posicion.coords.latitude);
@@ -219,19 +261,22 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
         const puntoGps = { lat, lng };
 
         if (!this.marcadorChofer) {
-          this.marcadorChofer = this.L.marker([lat, lng])
+          this.marcadorChofer = this.L.marker([lat, lng], { icon: iconoBus })
             .bindPopup('<b>Tu ubicación (Chofer)</b>')
             .addTo(this.mapa);
         } else {
+          this.marcadorChofer.setIcon(iconoBus);
           this.marcadorChofer.setLatLng([lat, lng]);
-          // ACTUALIZAR RUTA DINÁMICAMENTE DESDE LA UBICACIÓN ACTUAL
-          if (this.controlRuta) {
-            const wps = this.controlRuta.getWaypoints();
-            if (wps.length > 0) {
-              wps[0].latLng = this.L.latLng(lat, lng);
-              this.controlRuta.setWaypoints(wps);
-            }
-          }
+        }
+
+        if (this.controlRuta && this.rutaDefinida && this.rutaDefinida.length > 0) {
+          const waypoints = [
+            this.L.latLng(lat, lng),
+            ...this.rutaDefinida.map(p => this.L.latLng(Number(p.lat), Number(p.lng)))
+          ];
+          this.controlRuta.setWaypoints(waypoints);
+        } else if (!this.controlRuta && this.rutaDefinida && this.rutaDefinida.length > 0) {
+          this.trazarRuta(this.rutaDefinida);
         }
 
         this.cambioUbicacion.emit(puntoGps);
@@ -248,13 +293,26 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     const lat = Number(coords.lat);
     const lng = Number(coords.lng);
+    const choferLatLng = this.L.latLng(lat, lng);
+    const iconoBus = this.crearIconoBus();
 
     if (!this.marcadorChofer) {
-      this.marcadorChofer = this.L.marker([lat, lng])
-        .bindPopup(this.rol === 'usuario' ? '<b>El transporte viene aquí</b>' : '<b>Unidad en ruta</b>')
+      this.marcadorChofer = this.L.marker([lat, lng], { icon: iconoBus })
+        .bindPopup(this.rol === 'usuario' ? '<b>El transporte viene aquí</b>' : '<b>Ubicación actual del autobús</b>')
         .addTo(this.mapa);
     } else {
+      this.marcadorChofer.setIcon(iconoBus);
       this.marcadorChofer.setLatLng([lat, lng]);
+    }
+
+    if (this.controlRuta && this.rutaDefinida && this.rutaDefinida.length > 0) {
+      const waypoints = [
+        choferLatLng,
+        ...this.rutaDefinida.map(p => this.L.latLng(Number(p.lat), Number(p.lng)))
+      ];
+      this.controlRuta.setWaypoints(waypoints);
+    } else if (!this.controlRuta && this.rutaDefinida && this.rutaDefinida.length > 0) {
+      this.trazarRuta(this.rutaDefinida);
     }
 
     this.mapa.panTo([lat, lng]);
