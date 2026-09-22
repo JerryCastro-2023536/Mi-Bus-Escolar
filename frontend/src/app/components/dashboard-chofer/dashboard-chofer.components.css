@@ -239,7 +239,6 @@
   border: 1px solid #dfe8ee;
   border-radius: 14px;
   padding: 1.25rem 1.2rem;
-  min-height: 250px;
   display: flex;
   flex-direction: column;
 }
@@ -425,10 +424,4 @@
   color: #334155;
 }
 
-.students-card, .vehicles-card, .reports-card {
-  min-height: 220px;
-}
 
-.route-card {
-  min-height: 220px;
-}
