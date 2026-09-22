@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { actualizarValoracion, agregarValoraciones, buscarValoracionPorId, eliminarValoracion, listarValoraciones } from "../services/valoraciones.service";
+import { actualizarValoracion, agregarValoraciones, buscarValoracionPorId, eliminarValoracion, listarValoraciones, listarValoracionesDetalle } from "../services/valoraciones.service";
 import { Valoraciones } from "../models/valoraciones";
 
 export async function getValoraciones(req: Request, res: Response, next: NextFunction){
@@ -12,6 +12,24 @@ export async function getValoraciones(req: Request, res: Response, next: NextFun
         });
     }catch(error){
         next(error)
+    }
+}
+
+export async function getValoracionesDetalle(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    try {
+        const datos = await listarValoracionesDetalle();
+
+        return res.status(200).json({
+            success: true,
+            message: "Valoraciones con información del usuario cargadas",
+            data: datos
+        });
+    } catch (error) {
+        next(error);
     }
 }
 
