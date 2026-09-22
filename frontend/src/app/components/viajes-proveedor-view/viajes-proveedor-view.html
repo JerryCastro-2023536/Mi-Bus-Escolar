@@ -8,8 +8,7 @@
             <div class="filters">
                 <button [class.active]="filtro() === 'TODOS'" (click)="filtro.set('TODOS')">Todos</button>
                 <button [class.active]="filtro() === 'ACTIVO'" (click)="filtro.set('ACTIVO')">En curso</button>
-                <button [class.active]="filtro() === 'FINALIZADO'"
-                    (click)="filtro.set('FINALIZADO')">Finalizados</button>
+                <button [class.active]="filtro() === 'FINALIZADO'" (click)="filtro.set('FINALIZADO')">Finalizados</button>
             </div>
         </div>
 
@@ -24,7 +23,7 @@
         } @else {
         <div class="grid">
             @for(v of filtrados(); track v.id_viaje) {
-            <article class="item">
+            <article class="item" [class.item-active]="v.estado === 'ACTIVO'">
                 <div class="top">
                     <strong>{{ v.nombre_ruta || 'Ruta no disponible' }}</strong>
                     <span class="badge" [class.active]="v.estado === 'ACTIVO'">
@@ -50,9 +49,59 @@
                         {{ v.hora_inicio || '--' }} - {{ v.hora_fin || '--' }}
                     </span>
                 </div>
+
+                @if (v.estado === 'ACTIVO') {
+                <div class="card-action">
+                    <button class="btn-live-map" (click)="abrirModalRastreo(v)" type="button">
+                        <span class="pulse-dot-small"></span>
+                        <i class="fa-solid fa-map-location-dot"></i> Ver ruta en vivo
+                    </button>
+                </div>
+                }
             </article>
             }
         </div>
         }
     </div>
+
+    @if (modalRastreoAbierto() && viajeSeleccionado()) {
+    <div class="modal-overlay" (click)="cerrarModalRastreo()">
+        <div class="modal-map-box" (click)="$event.stopPropagation()">
+            <div class="modal-map-header">
+                <div>
+                    <div class="modal-title-row">
+                        <h3>{{ viajeSeleccionado()!.nombre_ruta || 'Ruta en curso' }}</h3>
+                        <span class="live-tag">
+                            <span class="pulse-dot"></span> EN VIVO
+                        </span>
+                    </div>
+                    <p class="modal-subtitle">
+                        <span><i class="fa-solid fa-id-card"></i> {{ viajeSeleccionado()!.nombre_chofer }} {{ viajeSeleccionado()!.apellido_chofer }}</span>
+                        <span><i class="fa-solid fa-bus"></i> {{ viajeSeleccionado()!.placa_vehiculo }}</span>
+                        <span><i class="fa-regular fa-clock"></i> Inicio: {{ viajeSeleccionado()!.hora_inicio || '--:--' }}</span>
+                    </p>
+                </div>
+                <button class="btn-close-icon" (click)="cerrarModalRastreo()" type="button" aria-label="Cerrar modal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="modal-map-body">
+                <app-mapa 
+                    [rol]="'proveedor'" 
+                    [rutaDefinida]="trazadoRuta()" 
+                    [posicionChofer]="posicionChofer()" 
+                />
+            </div>
+
+            <div class="modal-map-footer">
+                <div class="status-hint">
+                    <i class="fa-solid fa-eye"></i>
+                    <span>Modo visualizador (Solo lectura). Actualizando ubicación del chofer en tiempo real.</span>
+                </div>
+                <button class="btn-secondary" (click)="cerrarModalRastreo()" type="button">Cerrar</button>
+            </div>
+        </div>
+    </div>
+    }
 </div>
