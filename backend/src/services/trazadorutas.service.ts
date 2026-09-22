@@ -2,7 +2,6 @@ import { pool } from "../config/conexion";
 
 export class ViajesService {
 
-  // 0. Obtener id_chofer a partir del id_usuario autenticado
   static async obtenerChoferPorUsuario(idUsuario: number) {
     const { rows } = await pool.query(
       `SELECT id_chofer FROM Choferes WHERE id_usuario = $1 LIMIT 1`,
@@ -15,11 +14,9 @@ export class ViajesService {
     return fallback.rows[0] ?? { id_chofer: 1 };
   }
 
-  // 1. Obtener la ruta asignada del chofer usando la base de datos
   static async obtenerViajeDelDia(idChofer: number) {
     const idChoferNum = Number(idChofer) || 1;
 
-    // 1.1 Buscar si hay un viaje ACTIVO registrado en la base de datos
     const queryActivo = `
       SELECT v.id_viaje, v.id_ruta, v.id_chofer, v.id_vehiculo, v.fecha_viaje, v.hora_inicio, v.hora_fin, v.estado,
              r.nombre, r.hora_inicio_estimada, r.hora_fin_estimada
@@ -46,7 +43,6 @@ export class ViajesService {
       };
     }
 
-    // 1.2 Si no hay viaje activo, buscar la ruta asignada en la tabla Rutas de PostgreSQL
     let resRuta = await pool.query(`
       SELECT id_ruta, id_chofer, id_vehiculo, nombre, hora_inicio_estimada, hora_fin_estimada
       FROM Rutas
@@ -81,7 +77,6 @@ export class ViajesService {
     };
   }
 
-  // 2. Obtener solo las coordenadas de la ruta específica en orden desde PostgreSQL
   static async obtenerTrazadoRuta(idRuta: number) {
     const query = `
       SELECT p.latitud::float AS lat, p.longitud::float AS lng 
@@ -94,7 +89,6 @@ export class ViajesService {
     return rows;
   }
 
-  // 2.1 Obtener trazado filtrado únicamente con las paradas de estudiantes PRESENTES
   static async obtenerTrazadoRutaPorAsistencia(idRuta: number, idViaje: number, tipo: 'IDA' | 'VUELTA' = 'IDA') {
     const query = `
       SELECT p.latitud::float AS lat, p.longitud::float AS lng, rp.orden_parada
@@ -121,16 +115,13 @@ export class ViajesService {
     return tipo === 'VUELTA' ? [...base].reverse() : base;
   }
 
-  // 3. Generar SIEMPRE un NUEVO viaje por cada "Iniciar Viaje" (solo para IDA)
   static async iniciarViaje(idChofer: number) {
-    // Finalizar cualquier viaje previo activo antes de iniciar uno nuevo
     await pool.query(
       `UPDATE Viajes SET estado = 'FINALIZADO', hora_fin = CURRENT_TIME 
        WHERE id_chofer = $1 AND estado = 'ACTIVO'`,
       [idChofer]
     );
 
-    // Buscar la ruta del chofer
     let resRuta = await pool.query(
       `SELECT id_ruta, id_vehiculo, id_chofer, nombre FROM Rutas WHERE id_chofer = $1 LIMIT 1`,
       [idChofer]
@@ -145,7 +136,6 @@ export class ViajesService {
     }
     const ruta = resRuta.rows[0];
 
-    // Crear SIEMPRE un viaje nuevo
     const res = await pool.query(
       `INSERT INTO Viajes (id_ruta, id_chofer, id_vehiculo, fecha_viaje, hora_inicio, estado)
        VALUES ($1, $2, $3, CURRENT_DATE, CURRENT_TIME, 'ACTIVO') RETURNING *`,
@@ -153,7 +143,6 @@ export class ViajesService {
     );
     const viaje = res.rows[0];
 
-    // Crear registros PENDIENTE de asistencia para los estudiantes de la ruta
     await pool.query(
       `INSERT INTO Asistencias (id_viaje, id_estudiante, estado_abordaje)
        SELECT $1, id_estudiante, 'PENDIENTE' FROM Asignaciones_Ruta WHERE id_ruta = $2
@@ -164,7 +153,6 @@ export class ViajesService {
     return { ...viaje, nombre: ruta.nombre };
   }
 
-  // 4. Finalizar el viaje al completar las paradas
   static async finalizarViaje(idViaje: number) {
     const query = `
       UPDATE Viajes
@@ -187,7 +175,6 @@ export class ViajesService {
     return viaje || { estado: 'FINALIZADO' };
   }
 
-  // 5. Guardar la telemetría del GPS
   static async registrarUbicacion(idViaje: number, lat: number, lng: number) {
     await pool.query(
       `INSERT INTO Ubicaciones_Bus (id_viaje, latitud, longitud, fecha_hora) VALUES ($1, $2, $3, NOW())`,
@@ -196,7 +183,33 @@ export class ViajesService {
     return true;
   }
 
-  // 6. Estudiantes de la ruta del chofer con su asistencia
+  static async obtenerUltimaUbicacion(idViaje: number) {
+    const query = `
+      SELECT u.latitud::float AS latitud, u.longitud::float AS longitud, u.fecha_hora, v.estado
+      FROM Viajes v
+      LEFT JOIN Ubicaciones_Bus u ON u.id_viaje = v.id_viaje
+      WHERE v.id_viaje = $1 AND u.latitud IS NOT NULL
+      ORDER BY u.fecha_hora DESC
+      LIMIT 1;
+    `;
+    const { rows } = await pool.query(query, [idViaje]);
+    if (rows.length > 0 && rows[0].latitud !== null) {
+      return rows[0];
+    }
+
+    const fallbackQuery = `
+      SELECT p.latitud::float AS latitud, p.longitud::float AS longitud, NOW() AS fecha_hora, v.estado
+      FROM Viajes v
+      INNER JOIN Ruta_Parada rp ON rp.id_ruta = v.id_ruta
+      INNER JOIN Paradas p ON p.id_parada = rp.id_parada
+      WHERE v.id_viaje = $1
+      ORDER BY rp.orden_parada ASC
+      LIMIT 1;
+    `;
+    const fallbackRes = await pool.query(fallbackQuery, [idViaje]);
+    return fallbackRes.rows[0] || null;
+  }
+
   static async obtenerEstudiantesConAsistencia(idChofer: number, idViaje?: number) {
     let query: string;
     let params: any[];
@@ -271,7 +284,6 @@ export class ViajesService {
     return rows;
   }
 
-  // 7. Marcar abordaje PRESENTE (Asistió) y notificar al tutor
   static async marcarAbordaje(idViaje: number, idEstudiante: number) {
     const timestampNow = new Date();
     const { rows } = await pool.query(
@@ -284,7 +296,6 @@ export class ViajesService {
     );
     const asistencia = rows[0];
 
-    // Enviar notificación al tutor del estudiante (Asistió) solo si no se ha enviado aún para este viaje
     try {
       const estRes = await pool.query(
         `SELECT id_usuario_tutor, nombre, apellido FROM Estudiantes WHERE id_estudiante = $1`,
@@ -322,7 +333,6 @@ export class ViajesService {
     return asistencia;
   }
 
-  // 8. Marcar descenso PRESENTE y notificar al tutor
   static async marcarDescenso(idViaje: number, idEstudiante: number) {
     const timestampNow = new Date();
     const { rows } = await pool.query(
@@ -332,7 +342,6 @@ export class ViajesService {
     );
     const asistencia = rows[0];
 
-    // Enviar notificación al tutor del estudiante (Descenso) solo si no se ha enviado aún para este viaje
     try {
       const estRes = await pool.query(
         `SELECT id_usuario_tutor, nombre, apellido FROM Estudiantes WHERE id_estudiante = $1`,
@@ -370,7 +379,6 @@ export class ViajesService {
     return asistencia;
   }
 
-  // 9. Marcar estudiante como AUSENTE (No asistió) y notificar al tutor
   static async marcarAusente(idViaje: number, idEstudiante: number) {
     const timestampNow = new Date();
     const { rows } = await pool.query(
@@ -383,7 +391,6 @@ export class ViajesService {
     );
     const asistencia = rows[0];
 
-    // Enviar notificación al tutor del estudiante (No Asistió / Inasistencia) solo si no se ha enviado aún
     try {
       const estRes = await pool.query(
         `SELECT id_usuario_tutor, nombre, apellido FROM Estudiantes WHERE id_estudiante = $1`,
