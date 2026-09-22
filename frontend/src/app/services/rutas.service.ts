@@ -9,6 +9,7 @@ import { NotificacionDTO } from '../models/asistenciasDTO.interface';
 
 export interface EstudianteAsistenciaDTO {
   id_estudiante: number;
+  id_usuario_tutor?: number;
   nombre: string;
   apellido: string;
   grado: string;
@@ -18,7 +19,6 @@ export interface EstudianteAsistenciaDTO {
   estado_descenso?: string;
   hora_descenso?: string;
   id_viaje?: number;
-  /** Estado local que el chofer marca en el modal antes de confirmar */
   marcaLocal?: 'PRESENTE' | 'AUSENTE';
 }
 
@@ -27,7 +27,6 @@ export class rutasService {
   private http = inject(HttpClient);
   private apiUrl = environment.API_URL;
 
-  /** Resuelve id_chofer a partir del id_usuario autenticado */
   resolverChofer(idUsuario: number): Observable<{ id_chofer: number } | null> {
     return this.http.get<{ id_chofer: number }>(`${this.apiUrl}/chofer/usuario/${idUsuario}`).pipe(
       timeout(8000),
@@ -35,10 +34,10 @@ export class rutasService {
     );
   }
 
-  /** Obtiene el id_proveedor del chofer */
-  obtenerProveedorChofer(idChofer: number): Observable<{ id_proveedor: number } | null> {
-    return this.http.get<{ id_proveedor: number }>(`${this.apiUrl}/choferes/${idChofer}/proveedor`).pipe(
+  obtenerProveedorChofer(idChofer: number): Observable<{ id_proveedor: number; id_usuario_proveedor: number } | null> {
+    return this.http.get<{ success: boolean; data: { id_proveedor: number; id_usuario_proveedor: number } }>(`${this.apiUrl}/choferes/${idChofer}/proveedor`).pipe(
       timeout(8000),
+      map(res => res.data),
       catchError(() => of(null))
     );
   }
@@ -64,7 +63,6 @@ export class rutasService {
     );
   }
 
-  /** Genera o activa el viaje del día para el chofer */
   iniciarRutaViaje(idChofer: number, tipo: 'IDA' | 'VUELTA' = 'IDA'): Observable<any> {
     return this.http.post(`${this.apiUrl}/viajes/iniciar/${idChofer}`, { idChofer, tipo });
   }
@@ -81,7 +79,6 @@ export class rutasService {
     return this.http.patch(`${this.apiUrl}/viajes/${idViaje}/finalizar`, { id_viaje: idViaje });
   }
 
-  /** Obtiene lista de estudiantes de la ruta con su estado de asistencia */
   obtenerEstudiantesAsistencia(idChofer: number, idViaje?: number): Observable<EstudianteAsistenciaDTO[]> {
     const url = idViaje
       ? `${this.apiUrl}/viajes/chofer/${idChofer}/estudiantes?idViaje=${idViaje}`
@@ -92,17 +89,14 @@ export class rutasService {
     );
   }
 
-  /** Marca abordaje PRESENTE de un estudiante en un viaje activo */
   marcarAbordaje(idViaje: number, idEstudiante: number): Observable<any> {
     return this.http.patch(`${this.apiUrl}/viajes/${idViaje}/abordaje/${idEstudiante}`, undefined);
   }
 
-  /** Marca descenso PRESENTE de un estudiante en un viaje activo */
   marcarDescenso(idViaje: number, idEstudiante: number): Observable<any> {
     return this.http.patch(`${this.apiUrl}/viajes/${idViaje}/descenso/${idEstudiante}`, undefined);
   }
 
-  /** Marca un estudiante como AUSENTE */
   marcarAusente(idViaje: number, idEstudiante: number): Observable<any> {
     return this.http.patch(`${this.apiUrl}/viajes/${idViaje}/ausente/${idEstudiante}`, undefined);
   }
