@@ -106,7 +106,7 @@ export class ValoracionesService {
     return this.http.get<
       ApiResponse<ValoracionDetalle[]>
     >(
-      `${this.apiUrl}/valoraciones/detalle`
+      `${this.apiUrl}/landing/valoracionesDetalle`
     );
 
   }
