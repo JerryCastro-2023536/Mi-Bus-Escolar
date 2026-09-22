@@ -122,7 +122,7 @@ export class ServiciosService {
     return this.http.get<
       ApiResponse<Servicio[]>
     >(
-      `${this.apiUrl}/servicios`
+      `${this.apiUrl}/landing/servicios`
     );
 
   }
@@ -138,7 +138,7 @@ export class ServiciosService {
     return this.http.get<
       ApiResponse<Proveedor[]>
     >(
-      `${this.apiUrl}/proveedores`
+      `${this.apiUrl}/landing/proveedores`
     );
 
   }
@@ -154,7 +154,7 @@ export class ServiciosService {
     return this.http.get<
       ApiResponse<Ruta[]>
     >(
-      `${this.apiUrl}/rutas`
+      `${this.apiUrl}/landing/rutas`
     );
 
   }

@@ -8,18 +8,18 @@ import { authGuard, guestGuard } from './core/guards/auth.guard';
 import { roleGuard, dashboardRedirectGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
-    {
-        path: "mapa", 
-        component: MapaComponent
-    },
-
-    { path: '', redirectTo: 'login', pathMatch: 'full' },
+    { path: '', redirectTo: 'landing', pathMatch: 'full' },
 
     {
         path: 'login',
         title: 'Iniciar sesión | MiBusEscolar',
-        canActivate: [guestGuard],
         loadComponent: () => import('./components/login/login').then(m => m.Login),
+    },
+    {
+        path: 'landing',
+        title: ' Landing Page| MiBusEscolar',
+        canActivate: [guestGuard],
+        loadComponent: () => import('./components/landing-page/landing-page').then(m => m.LandingPage),
     },
 
     {
@@ -114,21 +114,6 @@ export const routes: Routes = [
                     import('./components/viajes-usuario/viajes-usuario')
                         .then(m => m.ViajesUsuario),
             },
-
-            {
-                path: 'mis-paradas',
-                title: 'Mis Paradas | MiBusEscolar',
-                canActivate: [roleGuard],
-                data: {
-                    roles: ['USUARIO'],
-                    title: 'Mis Paradas',
-                    subtitle: 'Consulta los estudiantes que tienen asignaciones de transporte.'
-                },
-                loadComponent: () =>
-                    import('./components/paradas-usuario/paradas-usuario')
-                        .then(m => m.ParadasUsuario),
-            },
-            
             {
                 path: 'cuenta',
                 title: 'Mi Cuenta | MiBusEscolar',

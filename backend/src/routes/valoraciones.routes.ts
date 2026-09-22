@@ -5,6 +5,7 @@ import {
     deleteValoracion,
     getValoracionById,
     getValoraciones,
+    getValoracionesDetalle,
     postValoraciones,
     putValoracion
 } from "../controllers/valoraciones.controller";
@@ -12,6 +13,7 @@ import {
 const router = Router();
 
 router.get("/valoraciones", getValoraciones);
+router.get("/valoraciones/detalle", getValoracionesDetalle);
 router.get("/valoraciones/:id", getValoracionById);
 router.post("/valoraciones", validateSchema(createValoracionSchema), postValoraciones);
 router.put("/valoraciones/:id", validateSchema(createValoracionSchema), putValoracion);

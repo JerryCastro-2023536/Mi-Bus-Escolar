@@ -30,7 +30,8 @@ import {
 
 import {
   ValoracionesService,
-  Valoracion
+  Valoracion,
+  ValoracionDetalle
 } from '../../services/valoraciones.service';
 
 
@@ -48,6 +49,8 @@ export interface ServicioLanding
   valoraciones: Valoracion[];
 
   promedioValoraciones: number;
+
+  valoracionesDetalle: ValoracionDetalle[];
 
 }
 
@@ -84,6 +87,8 @@ export class LandingPage
   rutas: Ruta[] = [];
 
   valoraciones: Valoracion[] = [];
+
+  valoracionesDetalle: ValoracionDetalle[] = [];
 
 
   serviciosLanding:
@@ -157,7 +162,11 @@ export class LandingPage
 
       valoraciones:
         this.valoracionesService
-          .obtenerValoraciones()
+          .obtenerValoraciones(),
+      
+       valoracionesDetalle:
+        this.valoracionesService
+          .obtenerValoracionesDetalle()
 
     }).subscribe({
 
@@ -166,7 +175,8 @@ export class LandingPage
         servicios,
         proveedores,
         rutas,
-        valoraciones
+        valoraciones,
+        valoracionesDetalle
       }) => {
 
 
@@ -184,6 +194,9 @@ export class LandingPage
 
         this.valoraciones =
           valoraciones.data ?? [];
+
+        this.valoracionesDetalle =
+          valoracionesDetalle.data ?? [];
 
 
         this.construirServiciosLanding();
@@ -314,6 +327,9 @@ export class LandingPage
             valoraciones:
               valoracionesProveedor,
 
+            valoracionesDetalle:
+              this.valoracionesDetalle,
+
             promedioValoraciones:
               promedio
 
@@ -417,5 +433,21 @@ export class LandingPage
     ).fill(0);
 
   }
+
+  /* ======================================
+   USUARIO DE LA VALORACIÓN
+     ====================================== */
+
+      obtenerUsuarioValoracion(
+        idValoracion: number
+      ): ValoracionDetalle | undefined {
+
+        return this.valoracionesDetalle.find(
+          valoracion =>
+            valoracion.id_valoracion ===
+            idValoracion
+        );
+
+      }
 
 }
