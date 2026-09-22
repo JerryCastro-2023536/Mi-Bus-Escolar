@@ -85,9 +85,10 @@ export const loginUsuario = async (req: Request, res: Response, next: NextFuncti
         const validatedUser = await login({correo, password});
 
         const token = generarToken({
-            id: validatedUser.id,
+            id: validatedUser.id_usuario || validatedUser.id,
             email: validatedUser.correo,
-            rol: validatedUser.rol
+            rol: validatedUser.rol,
+            id_chofer: validatedUser.id_chofer || null
         });
 
         return res.status(200).json({

@@ -101,16 +101,15 @@ const choferSidebar: SidebarSection[] = [
     {
         title: 'Mi Operación',
         items: [
-            { label: 'Mis Rutas', icon: 'route', route: '/rutas', description: 'Trayectos asignados' },
-            { label: 'Viajes', icon: 'map', route: '/viajes', description: 'Viajes en curso e historial' },
-            { label: 'Ubicación en Vivo', icon: 'location-arrow', route: '/ubicaciones-bus', description: 'Transmisión GPS de tu unidad' },
-            { label: 'Asistencias', icon: 'clipboard-check', route: '/asistencias', description: 'Registro de abordaje y descenso de alumnos' }
+            { label: 'Mis Rutas', icon: 'route', route: '/misrutas-chofer', description: 'Trayectos asignados' },
+            { label: 'Buses', icon: 'bus', route: '/buses-chofer', description: 'Buses asignados al chofer' },
+            { label: 'Estudiantes', icon: 'users', route: '/asistencias-chofer', description: 'Registro de abordaje y descenso de alumnos' }
         ]
     },
     {
         title: 'Comunicación',
         items: [
-            { label: 'Incidencias', icon: 'triangle-exclamation', route: '/incidencias', description: 'Reportar averías, tráfico o emergencias' },
+            { label: 'Incidencias', icon: 'triangle-exclamation', route: '/reportes-chofer', description: 'Registro de los reportes del chofer' },
             { label: 'Notificaciones', icon: 'bell', route: '/notificaciones', description: 'Avisos del sistema' }
         ]
     }

@@ -11,11 +11,13 @@ export const JsonSyntaxError = (err: any, req: Request, res: Response,next: Next
 
 
 export const validateEmptyBody = (req: Request,res: Response,next: NextFunction) => {
-    const metodosConBody = ["POST", "PUT", "PATCH"];
+    const metodosConBody = ["POST", "PUT"];
+
     if (metodosConBody.includes(req.method)) {
         if (!req.body || Object.keys(req.body).length === 0) {
-            throw new JsonError("El JSON está vacio")
+            throw new JsonError("El JSON está vacio");
         }
     }
+
     next();
 };

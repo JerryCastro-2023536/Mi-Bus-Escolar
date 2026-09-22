@@ -2,9 +2,17 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({ name: 'tiempoRelativo', standalone: true, pure: false })
 export class TiempoRelativoPipe implements PipeTransform {
-    transform(fecha: string | Date): string {
-        const ahora = Date.now();
+    transform(fecha?: string | Date | null): string {
+        if (!fecha) {
+            return 'Sin fecha';
+        }
+
         const entonces = new Date(fecha).getTime();
+        if (Number.isNaN(entonces)) {
+            return 'Sin fecha';
+        }
+
+        const ahora = Date.now();
         const diff = Math.floor((ahora - entonces) / 1000);
 
         if (diff < 60) return 'Hace un momento';

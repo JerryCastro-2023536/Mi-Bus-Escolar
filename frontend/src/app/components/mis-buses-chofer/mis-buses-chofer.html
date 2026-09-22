@@ -1,0 +1,83 @@
+<div class="container">
+  <div class="card">
+    <div class="head">
+      <div>
+        <h3>Buses Asignados</h3>
+        <p>Unidades de transporte asociadas a tus servicios y rutas.</p>
+      </div>
+
+      <div class="head-controls">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input 
+            type="text" 
+            placeholder="Buscar por placa, proveedor..." 
+            [ngModel]="busqueda()" 
+            (ngModelChange)="busqueda.set($event)"
+          />
+        </div>
+
+        <div class="filters">
+          <button [class.active]="filtro() === 'TODOS'" (click)="filtro.set('TODOS')">Todos</button>
+          <button [class.active]="filtro() === 'ACTIVO'" (click)="filtro.set('ACTIVO')">Activos</button>
+          <button [class.active]="filtro() === 'INACTIVO'" (click)="filtro.set('INACTIVO')">Inactivos</button>
+        </div>
+      </div>
+    </div>
+
+    @if (error()) {
+    <div class="alert error">{{ error() }}</div>
+    }
+
+    @if (cargando()) {
+    <div class="empty"><i class="fa-solid fa-spinner fa-spin"></i> Cargando buses...</div>
+    } @else if (!filtrados().length) {
+    <div class="empty">
+      <i class="fa-solid fa-bus empty-icon"></i>
+      <p>No tienes buses asignados actualmente{{ busqueda() ? ' para esta búsqueda' : '' }}.</p>
+    </div>
+    } @else {
+    <div class="grid">
+      @for (v of filtrados(); track v.id_vehiculo) {
+      <article class="item">
+        <div class="vehicle-media">
+          @if (v.foto_vehiculo) {
+          <img [src]="v.foto_vehiculo" [alt]="'Bus ' + v.placa" class="vehicle-img" />
+          } @else {
+          <div class="vehicle-placeholder">
+            <i class="fa-solid fa-bus"></i>
+          </div>
+          }
+        </div>
+
+        <div class="top">
+          <div class="plate-wrap">
+            <span class="plate-badge">{{ v.placa }}</span>
+          </div>
+          <span class="badge" [class.active]="v.estado?.toUpperCase() === 'ACTIVO' || v.estado?.toUpperCase() === 'ACTIVA'">
+            {{ labelEstado(v.estado) }}
+          </span>
+        </div>
+
+        <div class="data">
+          @if (v.proveedor) {
+          <span>
+            <i class="fa-solid fa-building"></i>
+            Proveedor: {{ v.proveedor }}
+          </span>
+          }
+          <span>
+            <i class="fa-solid fa-route"></i>
+            {{ v.ruta_asignada || 'Ruta asignada' }}
+          </span>
+          <span>
+            <i class="fa-solid fa-shield-halved"></i>
+            Unidad de transporte escolar
+          </span>
+        </div>
+      </article>
+      }
+    </div>
+    }
+  </div>
+</div>

@@ -19,11 +19,18 @@ export async function buscarUsuarioById(id: number) {
     try {
         const res = await pool.query('SELECT * FROM sp_usuarios_buscar_por_id($1)', [id]);
 
-        if (!res.rows[0]) {
-            throw new NotFoundError(`El usuario con ID ${id} no fue encontrado.`);
+        const usuario = res.rows[0];
+        delete usuario.password;
+
+        if (usuario.rol === 'CHOFER') {
+            const userId = usuario.id_usuario || usuario.id;
+            const choferRes = await pool.query('SELECT id_chofer FROM Choferes WHERE id_usuario = $1 LIMIT 1', [userId]);
+            if (choferRes.rows.length > 0) {
+                usuario.id_chofer = choferRes.rows[0].id_chofer;
+            }
         }
 
-        return res.rows[0];
+        return usuario;
     } catch (error) {
         errorThrower(error);
     }
@@ -92,6 +99,14 @@ export async function login(u: UsuarioLoginDTO) {
             }]);
         }
         delete usuario.password;
+
+        if (usuario.rol === 'CHOFER') {
+            const userId = usuario.id_usuario || usuario.id;
+            const choferRes = await pool.query('SELECT id_chofer FROM Choferes WHERE id_usuario = $1 LIMIT 1', [userId]);
+            if (choferRes.rows.length > 0) {
+                usuario.id_chofer = choferRes.rows[0].id_chofer;
+            }
+        }
 
         return usuario;
 

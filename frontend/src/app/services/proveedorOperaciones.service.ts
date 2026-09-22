@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { environment } from '../../environments/enviroment';
+import { environment } from '../../environments/enviroments';
 import {
     AsignacionRutaProveedor,
     EstudianteDisponible,
@@ -193,6 +193,20 @@ export class ProveedorOperacionesService {
     valoraciones(idUsuario: number) {
         return this.data(
             this.http.get<ApiResponse<ValoracionProveedor[]>>(`${this.base}/${idUsuario}/valoraciones`),
+        );
+    }
+
+    obtenerUbicacionActualViaje(idViaje: number) {
+        return this.http.get<{ success: boolean; data: { latitud: number; longitud: number; fecha_hora?: string } }>(
+            `${environment.API_URL}/viajes/${idViaje}/ubicacion-actual`
+        ).pipe(
+            map(res => res?.data || null)
+        );
+    }
+
+    obtenerTrazadoRuta(idRuta: number) {
+        return this.http.get<{ lat: number; lng: number }[]>(
+            `${environment.API_URL}/rutas/${idRuta}/paradas`
         );
     }
 }
