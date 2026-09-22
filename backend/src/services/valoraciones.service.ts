@@ -12,6 +12,18 @@ export async function listarValoraciones() {
     }
 }
 
+export async function listarValoracionesDetalle() {
+    try {
+        const resultado = await pool.query(
+            "SELECT * FROM sp_valoraciones_obtener_detalle()"
+        );
+
+        return resultado.rows;
+    } catch (error) {
+        errorThrower(error);
+    }
+}
+
 export async function buscarValoracionPorId(id: number) {
     try {
         const resultado = await pool.query(
