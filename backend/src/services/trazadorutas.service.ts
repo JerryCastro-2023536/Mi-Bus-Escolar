@@ -90,29 +90,79 @@ export class ViajesService {
   }
 
   static async obtenerTrazadoRutaPorAsistencia(idRuta: number, idViaje: number, tipo: 'IDA' | 'VUELTA' = 'IDA') {
-    const query = `
-      SELECT p.latitud::float AS lat, p.longitud::float AS lng, rp.orden_parada
+    const baseStopsQuery = `
+      SELECT p.id_parada, p.latitud::float AS lat, p.longitud::float AS lng, rp.orden_parada
       FROM Ruta_Parada rp
       INNER JOIN Paradas p ON rp.id_parada = p.id_parada
       WHERE rp.id_ruta = $1
-        AND (
-          rp.orden_parada = (SELECT MIN(orden_parada) FROM Ruta_Parada WHERE id_ruta = $1)
-          OR rp.orden_parada = (SELECT MAX(orden_parada) FROM Ruta_Parada WHERE id_ruta = $1)
-          OR p.id_parada IN (
-            SELECT (CASE WHEN $3 = 'VUELTA' THEN ar.id_parada_descenso ELSE ar.id_parada_recogida END)
-            FROM Asistencias a
-            INNER JOIN Asignaciones_Ruta ar ON ar.id_estudiante = a.id_estudiante AND ar.id_ruta = $1
-            WHERE a.id_viaje = $2 AND a.estado_abordaje = 'PRESENTE'
-          )
-        )
       ORDER BY rp.orden_parada ASC;
     `;
-    const { rows } = await pool.query(query, [idRuta, idViaje, tipo]);
-    if (rows.length >= 2) {
-      return tipo === 'VUELTA' ? rows.reverse() : rows;
+    const { rows: baseStops } = await pool.query(baseStopsQuery, [idRuta]);
+    if (baseStops.length === 0) return [];
+
+    const ausentesQuery = `
+      SELECT DISTINCT 
+        COALESCE(ar.id_parada_recogida, ar.id_parada_descenso) AS id_parada_recogida,
+        COALESCE(ar.id_parada_descenso, ar.id_parada_recogida) AS id_parada_descenso
+      FROM Asistencias a
+      INNER JOIN Asignaciones_Ruta ar ON ar.id_estudiante = a.id_estudiante AND ar.id_ruta = $1
+      WHERE a.id_viaje = $2 
+        AND (a.estado_abordaje = 'AUSENTE' OR a.estado_descenso = 'AUSENTE');
+    `;
+    const ausentesRes = await pool.query(ausentesQuery, [idRuta, idViaje]);
+    const paradasAusentes = new Set<number>();
+    for (const row of ausentesRes.rows) {
+      if (tipo === 'VUELTA' && row.id_parada_descenso) {
+        paradasAusentes.add(Number(row.id_parada_descenso));
+      } else if (row.id_parada_recogida) {
+        paradasAusentes.add(Number(row.id_parada_recogida));
+      }
     }
-    const base = await this.obtenerTrazadoRuta(idRuta);
-    return tipo === 'VUELTA' ? [...base].reverse() : base;
+
+    const presentesQuery = `
+      SELECT DISTINCT 
+        COALESCE(ar.id_parada_recogida, ar.id_parada_descenso) AS id_parada_recogida,
+        COALESCE(ar.id_parada_descenso, ar.id_parada_recogida) AS id_parada_descenso
+      FROM Asistencias a
+      INNER JOIN Asignaciones_Ruta ar ON ar.id_estudiante = a.id_estudiante AND ar.id_ruta = $1
+      WHERE a.id_viaje = $2 
+        AND (
+          ($3 = 'IDA' AND a.estado_abordaje = 'PRESENTE')
+          OR ($3 = 'VUELTA' AND (a.estado_descenso = 'PRESENTE' OR a.estado_abordaje = 'PRESENTE'))
+        );
+    `;
+    const presentesRes = await pool.query(presentesQuery, [idRuta, idViaje, tipo]);
+    const paradasPresentes = new Set<number>();
+    for (const row of presentesRes.rows) {
+      if (tipo === 'VUELTA' && row.id_parada_descenso) {
+        paradasPresentes.add(Number(row.id_parada_descenso));
+      } else if (row.id_parada_recogida) {
+        paradasPresentes.add(Number(row.id_parada_recogida));
+      }
+    }
+
+    const minOrden = baseStops[0].orden_parada;
+    const maxOrden = baseStops[baseStops.length - 1].orden_parada;
+
+    let paradasFiltradas = baseStops.filter(p => {
+      if (p.orden_parada === minOrden || p.orden_parada === maxOrden) {
+        return true;
+      }
+      if (paradasPresentes.has(p.id_parada)) {
+        return true;
+      }
+      if (paradasPresentes.size > 0) {
+        return false;
+      }
+      return !paradasAusentes.has(p.id_parada);
+    });
+
+    if (paradasFiltradas.length === 0) {
+      paradasFiltradas = baseStops;
+    }
+
+    const resultado = paradasFiltradas.map(p => ({ lat: p.lat, lng: p.lng }));
+    return tipo === 'VUELTA' ? resultado.reverse() : resultado;
   }
 
   static async iniciarViaje(idChofer: number) {
@@ -336,8 +386,11 @@ export class ViajesService {
   static async marcarDescenso(idViaje: number, idEstudiante: number) {
     const timestampNow = new Date();
     const { rows } = await pool.query(
-      `UPDATE Asistencias SET estado_descenso = 'PRESENTE', hora_descenso = $3
-       WHERE id_viaje = $1 AND id_estudiante = $2 RETURNING *`,
+      `INSERT INTO Asistencias (id_viaje, id_estudiante, estado_descenso, hora_descenso)
+       VALUES ($1, $2, 'PRESENTE', $3)
+       ON CONFLICT (id_viaje, id_estudiante)
+       DO UPDATE SET estado_descenso = 'PRESENTE', hora_descenso = $3
+       RETURNING *`,
       [idViaje, idEstudiante, timestampNow]
     );
     const asistencia = rows[0];
@@ -382,10 +435,10 @@ export class ViajesService {
   static async marcarAusente(idViaje: number, idEstudiante: number) {
     const timestampNow = new Date();
     const { rows } = await pool.query(
-      `INSERT INTO Asistencias (id_viaje, id_estudiante, estado_abordaje)
-       VALUES ($1, $2, 'AUSENTE')
+      `INSERT INTO Asistencias (id_viaje, id_estudiante, estado_abordaje, estado_descenso)
+       VALUES ($1, $2, 'AUSENTE', 'AUSENTE')
        ON CONFLICT (id_viaje, id_estudiante)
-       DO UPDATE SET estado_abordaje = 'AUSENTE'
+       DO UPDATE SET estado_abordaje = 'AUSENTE', estado_descenso = 'AUSENTE'
        RETURNING *`,
       [idViaje, idEstudiante]
     );
