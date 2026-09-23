@@ -94,7 +94,9 @@ export interface IncidenciaProveedor {
 
 export interface ValoracionProveedor {
   id_valoracion: number;
-  id_usuario: number | null;
+  id_servicio: number;
+  nombre_servicio: string;
+  id_usuario: number;
   nombre_usuario: string | null;
   apellido_usuario: string | null;
   foto_usuario: string | null;
