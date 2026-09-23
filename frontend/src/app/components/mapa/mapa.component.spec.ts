@@ -18,4 +18,11 @@ describe('MapaComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should disable point selection while tracking a live route for users', () => {
+    component.rol = 'usuario';
+    component.posicionChofer = { lat: 14.62, lng: -90.52 };
+
+    expect((component as any).debePermitirSeleccionPunto()).toBeFalse();
+  });
 });

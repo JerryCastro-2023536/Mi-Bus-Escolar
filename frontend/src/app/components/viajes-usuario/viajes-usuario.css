@@ -508,6 +508,268 @@
     padding: 24px;
 }
 
+/* ===================== Botón Ruta en Vivo ===================== */
+.card-action {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #E2E8EC;
+}
+
+.btn-live-map {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: #0284c7;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+    transition: all 0.2s ease;
+}
+
+.btn-live-map:hover {
+    background: #0369a1;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+    transform: translateY(-1px);
+}
+
+.pulse-dot-small {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    animation: pulse 1.5s infinite;
+}
+
+/* ===================== Modal de Mapa en Vivo ===================== */
+.modal-map-box {
+    background: #ffffff;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 920px;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: modalIn 0.2s ease-out;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-map-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #E2E8EC;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: #f8fafc;
+}
+
+.modal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-title-row h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.live-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 999px;
+    color: #059669;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.modal-subtitle {
+    margin: 6px 0 0;
+    display: flex;
+    gap: 16px;
+    color: #64748b;
+    font-size: 0.84rem;
+    flex-wrap: wrap;
+}
+
+.modal-subtitle span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-close-icon {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    transition: all 0.15s;
+}
+
+.btn-close-icon:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.modal-map-body {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #f1f5f9;
+}
+
+.modal-map-footer {
+    padding: 14px 24px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.status-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 0.82rem;
+}
+
+.status-hint i {
+    color: #0284c7;
+}
+
+.btn-secondary {
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+/* STATE: SIN RUTA ASIGNADA */
+
+.state-no-route {
+    border: 2px dashed #e2a73b;
+    background: linear-gradient(135deg, #fffbea 0%, #fff7e0 100%);
+}
+
+.no-route-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 8px;
+}
+
+.no-route-icon > i:first-child {
+    font-size: 38px;
+    color: #d4930a;
+}
+
+.no-route-badge {
+    position: absolute;
+    bottom: 0;
+    right: -4px;
+    font-size: 18px;
+    color: #dc2626;
+    background: #fff;
+    border-radius: 50%;
+}
+
+.state-no-route h3 {
+    color: #92600e;
+    margin: 4px 0 8px;
+}
+
+.state-no-route p {
+    color: #78590d;
+    max-width: 420px;
+}
+
+.hint-text {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 12px !important;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    font-size: 12.5px;
+    color: #7a6321 !important;
+    line-height: 1.5;
+}
+
+.hint-text i {
+    margin-top: 2px;
+    color: #d4930a;
+    flex-shrink: 0;
+}
+
 /* RESPONSIVE */
 
 @media (max-width: 900px) {

@@ -1,13 +1,17 @@
 <section class="paradas-view">
 
     @if (mensajeError) {
-
         <div class="alert-error">
             <i class="fa-solid fa-circle-exclamation"></i>
-
             {{ mensajeError }}
         </div>
+    }
 
+    @if (mensajeExito) {
+        <div class="alert-success">
+            <i class="fa-solid fa-circle-check"></i>
+            {{ mensajeExito }}
+        </div>
     }
 
 
@@ -38,13 +42,8 @@
         @if (cargando()) {
 
             <div class="state-card">
-
                 <i class="fa-solid fa-spinner fa-spin"></i>
-
-                <p>
-                    Cargando estudiantes...
-                </p>
-
+                <p>Cargando estudiantes...</p>
             </div>
 
         } @else {
@@ -63,72 +62,33 @@
                     >
 
                         <div class="student-photo">
-
                             @if (estudiante.foto_estudiante) {
-
                                 <img
                                     [src]="estudiante.foto_estudiante"
                                     [alt]="estudiante.nombre + ' ' + estudiante.apellido"
                                 />
-
                             } @else {
-
                                 <i class="fa-solid fa-user-graduate"></i>
-
                             }
-
                         </div>
-
 
                         <div class="student-data">
-
-                            <span>
-                                Estudiante
-                            </span>
-
-                            <h3>
-                                {{ estudiante.nombre }}
-                                {{ estudiante.apellido }}
-                            </h3>
-
-                            <p>
-                                {{
-                                    estudiante.nombre_colegio
-                                    || 'Sin colegio registrado'
-                                }}
-                            </p>
-
-                            <small>
-                                {{
-                                    estudiante.grado
-                                    || 'Sin grado registrado'
-                                }}
-                            </small>
-
+                            <span>Estudiante</span>
+                            <h3>{{ estudiante.nombre }} {{ estudiante.apellido }}</h3>
+                            <p>{{ estudiante.nombre_colegio || 'Sin colegio registrado' }}</p>
+                            <small>{{ estudiante.grado || 'Sin grado registrado' }}</small>
                         </div>
 
-
-                        <i
-                            class="fa-solid fa-chevron-right arrow"
-                        ></i>
+                        <i class="fa-solid fa-chevron-right arrow"></i>
 
                     </button>
 
                 } @empty {
 
                     <div class="state-card">
-
                         <i class="fa-solid fa-user-graduate"></i>
-
-                        <h3>
-                            No tienes estudiantes registrados
-                        </h3>
-
-                        <p>
-                            Actualmente no hay estudiantes
-                            asociados a tu cuenta.
-                        </p>
-
+                        <h3>No tienes estudiantes registrados</h3>
+                        <p>Actualmente no hay estudiantes asociados a tu cuenta.</p>
                     </div>
 
                 }
@@ -153,194 +113,328 @@
                 class="back-button"
                 (click)="volver()"
             >
-
                 <i class="fa-solid fa-arrow-left"></i>
-
                 Volver
-
             </button>
 
-
             <div>
-
-                <span>
-                    Paradas de
-                </span>
-
+                <span>Paradas de</span>
                 <h2>
                     {{ estudianteSeleccionado()?.nombre }}
                     {{ estudianteSeleccionado()?.apellido }}
                 </h2>
-
             </div>
 
         </div>
 
 
-        <!-- =====================================
-             PENDIENTE - NO IMPLEMENTAR
+        @if (cargandoAsignacion()) {
 
-             En esta sección se implementará:
+            <div class="state-card">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Cargando información de paradas...</p>
+            </div>
 
-             - Mostrar parada de subida
-             - Mostrar parada de descenso
-             - Agregar parada
-             - Editar parada
-             - Relacionar automáticamente la parada
-               con RutaParada
+        } @else if (!asignacion()) {
 
-             Estas funciones NO forman parte
-             de la implementación actual.
-        ====================================== -->
+            <div class="state-card">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <h3>Sin ruta asignada</h3>
+                <p>Este estudiante aún no tiene una ruta de transporte asignada.</p>
+            </div>
 
+        } @else {
 
-        <div class="stops-grid">
+            <!-- PARADAS ACTUALES -->
+            <div class="stops-section">
 
-
-            <!-- PARADA DE SUBIDA -->
-
-            <article class="stop-card">
-
-                <div class="stop-icon pickup">
-
-                    <i class="fa-solid fa-location-dot"></i>
-
-                </div>
-
-
-                <div class="stop-content">
-
-                    <span class="stop-label">
-                        Parada de subida
+                <div class="stops-header">
+                    <h3>Paradas asignadas</h3>
+                    <span class="ruta-badge">
+                        <i class="fa-solid fa-route"></i>
+                        Ruta #{{ asignacion()?.id_ruta }}
                     </span>
-
-                    <h3>
-                        Punto de recogida
-                    </h3>
-
-                    <p>
-                        Aquí se mostrará la parada donde
-                        el estudiante aborda el transporte.
-                    </p>
-
-
-                    <div class="pending-badge">
-
-                        <i class="fa-solid fa-clock"></i>
-
-                        Funcionalidad pendiente
-
-                    </div>
-
                 </div>
 
-            </article>
+                <div class="stops-grid">
+
+                    <!-- PARADA DE SUBIDA -->
+                    <article class="stop-card">
+
+                        <div class="stop-icon pickup">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+
+                        <div class="stop-content">
+                            <span class="stop-label">Parada de subida</span>
+
+                            @if (getParadaRecogida(); as parada) {
+                                <h3>{{ parada.nombre }}</h3>
+                                <p>{{ parada.direccion || 'Sin dirección registrada' }}</p>
+                                @if (parada.latitud != null && parada.longitud != null) {
+                                    <div class="coords-badge">
+                                        <i class="fa-solid fa-map-pin"></i>
+                                        {{ parada.latitud | number:'1.4-4' }},
+                                        {{ parada.longitud | number:'1.4-4' }}
+                                    </div>
+                                }
+                            } @else {
+                                <h3>Punto de recogida</h3>
+                                <p>Sin parada de recogida asignada todavía.</p>
+                                <div class="pending-badge">
+                                    <i class="fa-solid fa-clock"></i>
+                                    Por asignar
+                                </div>
+                            }
+                        </div>
+
+                    </article>
 
 
-            <!-- PARADA DE DESCENSO -->
+                    <!-- PARADA DE DESCENSO -->
+                    <article class="stop-card">
 
-            <article class="stop-card">
+                        <div class="stop-icon dropoff">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
 
-                <div class="stop-icon dropoff">
+                        <div class="stop-content">
+                            <span class="stop-label">Parada de descenso</span>
 
-                    <i class="fa-solid fa-location-dot"></i>
+                            @if (getParadaDescenso(); as parada) {
+                                <h3>{{ parada.nombre }}</h3>
+                                <p>{{ parada.direccion || 'Sin dirección registrada' }}</p>
+                                @if (parada.latitud != null && parada.longitud != null) {
+                                    <div class="coords-badge">
+                                        <i class="fa-solid fa-map-pin"></i>
+                                        {{ parada.latitud | number:'1.4-4' }},
+                                        {{ parada.longitud | number:'1.4-4' }}
+                                    </div>
+                                }
+                            } @else {
+                                <h3>Punto de descenso</h3>
+                                <p>Sin parada de descenso asignada todavía.</p>
+                                <div class="pending-badge">
+                                    <i class="fa-solid fa-clock"></i>
+                                    Por asignar
+                                </div>
+                            }
+                        </div>
 
-                </div>
-
-
-                <div class="stop-content">
-
-                    <span class="stop-label">
-                        Parada de descenso
-                    </span>
-
-                    <h3>
-                        Punto de descenso
-                    </h3>
-
-                    <p>
-                        Aquí se mostrará la parada donde
-                        el estudiante desciende del transporte.
-                    </p>
-
-
-                    <div class="pending-badge">
-
-                        <i class="fa-solid fa-clock"></i>
-
-                        Funcionalidad pendiente
-
-                    </div>
-
-                </div>
-
-            </article>
-
-        </div>
-
-
-        <!-- =====================================
-             ACCIONES FUTURAS
-        ====================================== -->
-
-        <div class="future-section">
-
-            <div class="future-header">
-
-                <div class="future-icon">
-
-                    <i class="fa-solid fa-map-location-dot"></i>
-
-                </div>
-
-
-                <div>
-
-                    <span>
-                        Próximamente
-                    </span>
-
-                    <h3>
-                        Gestión de paradas
-                    </h3>
+                    </article>
 
                 </div>
 
             </div>
 
 
-            <p>
-                En esta sección el usuario podrá agregar o editar
-                las paradas del estudiante.
-            </p>
 
 
-            <div class="future-actions">
+            <!-- ACCIONES -->
+            <div class="actions-bar">
 
                 <button
                     type="button"
-                    disabled
+                    class="btn-primary"
+                    (click)="abrirModalAgregar()"
                 >
-
                     <i class="fa-solid fa-plus"></i>
-
                     Agregar parada
-
-                </button>
-
-
-                <button
-                    type="button"
-                    disabled
-                >
-
-                    <i class="fa-solid fa-pen"></i>
-
-                    Editar parada
-
                 </button>
 
             </div>
+
+        }
+
+    }
+
+
+    <!-- =========================================
+         MODAL AGREGAR PARADA
+    ========================================== -->
+
+    @if (mostrarModalAgregar()) {
+
+        <div class="modal-backdrop" (click)="cerrarModalAgregar()"></div>
+
+        <div class="modal-panel">
+
+            <div class="modal-header">
+
+                <div class="modal-title-group">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <div>
+                        <h3>Agregar parada</h3>
+                        <p>{{ pasoModal() === 'mapa' ? 'Selecciona el punto en el mapa' : 'Completa los datos de la parada' }}</p>
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    class="modal-close"
+                    (click)="cerrarModalAgregar()"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+            </div>
+
+
+            <!-- Pasos -->
+            <div class="modal-steps">
+                <div class="step" [class.active]="pasoModal() === 'mapa'" [class.done]="pasoModal() === 'formulario'">
+                    <span class="step-number">
+                        @if (pasoModal() === 'formulario') {
+                            <i class="fa-solid fa-check"></i>
+                        } @else {
+                            1
+                        }
+                    </span>
+                    <span class="step-label">Ubicación</span>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" [class.active]="pasoModal() === 'formulario'">
+                    <span class="step-number">2</span>
+                    <span class="step-label">Datos</span>
+                </div>
+            </div>
+
+
+            @if (errorModal) {
+                <div class="modal-error">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ errorModal }}
+                </div>
+            }
+
+
+            <!-- PASO 1: MAPA -->
+            @if (pasoModal() === 'mapa') {
+
+                <div class="modal-map-container">
+                    <app-mapa
+                        rol="usuario"
+                        (cambioUbicacion)="onUbicacionCambiada($event)"
+                    ></app-mapa>
+                </div>
+
+                @if (ubicacionSeleccionada()) {
+                    <div class="coords-preview">
+                        <i class="fa-solid fa-circle-check" style="color: #198754;"></i>
+                        Punto seleccionado:
+                        <strong>
+                            {{ ubicacionSeleccionada()!.lat | number:'1.4-4' }},
+                            {{ ubicacionSeleccionada()!.lng | number:'1.4-4' }}
+                        </strong>
+                    </div>
+                } @else {
+                    <div class="map-hint">
+                        <i class="fa-solid fa-hand-pointer"></i>
+                        Haz clic en el mapa para seleccionar la ubicación de la parada
+                    </div>
+                }
+
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn-secondary"
+                        (click)="cerrarModalAgregar()"
+                    >
+                        Cancelar
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        (click)="continuarAFormulario()"
+                        [disabled]="!ubicacionSeleccionada()"
+                    >
+                        Continuar
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            }
+
+
+            <!-- PASO 2: FORMULARIO -->
+            @if (pasoModal() === 'formulario') {
+
+                <div class="modal-form">
+
+                    <div class="form-group">
+                        <label for="nombre-parada">Nombre de la parada *</label>
+                        <input
+                            id="nombre-parada"
+                            type="text"
+                            [(ngModel)]="nombreParada"
+                            placeholder="Ej: Frente al parque central"
+                            class="form-input"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dir-parada">Dirección *</label>
+                        <input
+                            id="dir-parada"
+                            type="text"
+                            [(ngModel)]="direccionParada"
+                            placeholder="Ej: 4a Calle 5-30, Zona 1"
+                            class="form-input"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipo-parada">Tipo de parada</label>
+                        <select
+                            id="tipo-parada"
+                            [ngModel]="tipoParada"
+                            (ngModelChange)="cambiarTipoParada($event)"
+                            class="form-input"
+                        >
+                            <option value="recogida">Parada de recogida (subida)</option>
+                            <option value="descenso">Parada de descenso (bajada)</option>
+                        </select>
+                    </div>
+
+                    <div class="location-summary">
+                        <i class="fa-solid fa-map-pin"></i>
+                        <div>
+                            <span>Ubicación seleccionada</span>
+                            <strong>
+                                {{ ubicacionSeleccionada()!.lat | number:'1.4-4' }},
+                                {{ ubicacionSeleccionada()!.lng | number:'1.4-4' }}
+                            </strong>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn-secondary"
+                        (click)="volverAlMapa()"
+                    >
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Volver al mapa
+                    </button>
+                    <button
+                        type="button"
+                        class="btn-primary"
+                        (click)="guardarParada()"
+                        [disabled]="guardando()"
+                    >
+                        @if (guardando()) {
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            Guardando...
+                        } @else {
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Guardar parada
+                        }
+                    </button>
+                </div>
+
+            }
 
         </div>
 

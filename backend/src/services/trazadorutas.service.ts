@@ -1,6 +1,29 @@
 import { pool } from "../config/conexion";
 
+const trazadosActivosMap = new Map<number, { lat: number; lng: number }[]>();
+
 export class ViajesService {
+
+  static guardarTrazadoActivo(idViaje: number, puntos: { lat: number; lng: number }[]) {
+    if (idViaje && Array.isArray(puntos)) {
+      trazadosActivosMap.set(Number(idViaje), puntos);
+    }
+  }
+
+  static obtenerTrazadoActivo(idViaje: number) {
+    return trazadosActivosMap.get(Number(idViaje)) || null;
+  }
+
+  static async obtenerTrazadoActivoAsync(idViaje: number, idRuta?: number) {
+    const enMemoria = trazadosActivosMap.get(Number(idViaje));
+    if (enMemoria && enMemoria.length > 0) {
+      return enMemoria;
+    }
+    if (idRuta) {
+      return this.obtenerTrazadoRutaPorAsistencia(Number(idRuta), Number(idViaje));
+    }
+    return [];
+  }
 
   static async obtenerChoferPorUsuario(idUsuario: number) {
     const { rows } = await pool.query(
@@ -102,27 +125,27 @@ export class ViajesService {
 
     const ausentesQuery = `
       SELECT DISTINCT 
-        COALESCE(ar.id_parada_recogida, ar.id_parada_descenso) AS id_parada_recogida,
-        COALESCE(ar.id_parada_descenso, ar.id_parada_recogida) AS id_parada_descenso
+        ar.id_parada_recogida,
+        ar.id_parada_descenso
       FROM Asistencias a
       INNER JOIN Asignaciones_Ruta ar ON ar.id_estudiante = a.id_estudiante AND ar.id_ruta = $1
       WHERE a.id_viaje = $2 
-        AND (a.estado_abordaje = 'AUSENTE' OR a.estado_descenso = 'AUSENTE');
+        AND (
+          ($3 = 'IDA' AND a.estado_abordaje = 'AUSENTE')
+          OR ($3 = 'VUELTA' AND (a.estado_descenso = 'AUSENTE' OR a.estado_abordaje = 'AUSENTE'))
+        );
     `;
-    const ausentesRes = await pool.query(ausentesQuery, [idRuta, idViaje]);
+    const ausentesRes = await pool.query(ausentesQuery, [idRuta, idViaje, tipo]);
     const paradasAusentes = new Set<number>();
     for (const row of ausentesRes.rows) {
-      if (tipo === 'VUELTA' && row.id_parada_descenso) {
-        paradasAusentes.add(Number(row.id_parada_descenso));
-      } else if (row.id_parada_recogida) {
-        paradasAusentes.add(Number(row.id_parada_recogida));
-      }
+      if (row.id_parada_recogida) paradasAusentes.add(Number(row.id_parada_recogida));
+      if (row.id_parada_descenso) paradasAusentes.add(Number(row.id_parada_descenso));
     }
 
     const presentesQuery = `
       SELECT DISTINCT 
-        COALESCE(ar.id_parada_recogida, ar.id_parada_descenso) AS id_parada_recogida,
-        COALESCE(ar.id_parada_descenso, ar.id_parada_recogida) AS id_parada_descenso
+        ar.id_parada_recogida,
+        ar.id_parada_descenso
       FROM Asistencias a
       INNER JOIN Asignaciones_Ruta ar ON ar.id_estudiante = a.id_estudiante AND ar.id_ruta = $1
       WHERE a.id_viaje = $2 
@@ -134,11 +157,8 @@ export class ViajesService {
     const presentesRes = await pool.query(presentesQuery, [idRuta, idViaje, tipo]);
     const paradasPresentes = new Set<number>();
     for (const row of presentesRes.rows) {
-      if (tipo === 'VUELTA' && row.id_parada_descenso) {
-        paradasPresentes.add(Number(row.id_parada_descenso));
-      } else if (row.id_parada_recogida) {
-        paradasPresentes.add(Number(row.id_parada_recogida));
-      }
+      if (row.id_parada_recogida) paradasPresentes.add(Number(row.id_parada_recogida));
+      if (row.id_parada_descenso) paradasPresentes.add(Number(row.id_parada_descenso));
     }
 
     const minOrden = baseStops[0].orden_parada;
@@ -148,21 +168,24 @@ export class ViajesService {
       if (p.orden_parada === minOrden || p.orden_parada === maxOrden) {
         return true;
       }
-      if (paradasPresentes.has(p.id_parada)) {
-        return true;
+
+      if (tipo === 'VUELTA' && paradasPresentes.size > 0) {
+        return paradasPresentes.has(p.id_parada);
       }
+
       if (paradasPresentes.size > 0) {
-        return false;
+        return paradasPresentes.has(p.id_parada);
       }
+
       return !paradasAusentes.has(p.id_parada);
     });
 
-    if (paradasFiltradas.length === 0) {
+    if (paradasFiltradas.length < 2) {
       paradasFiltradas = baseStops;
     }
 
     const resultado = paradasFiltradas.map(p => ({ lat: p.lat, lng: p.lng }));
-    return tipo === 'VUELTA' ? resultado.reverse() : resultado;
+    return tipo === 'VUELTA' ? resultado.slice().reverse() : resultado;
   }
 
   static async iniciarViaje(idChofer: number) {
@@ -221,6 +244,8 @@ export class ViajesService {
        WHERE (id_chofer = $1 OR id_ruta = $2 OR id_viaje = $3) AND estado = 'ACTIVO'`,
       [idChofer, idRuta, idViaje]
     );
+
+    trazadosActivosMap.delete(Number(idViaje));
 
     return viaje || { estado: 'FINALIZADO' };
   }

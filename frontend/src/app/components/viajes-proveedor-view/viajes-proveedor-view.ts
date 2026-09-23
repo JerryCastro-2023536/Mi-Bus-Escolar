@@ -64,7 +64,30 @@ export class ViajesProveedorView implements OnInit, OnDestroy {
         this.modalRastreoAbierto.set(true);
         this.cargandoMapa.set(true);
 
-        if (v.id_ruta) {
+        if (v.id_viaje) {
+            this.api.obtenerTrazadoActivoViaje(v.id_viaje, v.id_ruta).subscribe({
+                next: (puntos) => {
+                    if (puntos && puntos.length > 0) {
+                        this.trazadoRuta.set(puntos);
+                    } else if (v.id_ruta) {
+                        this.api.obtenerTrazadoRuta(v.id_ruta).subscribe({
+                            next: (pts) => this.trazadoRuta.set(pts || []),
+                            error: () => this.trazadoRuta.set([])
+                        });
+                    }
+                    this.cargandoMapa.set(false);
+                },
+                error: () => {
+                    if (v.id_ruta) {
+                        this.api.obtenerTrazadoRuta(v.id_ruta).subscribe({
+                            next: (pts) => this.trazadoRuta.set(pts || []),
+                            error: () => this.trazadoRuta.set([])
+                        });
+                    }
+                    this.cargandoMapa.set(false);
+                }
+            });
+        } else if (v.id_ruta) {
             this.api.obtenerTrazadoRuta(v.id_ruta).subscribe({
                 next: (puntos) => {
                     this.trazadoRuta.set(puntos || []);
@@ -90,12 +113,15 @@ export class ViajesProveedorView implements OnInit, OnDestroy {
 
     private actualizarGPSChofer(idViaje: number): void {
         this.api.obtenerUbicacionActualViaje(idViaje).subscribe({
-            next: (data) => {
+            next: (data: any) => {
                 if (data && data.latitud && data.longitud) {
                     this.posicionChofer.set({
                         lat: Number(data.latitud),
                         lng: Number(data.longitud)
                     });
+                }
+                if (data && data.trazado_activo && Array.isArray(data.trazado_activo) && data.trazado_activo.length > 0) {
+                    this.trazadoRuta.set(data.trazado_activo);
                 }
             },
             error: (err) => {
