@@ -88,7 +88,7 @@ BEGIN
         NULLIF(TRIM(p_comentario), ''),
         p_calificacion
     )
-    ON CONFLICT (id_servicio, id_usuario)
+    ON CONFLICT ON CONSTRAINT uq_valoracion_servicio_usuario
     DO UPDATE SET
         comentario = EXCLUDED.comentario,
         calificacion = EXCLUDED.calificacion
