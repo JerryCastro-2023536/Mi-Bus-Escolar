@@ -81,28 +81,49 @@ export async function eliminarUsuarioById(id: number) {
 
 export async function login(u: UsuarioLoginDTO) {
     try {
-        const res = await pool.query('SELECT * FROM sp_usuarios_buscar_por_correo($1)', [u.correo]);
+        const correo = u.correo.trim().toLowerCase();
+        const res = await pool.query(
+            'SELECT * FROM sp_usuarios_buscar_por_correo($1)',
+            [correo]
+        );
+
         if (res.rowCount === 0) {
-            throw new ValidationError("Error al logearse", [{
+            throw new ValidationError("Error al iniciar sesión", [{
                 campo: "correo",
-                mensaje: "El correo es invalido"
+                mensaje: "El correo no está registrado"
             }]);
         }
 
         const usuario = res.rows[0];
-        const passwordValida = await bcrypt.compare(u.password, usuario.password);
+        const hashGuardado = String(usuario.password ?? '');
 
-        if (!passwordValida) {
-            throw new ValidationError("Error al logearse", [{
+        // bcrypt.compare recibe la contraseña en texto plano y el hash
+        // almacenado. Nunca se vuelve a hashear la contraseña del login.
+        const esHashBcrypt = /^\$2[aby]\$\d{2}\$/.test(hashGuardado);
+        if (!esHashBcrypt) {
+            throw new ValidationError("Error al iniciar sesión", [{
                 campo: "password",
-                mensaje: "La contraseña es invalida"
+                mensaje: "La contraseña almacenada para esta cuenta debe restablecerse"
             }]);
         }
+
+        const passwordValida = await bcrypt.compare(u.password, hashGuardado);
+
+        if (!passwordValida) {
+            throw new ValidationError("Error al iniciar sesión", [{
+                campo: "password",
+                mensaje: "La contraseña es inválida"
+            }]);
+        }
+
         delete usuario.password;
 
         if (usuario.rol === 'CHOFER') {
             const userId = usuario.id_usuario || usuario.id;
-            const choferRes = await pool.query('SELECT id_chofer FROM Choferes WHERE id_usuario = $1 LIMIT 1', [userId]);
+            const choferRes = await pool.query(
+                'SELECT id_chofer FROM Choferes WHERE id_usuario = $1 LIMIT 1',
+                [userId]
+            );
             if (choferRes.rows.length > 0) {
                 usuario.id_chofer = choferRes.rows[0].id_chofer;
             }
@@ -118,7 +139,7 @@ export async function login(u: UsuarioLoginDTO) {
 export async function register(u: UsuarioRegisterDTO) {
     try {
         const hashedPassword = await bcrypt.hash(u.password, 10);
-        const values = [u.nombre, u.apellido, u.correo, hashedPassword, u.telefono, u.foto_usuario, userRol.USUARIO, false];
+        const values = [u.nombre, u.apellido, u.correo.trim().toLowerCase(), hashedPassword, u.telefono, u.foto_usuario, userRol.USUARIO, false];
         const query = 'SELECT * FROM sp_usuarios_agregar($1, $2, $3, $4, $5, $6, $7, $8)';
         const res = await pool.query(query, values);
 
