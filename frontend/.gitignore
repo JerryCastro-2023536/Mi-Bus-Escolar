@@ -44,4 +44,4 @@ __screenshots__/
 Thumbs.db
 
 # Variables de entorno
-src/environments/
+src/environments/enviroment.ts
