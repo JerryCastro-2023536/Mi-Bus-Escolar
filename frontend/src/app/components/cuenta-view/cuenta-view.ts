@@ -45,7 +45,6 @@ export class CuentaView implements OnInit {
 
   subiendoFoto = signal(false);
   draggingImage = false;
-  private passwordActual = '';
 
   onFotoSeleccionada(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -134,7 +133,6 @@ export class CuentaView implements OnInit {
       this.usuarioService.buscarUsuarioById(this.usuario.id_usuario!).subscribe({
         next: (response) => {
           if (!response?.data) return;
-          this.passwordActual = response.data.password || '';
           this.usuario = { ...this.usuario, ...response.data };
           this.cdr.markForCheck();
         }
@@ -236,12 +234,14 @@ export class CuentaView implements OnInit {
   }
 
   private payloadUsuario(changes: Partial<UsuarioDTO> = {}): Partial<UsuarioDTO> {
-    const password = changes.password || this.passwordActual || this.usuario.password;
-    if (changes.password) this.passwordActual = changes.password;
+    // La contraseña se cambia únicamente desde el apartado Seguridad.
+    // No debe enviarse al editar nombre, correo, teléfono o foto.
+    const { password: _password, ...usuarioSinPassword } = this.usuario;
+    const { password: _passwordChange, ...changesSinPassword } = changes;
+
     return {
-      ...this.usuario,
-      ...changes,
-      password,
+      ...usuarioSinPassword,
+      ...changesSinPassword,
       rol: this.usuario.rol,
       correo_verificado: this.usuario.correo_verificado ?? false
     };
