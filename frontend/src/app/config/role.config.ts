@@ -101,7 +101,7 @@ const choferSidebar: SidebarSection[] = [
     {
         title: 'Mi Operación',
         items: [
-            { label: 'Mis Rutas', icon: 'route', route: '/misrutas-chofer', description: 'Trayectos asignados' },
+            { label: 'Mis Rutas', icon: 'route', route: '/mis-rutas-chofer', description: 'Trayectos asignados' },
             { label: 'Buses', icon: 'bus', route: '/buses-chofer', description: 'Buses asignados al chofer' },
             { label: 'Estudiantes', icon: 'users', route: '/asistencias-chofer', description: 'Registro de abordaje y descenso de alumnos' }
         ]
