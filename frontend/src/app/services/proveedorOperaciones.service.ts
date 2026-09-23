@@ -209,4 +209,11 @@ export class ProveedorOperacionesService {
             `${environment.API_URL}/rutas/${idRuta}/paradas`
         );
     }
+
+    obtenerTrazadoActivoViaje(idViaje: number, idRuta?: number | null) {
+        const url = idRuta
+            ? `${environment.API_URL}/viajes/${idViaje}/trazado-activo?idRuta=${idRuta}`
+            : `${environment.API_URL}/viajes/${idViaje}/trazado-activo`;
+        return this.http.get<{ lat: number; lng: number }[]>(url);
+    }
 }
