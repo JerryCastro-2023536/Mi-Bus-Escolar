@@ -457,4 +457,13 @@ export class LandingPage implements OnInit, OnDestroy {
       (valoracion) => valoracion.id_valoracion === idValoracion,
     );
   }
+
+  enviarAWhatsApp(telefono: string, mensaje: string) {
+    const numeroLimpiado = telefono.replace(/\D/g, '');
+    const mensajeCodificado = encodeURIComponent(mensaje);
+    
+    const url = `https://wa.me/${numeroLimpiado}?text=${mensajeCodificado}`;
+    
+    window.open(url, '_blank');
+  }
 }
