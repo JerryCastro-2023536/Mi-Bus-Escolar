@@ -1,0 +1,116 @@
+<div class="dashboard-container">
+
+  <main class="main-content">
+    <header class="top-header">
+      <div>
+        <h1 class="page-title">Bienvenido al Centro de Control</h1>
+        <p class="page-subtitle">Gestión de la jornada de transporte escolar</p>
+      </div>
+      <div class="status-pill active">
+        <span class="dot"></span> Turno Activo: Mañana
+      </div>
+    </header>
+
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon bg-blue"><i class="bi bi-bus-front-fill"></i></div>
+        <div class="kpi-data">
+          <span class="kpi-label">Vehículo</span>
+          <strong class="kpi-value">Bus #{{ vehiculoActual?.id_vehiculo ?? 1 }}</strong>
+          <span class="kpi-sub">Placa: {{ vehiculoActual?.placa || 'KTR-842' }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon bg-green"><i class="bi bi-geo-alt-fill"></i></div>
+        <div class="kpi-data route-select-block">
+          <span class="kpi-label">Ruta Asignada</span>
+          <select class="route-select" [(ngModel)]="selectedRutaId" (change)="onRutaSeleccionada()">
+            <option [ngValue]="null" disabled>Selecciona una ruta</option>
+            @for (ruta of rutasAsignadas; track ruta.id_ruta) {
+              <option [ngValue]="ruta.id_ruta">
+                {{ ruta.nombre }}
+              </option>
+            }
+          </select>
+          <span class="kpi-sub">
+            {{ rutaSeleccionada ? rutaSeleccionada.zona : 'Primero selecciona la ruta del chofer' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon bg-purple"><i class="bi bi-people-fill"></i></div>
+        <div class="kpi-data">
+          <span class="kpi-label">Estudiantes</span>
+          <strong class="kpi-value">{{ estudiantesCount }} Alumnos</strong>
+          <span class="kpi-sub">A bordo / Registrados</span>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon bg-amber"><i class="bi bi-lightning-charge-fill"></i></div>
+        <div class="kpi-data">
+          <span class="kpi-label">Estado de Flujo</span>
+          <strong class="kpi-value">{{ flujoTitulo }}</strong>
+          <span class="kpi-sub">{{ flujoDescripcion }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="action-grid">
+      <article class="info-card route-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-icon"><i class="bi bi-geo-alt-fill"></i></span>
+            <h3>Rutas Asignadas</h3>
+          </div>
+        </div>
+        <p class="card-desc">Visualiza las paradas, la ruta sugerida y la navegación GPS en tiempo real.</p>
+        <button class="primary-btn" type="button" [disabled]="!selectedRutaId" (click)="irARuta()">
+          {{ selectedRutaId ? 'Ir a la Ruta' : 'Selecciona una ruta' }}
+        </button>
+      </article>
+
+      <article class="info-card students-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-icon"><i class="bi bi-people-fill"></i></span>
+            <h3>Lista de Estudiantes</h3>
+          </div>
+        </div>
+        <p class="card-desc">Visualiza y gestiona el padrón completo de estudiantes asignados.</p>
+        <button class="toggle-btn2" type="button" (click)="irAComponente('/asistencias-chofer')">
+          Ir a Estudiantes
+        </button>
+      </article>
+
+      <article class="info-card vehicles-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-icon"><i class="bi bi-bus-front-fill"></i></span>
+            <h3>Vehículos del Chofer</h3>
+          </div>
+        </div>
+        <p class="card-desc">Detalles técnicos, placas y modelos de los vehículos a tu cargo.</p>
+        <button class="toggle-btn secondary" type="button" (click)="irAComponente('/reportes-chofer')">
+          Ir a Vehículos
+        </button>
+      </article>
+
+      <!-- Tarjeta 4: Incidencias -->
+      <article class="info-card reports-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="card-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+            <h3>Incidencias</h3>
+          </div>
+        </div>
+        <p class="card-desc">Visualiza y reporta emergencias, averías o retrasos en el trayecto.</p>
+        <button class="toggle-btn danger" type="button" (click)="irAComponente('/buses-chofer')">
+          Ir a Incidencias
+        </button>
+      </article>
+    </section>
+  </main>
+</div>

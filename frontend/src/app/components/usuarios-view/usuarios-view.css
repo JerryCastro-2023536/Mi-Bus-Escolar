@@ -1,0 +1,310 @@
+:host {
+    display: block;
+}
+
+.user-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+
+/* ========================================
+   BIENVENIDA
+======================================== */
+
+.welcome-card {
+    min-height: 190px;
+
+    padding: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 30px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #1A456B,
+            #123653
+        );
+
+    color: white;
+
+    overflow: hidden;
+
+    position: relative;
+}
+
+.welcome-content {
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 650px;
+}
+
+.welcome-badge {
+    display: inline-flex;
+
+    padding: 6px 11px;
+
+    margin-bottom: 12px;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.12);
+
+    color: #FFD141;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.8px;
+}
+
+.welcome-card h2 {
+    margin: 0 0 10px;
+
+    font-size: 26px;
+
+    line-height: 1.25;
+}
+
+.welcome-card p {
+    margin: 0;
+
+    color: #D6E3EC;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+.welcome-icon {
+    width: 120px;
+    height: 120px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgba(255, 209, 65, 0.12);
+
+    color: #FFD141;
+
+    font-size: 50px;
+}
+
+
+/* ========================================
+   GRID
+======================================== */
+
+.dashboard-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+
+/* ========================================
+   TARJETAS
+======================================== */
+
+.dashboard-card {
+    min-height: 210px;
+
+    padding: 25px;
+
+    display: flex;
+
+    gap: 20px;
+
+    border: 1px solid #E2E8EC;
+
+    border-radius: 18px;
+
+    background: white;
+
+    color: inherit;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-4px);
+
+    border-color: #C9D7E1;
+
+    box-shadow:
+        0 15px 35px rgba(26, 69, 107, 0.10);
+}
+
+
+/* ========================================
+   ICONOS
+======================================== */
+
+.card-icon {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    font-size: 20px;
+}
+
+.card-icon.blue {
+    background: #E8F1F7;
+
+    color: #1A456B;
+}
+
+.card-icon.yellow {
+    background: #FFF5CC;
+
+    color: #B98C00;
+}
+
+.card-icon.green {
+    background: #E9F7EF;
+
+    color: #198754;
+}
+
+.card-icon.purple {
+    background: #F1EAFE;
+
+    color: #7147A8;
+}
+
+
+/* ========================================
+   CONTENIDO
+======================================== */
+
+.card-content {
+    display: flex;
+
+    flex: 1;
+
+    flex-direction: column;
+}
+
+.card-label {
+    color: #6D7D87;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.8px;
+}
+
+.card-content h3 {
+    margin: 5px 0 9px;
+
+    color: #1A456B;
+
+    font-size: 18px;
+}
+
+.card-content p {
+    margin: 0 0 18px;
+
+    color: #6D7D87;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+.card-link {
+    margin-top: auto;
+
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    color: #1A456B;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.dashboard-card:hover .card-link {
+    gap: 12px;
+}
+
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 900px) {
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .welcome-card {
+        padding: 25px;
+    }
+
+    .welcome-icon {
+        display: none;
+    }
+
+    .welcome-card h2 {
+        font-size: 21px;
+    }
+
+    .dashboard-card {
+        padding: 20px;
+    }
+
+}
+
+
+@media (max-width: 450px) {
+
+    .dashboard-card {
+        flex-direction: column;
+    }
+
+}

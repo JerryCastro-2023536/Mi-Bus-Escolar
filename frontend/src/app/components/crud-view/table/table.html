@@ -1,0 +1,63 @@
+<div class="table-wrapper">
+    <table class="crud-table">
+        <thead>
+            <tr>
+                @for (col of columns(); track col.key) {
+                <th>{{ col.label }}</th>
+                }
+            </tr>
+        </thead>
+
+        <tbody>
+            @for (row of data(); track row[idKey()]) {
+            <tr (click)="onRowClick(row)">
+                @for (col of columns(); track col.key) {
+
+                @if (isBoolean(getValue(row, col))) {
+                <td>
+                    <span class="bool-box" [class.is-true]="getValue(row, col)" [class.is-false]="!getValue(row, col)">
+                        {{ getValue(row, col) ? '✓' : '✕' }}
+                    </span>
+                </td>
+                } @else if (col.type === 'badge') {
+                <td>
+                    <span class="badge" [style.background]="getBadgeColor(getValue(row, col)).bg"
+                        [style.color]="getBadgeColor(getValue(row, col)).text">
+                        <span class="badge-dot" [style.background]="getBadgeColor(getValue(row, col)).text"></span>
+                        {{ getValue(row, col) }}
+                    </span>
+                </td>
+                } @else if (col.type === 'date' || col.type === 'time' || col.type === 'datetime') {
+                <td>{{ getValue(row, col) | date: (col.type === 'datetime' ? 'dd/MM/yyyy HH:mm' : col.type === 'time' ? 'HH:mm' : 'dd/MM/yyyy') }}</td>
+                }@else if (col.type === 'image') {
+                <td>
+                    @if (getValue(row, col)) {
+                    <button type="button" class="btn-view-photo" (click)="onViewImage($event, getValue(row, col))">
+                        <span class="btn-view-photo__icon">🖼️</span> Ver foto
+                    </button>
+                    } @else {
+                    <span class="no-photo">Sin foto</span>
+                    }
+                </td>
+                }@else {
+                <td>{{ getValue(row, col) }}</td>
+                }
+
+                }
+            </tr>
+            } @empty {
+            <tr>
+                <td [attr.colspan]="columns().length" class="empty-state">
+                    No hay registros para mostrar.
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    @if (viewingImage(); as url) {
+        <div class="image-lightbox" (click)="closeImage()">
+            <img [src]="url" (click)="$event.stopPropagation()" />
+            <button type="button" class="lightbox-close" (click)="closeImage()">✕</button>
+        </div>
+    }
+</div>

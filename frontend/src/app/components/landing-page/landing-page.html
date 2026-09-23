@@ -1,0 +1,1235 @@
+<!-- NAVBAR -->
+<header class="navbar">
+
+  <div class="container nav-container">
+
+    <a routerLink="/" class="logo">
+      <img
+        src="/logo-mi-bus-escolar.png"
+        alt="Mi Bus Escolar"
+        class="logo-image"
+      />
+    </a>
+
+    <nav class="nav-links">
+
+      <a href="#inicio">Inicio</a>
+
+      <a href="#funciones">Funciones</a>
+
+      <!-- NUEVO -->
+      <a href="#servicios">Servicios</a>
+
+      <a href="#como-funciona">
+        Cómo funciona
+      </a>
+
+      <a href="#seguridad">
+        Seguridad
+      </a>
+
+      <a href="#contacto">
+        Contacto
+      </a>
+
+      @if (estaLogueado()) {
+        <a
+          [routerLink]="rutaDashboard()"
+          class="btn btn-primary">
+          Ir al dashboard
+        </a>
+      } @else {
+        <a
+          routerLink="/login"
+          class="btn btn-outline">
+          Iniciar sesión
+        </a>
+
+        <a
+          routerLink="/register"
+          class="btn btn-primary">
+          Registrarse
+        </a>
+      }
+
+    </nav>
+
+  </div>
+
+</header>
+
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+
+  <div class="container hero-content">
+
+    <div class="hero-text">
+
+      <span class="badge">
+        ● TRANSPORTE ESCOLAR INTELIGENTE
+      </span>
+
+      <h1>
+        Conectando familias con el
+        <span>transporte escolar.</span>
+      </h1>
+
+      <p>
+        Monitorea las rutas en tiempo real,
+        recibe alertas de llegada y mantén
+        a tus hijos seguros durante cada trayecto.
+      </p>
+
+      <div class="hero-buttons">
+
+        <a
+          [routerLink]="rutaAccionPrincipal()"
+          class="btn btn-primary btn-large">
+          {{ estaLogueado() ? 'Ir al dashboard →' : 'Comenzar ahora →' }}
+        </a>
+
+        <a
+          href="#como-funciona"
+          class="btn btn-light btn-large">
+          Conocer más
+        </a>
+
+      </div>
+
+
+      <!-- ESTADÍSTICAS -->
+      <div class="statistics">
+
+        <div>
+          <strong>2,400+</strong>
+          <small>familias registradas</small>
+        </div>
+
+        <div>
+          <strong>98%</strong>
+          <small>puntualidad</small>
+        </div>
+
+        <div>
+          <strong>24/7</strong>
+          <small>soporte activo</small>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- TARJETA DEL MAPA -->
+    <div class="map-card">
+
+      <div class="map-header">
+
+        <div>
+          <small>Ruta en progreso</small>
+          <strong>Bus Escolar #24</strong>
+        </div>
+
+        <span class="live">
+          ● EN VIVO
+        </span>
+
+      </div>
+
+
+      <div class="map">
+
+        <div class="road road-one"></div>
+        <div class="road road-two"></div>
+        <div class="road road-three"></div>
+
+        <div class="route-line"></div>
+
+        <div class="stop stop-one">1</div>
+        <div class="stop stop-two">2</div>
+        <div class="stop stop-three">3</div>
+
+        <div class="bus">🚌</div>
+
+      </div>
+
+
+      <div class="arrival">
+
+        <div>
+          <small>Próxima parada</small>
+          <strong>Colegio Central</strong>
+        </div>
+
+        <strong class="arrival-time">
+          04 min
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- FUNCIONES -->
+<section
+  class="section"
+  id="funciones">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <small>
+        TODO EN UN SOLO LUGAR
+      </small>
+
+      <h2>
+        Una plataforma pensada para
+        <span>familias y colegios.</span>
+      </h2>
+
+      <p>
+        Información clara, seguimiento en tiempo real
+        y herramientas para una operación escolar más segura.
+      </p>
+
+    </div>
+
+
+    <div class="features">
+
+      <!-- CARD 1 -->
+      <article class="feature feature-main">
+
+        <div class="feature-icon">
+          📍
+        </div>
+
+        <h3>
+          Seguimiento en tiempo real
+        </h3>
+
+        <p>
+          Visualiza la ubicación del bus
+          y conoce el avance de la ruta
+          desde cualquier dispositivo.
+        </p>
+
+      </article>
+
+
+      <!-- CARD 2 -->
+      <article class="feature">
+
+        <div class="feature-icon yellow">
+          🔔
+        </div>
+
+        <h3>
+          Alertas inteligentes
+        </h3>
+
+        <p>
+          Recibe notificaciones cuando
+          el bus está por llegar o existe
+          alguna incidencia.
+        </p>
+
+      </article>
+
+
+      <!-- CARD 3 -->
+      <article class="feature">
+
+        <div class="feature-icon">
+          ✓
+        </div>
+
+        <h3>
+          Control de asistencia
+        </h3>
+
+        <p>
+          Registra abordajes y mantén
+          un historial organizado de
+          cada viaje escolar.
+        </p>
+
+      </article>
+
+
+      <!-- CARD 4 -->
+      <article class="feature">
+
+        <div class="feature-icon">
+          🚌
+        </div>
+
+        <h3>
+          Gestión de rutas
+        </h3>
+
+        <p>
+          Administra rutas, paradas,
+          vehículos y conductores
+          desde una interfaz sencilla.
+        </p>
+
+      </article>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- SERVICIOS DISPONIBLES -->
+<section
+  class="section services-section"
+  id="servicios">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <small>
+        SERVICIOS DISPONIBLES
+      </small>
+
+      <h2>
+        Encuentra el transporte
+        <span>ideal para ti.</span>
+      </h2>
+
+      <p>
+        Consulta servicios de transporte escolar,
+        compara precios, conoce sus rutas y revisa
+        las valoraciones de cada servicio.
+      </p>
+
+    </div>
+
+
+    <!-- FILTROS -->
+    <div class="services-filters">
+
+      <div class="filter-group">
+
+        <label for="filtroNombre">
+          Buscar servicio
+        </label>
+
+        <input
+          id="filtroNombre"
+          type="text"
+          [(ngModel)]="filtroNombre"
+          (input)="filtrarServicios()"
+          placeholder="Ej. Transporte Zona 1"
+        />
+
+      </div>
+
+
+      <div class="filter-group">
+
+        <label for="precioMaximo">
+          Precio máximo mensual
+        </label>
+
+        <input
+          id="precioMaximo"
+          type="number"
+          [(ngModel)]="precioMaximo"
+          (input)="filtrarServicios()"
+          placeholder="Ej. 500"
+          min="0"
+        />
+
+      </div>
+
+
+      <button
+        type="button"
+        class="clear-filter"
+        (click)="limpiarFiltros()">
+        Limpiar filtros
+      </button>
+
+    </div>
+
+
+    <!-- CARGANDO -->
+    @if (cargando()) {
+
+      <div class="services-message">
+
+        <div class="loader"></div>
+
+        <p>
+          Cargando servicios disponibles...
+        </p>
+
+      </div>
+
+    }
+
+
+    <!-- ERROR -->
+    @if (errorCarga() && !cargando()) {
+
+      <div class="services-message error-message">
+
+        <strong>
+          No fue posible cargar los servicios.
+        </strong>
+
+        <p>
+          Verifica que el servidor del backend
+          se encuentre funcionando.
+        </p>
+
+      </div>
+
+    }
+
+
+    <!-- LISTADO DE SERVICIOS -->
+    @if (!cargando() && !errorCarga()) {
+
+      @if (serviciosFiltrados().length > 0) {
+
+        <div class="services-grid">
+
+          @for (
+            servicio of serviciosFiltrados();
+            track servicio.id_servicio
+          ) {
+
+            <article class="service-card">
+
+
+              <!-- CABECERA DEL SERVICIO -->
+              <div class="service-card-header">
+
+                <div>
+
+                  <span class="service-status">
+                    Disponible
+                  </span>
+
+                  <h3>
+                    {{ servicio.nombre }}
+                  </h3>
+
+                </div>
+
+
+                <div class="service-price">
+
+                  <strong>
+                    Q{{ servicio.precio_mensual }}
+                  </strong>
+
+                  <small>
+                    / mes
+                  </small>
+
+                </div>
+
+              </div>
+
+
+              <!-- DESCRIPCIÓN -->
+              <p class="service-description">
+                {{ servicio.descripcion }}
+              </p>
+
+
+              <!-- PROMEDIO DE VALORACIONES -->
+              <div class="service-rating">
+
+                @if (servicio.valoraciones.length > 0) {
+
+                  <div class="rating-stars">
+
+                    @for (
+                      estrella of obtenerEstrellas(
+                        servicio.promedioValoraciones
+                      );
+                      track $index
+                    ) {
+                      <span>★</span>
+                    }
+
+                  </div>
+
+                  <strong>
+                    {{
+                      servicio.promedioValoraciones
+                        | number:'1.1-1'
+                    }}
+                  </strong>
+
+                  <small>
+                    ({{ servicio.valoraciones.length }}
+                    valoraciones)
+                  </small>
+
+                } @else {
+
+                  <small>
+                    Sin valoraciones todavía
+                  </small>
+
+                }
+
+              </div>
+
+
+              <!-- PROVEEDOR -->
+              <div class="service-block">
+
+                <div class="service-block-title">
+
+                  <span>🏢</span>
+
+                  <h4>
+                    Proveedor
+                  </h4>
+
+                </div>
+
+
+                @if (servicio.proveedor) {
+
+                  <div class="provider-info">
+
+                    <strong>
+                      {{ servicio.proveedor.nombre_negocio }}
+                    </strong>
+
+                    <p>
+                      {{ servicio.proveedor.direccion }}
+                    </p>
+
+                    <p>
+                      Tel:
+                      {{ servicio.proveedor.telefono_contacto }}
+                    </p>
+
+                  </div>
+
+                } @else {
+
+                  <p class="muted-text">
+                    Información del proveedor no disponible.
+                  </p>
+
+                }
+
+              </div>
+
+
+              <!-- RUTAS -->
+              <div class="service-block">
+
+                <div class="service-block-title">
+
+                  <span>🚌</span>
+
+                  <h4>
+                    Rutas disponibles
+                  </h4>
+
+                </div>
+
+
+                @if (servicio.rutas.length > 0) {
+
+                  <div class="routes-list">
+
+                    @for (
+                      ruta of servicio.rutas;
+                      track ruta.id_ruta
+                    ) {
+
+                      <div class="route-item">
+
+                        <div>
+
+                          <strong>
+                            {{ ruta.nombre }}
+                          </strong>
+
+                          <small>
+                            Horario estimado
+                          </small>
+
+                        </div>
+
+
+                        <div class="route-time">
+
+                          <span>
+                            {{ ruta.hora_inicio_estimada }}
+                          </span>
+
+                          <span>→</span>
+
+                          <span>
+                            {{ ruta.hora_fin_estimada }}
+                          </span>
+
+                        </div>
+
+                      </div>
+
+                    }
+
+                  </div>
+
+                } @else {
+
+                  <p class="muted-text">
+                    Este servicio todavía no tiene rutas disponibles.
+                  </p>
+
+                }
+
+              </div>
+
+
+              <!-- VALORACIONES -->
+              <div class="service-block">
+
+                <div class="service-block-title">
+
+                  <span>⭐</span>
+
+                  <h4>
+                    Valoraciones
+                  </h4>
+
+                </div>
+
+                @if (esUsuario()) {
+
+                  @if (
+                    !valoracionPropia(servicio) &&
+                    !formularioAbierto(servicio.id_servicio)
+                  ) {
+                    <div class="review-action-row">
+                      <button
+                        type="button"
+                        class="open-review-button"
+                        (click)="abrirFormularioNuevaValoracion(servicio)"
+                      >
+                        <i class="fa-regular fa-star"></i>
+                        Añadir valoración
+                      </button>
+                    </div>
+                  }
+
+                  @if (formularioAbierto(servicio.id_servicio)) {
+                    <div class="review-form">
+
+                      <div class="review-form-heading">
+                        <div>
+                          <strong>
+                            {{
+                              enEdicion(servicio.id_servicio)
+                                ? 'Editar tu valoración'
+                                : 'Valora este servicio'
+                            }}
+                          </strong>
+
+                          <small>
+                            Selecciona de 0 a 5 estrellas.
+                          </small>
+                        </div>
+
+                        <span class="selected-rating">
+                          {{ calificacionServicio(servicio.id_servicio) }}/5
+                        </span>
+                      </div>
+
+                      <div
+                        class="rating-selector"
+                        [attr.aria-label]="
+                          'Calificación seleccionada: ' +
+                          calificacionServicio(servicio.id_servicio) +
+                          ' de 5'
+                        "
+                      >
+                        <button
+                          type="button"
+                          class="zero-star"
+                          [class.selected]="
+                            calificacionServicio(servicio.id_servicio) === 0
+                          "
+                          (click)="seleccionarCalificacion(
+                            servicio.id_servicio,
+                            0
+                          )"
+                          title="0 estrellas"
+                        >
+                          0
+                        </button>
+
+                        @for (
+                          estrella of estrellasSelector();
+                          track estrella
+                        ) {
+                          <button
+                            type="button"
+                            class="star-button"
+                            [class.active]="
+                              estrella <=
+                              calificacionServicio(servicio.id_servicio)
+                            "
+                            (click)="seleccionarCalificacion(
+                              servicio.id_servicio,
+                              estrella
+                            )"
+                            [attr.aria-label]="estrella + ' estrellas'"
+                          >
+                            ★
+                          </button>
+                        }
+                      </div>
+
+                      <textarea
+                        rows="3"
+                        maxlength="1000"
+                        [ngModel]="comentarioServicio(servicio.id_servicio)"
+                        (ngModelChange)="actualizarComentario(
+                          servicio.id_servicio,
+                          $event
+                        )"
+                        placeholder="Cuéntanos tu experiencia con este servicio..."
+                      ></textarea>
+
+                      <div class="review-form-footer">
+
+                        <div class="review-feedback">
+                          @if (
+                            errorDeServicio(servicio.id_servicio)
+                          ) {
+                            <span class="review-error">
+                              {{ errorDeServicio(servicio.id_servicio) }}
+                            </span>
+                          }
+                        </div>
+
+                        <div class="review-form-actions">
+                          <button
+                            type="button"
+                            class="cancel-review"
+                            (click)="cerrarFormularioValoracion(servicio)"
+                            [disabled]="enviando(servicio.id_servicio)"
+                          >
+                            Cancelar
+                          </button>
+
+                          <button
+                            type="button"
+                            class="submit-review"
+                            (click)="guardarValoracion(servicio)"
+                            [disabled]="enviando(servicio.id_servicio)"
+                          >
+                            {{
+                              enviando(servicio.id_servicio)
+                                ? 'Guardando...'
+                                : (
+                                    enEdicion(servicio.id_servicio)
+                                      ? 'Guardar cambios'
+                                      : 'Publicar valoración'
+                                  )
+                            }}
+                          </button>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  }
+
+                  @if (
+                    mensajeDeServicio(servicio.id_servicio) &&
+                    !formularioAbierto(servicio.id_servicio)
+                  ) {
+                    <div class="review-success standalone-feedback">
+                      {{ mensajeDeServicio(servicio.id_servicio) }}
+                    </div>
+                  }
+
+                } @else if (!estaLogueado()) {
+
+                  <p class="review-login-hint">
+                    <a routerLink="/login">Inicia sesión</a>
+                    con una cuenta de usuario para valorar este servicio.
+                  </p>
+
+                }
+
+
+                @if (servicio.valoraciones.length > 0) {
+
+                  <div class="reviews-list">
+
+                    @for (
+                      valoracion of servicio.valoraciones;
+                      track valoracion.id_valoracion
+                    ) {
+
+                      <div class="review-item">
+
+                        <!-- USUARIO DE LA VALORACIÓN -->
+
+                            @if (
+                              obtenerUsuarioValoracion(
+                                valoracion.id_valoracion
+                              );
+                              as detalle
+                            ) {
+
+                              <div class="review-user">
+
+                                <div class="review-avatar">
+
+                                  {{
+                                    detalle.nombre_usuario
+                                      ?.charAt(0)
+                                      ?.toUpperCase()
+                                      || '?'
+                                  }}
+
+                                </div>
+
+                                <div class="review-user-info">
+
+                                  @if (detalle.nombre_usuario) {
+
+                                    <strong>
+                                      {{ detalle.nombre_usuario }}
+                                      {{ detalle.apellido_usuario }}
+                                    </strong>
+
+                                  } @else {
+
+                                    <strong>
+                                      Usuario
+                                    </strong>
+
+                                  }
+
+                                </div>
+
+                              </div>
+
+                            }
+
+                        <div class="review-rating">
+
+                          @for (
+                            estrella of obtenerEstrellas(
+                              valoracion.calificacion
+                            );
+                            track $index
+                          ) {
+                            <span>★</span>
+                          }
+
+                          <strong>
+                            {{ valoracion.calificacion }}/5
+                          </strong>
+
+                        </div>
+
+                        <p>
+                          {{ valoracion.comentario || 'Sin comentario.' }}
+                        </p>
+
+                        @if (esValoracionPropia(valoracion)) {
+                          <div class="own-review-actions">
+
+                            <button
+                              type="button"
+                              class="edit-review-button"
+                              (click)="abrirEdicionValoracion(
+                                servicio,
+                                valoracion
+                              )"
+                            >
+                              <i class="fa-solid fa-pen"></i>
+                              Editar valoración
+                            </button>
+                          </div>
+                        }
+
+                      </div>
+
+                    }
+
+                  </div>
+
+                } @else {
+
+                  <p class="muted-text">
+                    Aún no existen comentarios para este servicio.
+                  </p>
+
+                }
+
+              </div>
+
+
+              <!-- CONTACTAR PROVEEDOR -->
+              @if (servicio.proveedor) {
+
+                <a
+                  class="contact-provider"
+                  (click)="enviarAWhatsApp( servicio.proveedor.telefono_contacto ?? '', 'Contacta conmigo para asignar a tu estudiante' )">
+                  Contactar proveedor
+                </a>
+
+              }
+
+            </article>
+
+          }
+
+        </div>
+
+      } @else {
+
+        <!-- SIN RESULTADOS -->
+        <div class="services-message">
+
+          <strong>
+            No encontramos servicios
+          </strong>
+
+          <p>
+            Intenta cambiar el nombre o
+            el precio máximo del filtro.
+          </p>
+
+        </div>
+
+      }
+
+    }
+
+  </div>
+
+</section>
+
+
+<!-- COMO FUNCIONA -->
+<section
+  class="section how"
+  id="como-funciona">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <small>
+        ASÍ DE SENCILLO
+      </small>
+
+      <h2>
+        Tu recorrido,
+        <span>paso a paso.</span>
+      </h2>
+
+    </div>
+
+
+    <div class="steps">
+
+      <div class="step">
+
+        <div class="step-number">
+          01
+        </div>
+
+        <h3>
+          Regístrate
+        </h3>
+
+        <p>
+          Crea tu cuenta y vincula
+          a tus estudiantes con
+          su ruta escolar.
+        </p>
+
+      </div>
+
+
+      <div class="step-line"></div>
+
+
+      <div class="step">
+
+        <div class="step-number">
+          02
+        </div>
+
+        <h3>
+          Consulta la ruta
+        </h3>
+
+        <p>
+          Revisa paradas, horarios
+          y ubicación del bus
+          en tiempo real.
+        </p>
+
+      </div>
+
+
+      <div class="step-line"></div>
+
+
+      <div class="step">
+
+        <div class="step-number">
+          03
+        </div>
+
+        <h3>
+          Recibe alertas
+        </h3>
+
+        <p>
+          Obtén avisos oportunos
+          para acompañar cada
+          trayecto con tranquilidad.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- SEGURIDAD -->
+<section
+  class="section"
+  id="seguridad">
+
+  <div class="container security-content">
+
+    <div class="security-text">
+
+      <small>
+        SEGURIDAD PRIMERO
+      </small>
+
+      <h2>
+        Más tranquilidad para
+        cada <span>trayecto.</span>
+      </h2>
+
+      <p>
+        Mi Bus Escolar centraliza la información
+        del transporte para que familias, colegios
+        y conductores puedan coordinarse de forma
+        rápida y confiable.
+      </p>
+
+
+      <ul>
+
+        <li>
+          <span>✓</span>
+          Monitoreo de rutas en tiempo real
+        </li>
+
+        <li>
+          <span>✓</span>
+          Notificaciones de llegada e incidencias
+        </li>
+
+        <li>
+          <span>✓</span>
+          Registro de asistencia por viaje
+        </li>
+
+        <li>
+          <span>✓</span>
+          Información organizada y accesible
+        </li>
+
+      </ul>
+
+    </div>
+
+
+    <div class="security-card">
+
+      <div class="shield">
+        ✓
+      </div>
+
+      <h3>
+        Transporte seguro
+      </h3>
+
+      <p>
+        Diseñada para apoyar una operación
+        de transporte escolar segura y conectada.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- CTA -->
+<section class="cta">
+
+  <div class="container cta-content">
+
+    <div>
+
+      <small>
+        EMPIEZA HOY
+      </small>
+
+      <h2>
+        Haz del transporte escolar
+        una experiencia más segura.
+      </h2>
+
+      <p>
+        Conecta a tu comunidad escolar
+        con información que realmente importa.
+      </p>
+
+    </div>
+
+
+    <a
+      [routerLink]="rutaAccionPrincipal()"
+      class="btn btn-yellow">
+      {{ estaLogueado() ? 'Ir al dashboard →' : 'Crear mi cuenta →' }}
+    </a>
+
+  </div>
+
+</section>
+
+
+<!-- FOOTER -->
+<footer id="contacto">
+
+  <div class="container footer-content">
+
+    <div>
+
+      <div class="footer-logo">
+        Mi Bus <span>Escolar</span>
+      </div>
+
+      <p>
+        Transporte seguro y conectado.
+      </p>
+
+    </div>
+
+
+    <div>
+
+      <h4>
+        Plataforma
+      </h4>
+
+      <a href="#funciones">
+        Funciones
+      </a>
+
+      <!-- NUEVO -->
+      <a href="#servicios">
+        Servicios
+      </a>
+
+      <a href="#como-funciona">
+        Cómo funciona
+      </a>
+
+      <a href="#seguridad">
+        Seguridad
+      </a>
+
+    </div>
+
+
+    <div>
+
+      <h4>
+        Soporte
+      </h4>
+
+      <a href="#">
+        Centro de ayuda
+      </a>
+
+      <a href="mailto:soporte@mibusescolar.com">
+        soporte@mibusescolar.com
+      </a>
+
+    </div>
+
+
+    <div>
+
+      <h4>
+        Cuenta
+      </h4>
+
+      @if (estaLogueado()) {
+        <a [routerLink]="rutaDashboard()">
+          Ir al dashboard
+        </a>
+      } @else {
+        <a routerLink="/login">
+          Iniciar sesión
+        </a>
+
+        <a routerLink="/register">
+          Registrarse
+        </a>
+      }
+
+    </div>
+
+  </div>
+
+
+  <div class="container footer-bottom">
+
+    <span>
+      © 2026 Mi Bus Escolar
+    </span>
+
+    <span>
+      Transporte Seguro y Conectado
+    </span>
+
+  </div>
+
+</footer>

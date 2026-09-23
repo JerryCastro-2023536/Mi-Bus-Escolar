@@ -1,0 +1,48 @@
+<div class="overlay" (click)="onClose()">
+    <div class="card" (click)="$event.stopPropagation()">
+
+        <div class="card-header">
+            <span class="eyebrow">Detalle del registro</span>
+            <button class="close-btn" (click)="onClose()">✕</button>
+        </div>
+
+        <div class="card-body">
+            @for (col of columns(); track col.key) {
+            <div class="field-row">
+                <span class="field-label">{{ col.label }}</span>
+                @if (col.type === 'image') {
+                    @if (getValue(col)) {
+                        <button type="button" class="btn-view-photo" (click)="onViewImage(getValue(col))">
+                            <span class="btn-view-photo__icon">🖼️</span> Ver foto
+                        </button>
+                    } @else {
+                        <span class="field-value">Sin foto</span>
+                    }
+                } @else if (isBoolean(getValue(col))) {
+                    <span class="bool-box" [class.is-true]="getValue(col)" [class.is-false]="!getValue(col)">
+                        {{ getValue(col) ? '✓' : '✕' }}
+                    </span>
+                } @else {
+                    <span class="field-value">{{ getValue(col) }}</span>
+                }
+            </div>
+            }
+        </div>
+
+        <div class="card-actions">
+            <button class="btn-edit" (click)="onEdit()">
+                <span class="btn-icon">✎</span> Editar registro
+            </button>
+            <button class="btn-delete" (click)="onDelete()">
+                <span class="btn-icon">🗑️</span> Eliminar
+            </button>
+        </div>
+
+    </div>
+</div>
+@if (viewingImage(); as url) {
+    <div class="image-lightbox" (click)="closeImage()">
+        <img [src]="url" (click)="$event.stopPropagation()" />
+        <button type="button" class="lightbox-close" (click)="closeImage()">✕</button>
+    </div>
+}

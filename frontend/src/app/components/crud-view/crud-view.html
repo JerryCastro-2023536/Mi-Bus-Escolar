@@ -1,0 +1,87 @@
+<div class="crud-view">
+
+    <app-crud-header [title]="config().title" [subtitle]="config().subtitle" [kpis]="config().kpis"
+        [kpiData]="kpiData()" (search)="onSearch($event)" (create)="onCreate()" />
+
+    @if (loading()) {
+
+    <p class="status-text">
+        Cargando...
+    </p>
+
+    } @else {
+
+    <app-crud-table [columns]="config().tableColumns" [data]="paginatedItems()" [idKey]="config().idKey"
+        (rowClick)="onRowClick($event)" />
+
+    <div class="pagination-bar">
+
+        <div class="pagination-size">
+
+            <span>Mostrar</span>
+
+            <select class="page-size-select" [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)"
+                aria-label="Registros por página">
+                @for (
+                option of pageSizeOptions;
+                track option
+                ) {
+                <option [ngValue]="option">
+                    {{ option }}
+                </option>
+                }
+            </select>
+
+            <span>registros</span>
+
+        </div>
+
+        <div class="pagination-summary">
+            Mostrando
+            <strong>{{ firstVisibleItem() }}</strong>
+            –
+            <strong>{{ lastVisibleItem() }}</strong>
+            de
+            <strong>{{ totalItems() }}</strong>
+        </div>
+
+        <div class="pagination-controls">
+
+            <button type="button" class="pagination-btn" (click)="previousPage()" [disabled]="currentPage() === 1"
+                aria-label="Página anterior">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            @for (
+            page of pageNumbers();
+            track page
+            ) {
+            <button type="button" class="pagination-btn page-number" [class.active]="page === currentPage()"
+                (click)="goToPage(page)">
+                {{ page }}
+            </button>
+            }
+
+            <button type="button" class="pagination-btn" (click)="nextPage()" [disabled]="currentPage() >= totalPages()"
+                aria-label="Página siguiente">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+        </div>
+
+    </div>
+    }
+
+    @if (selectedItem(); as item) {
+
+    <app-crud-card [item]="item" [columns]="config().tableColumns" (close)="onCloseCard()"
+        (edit)="onEditFromCard($event)" (delete)="onDeleteFromCard($event)" />
+
+    }
+
+    @if (formItem() !== undefined) {
+    <app-crud-form [fields]="formFields()" [item]="formItem()" [errors]="serverErrors()"
+        [imageFolder]="config().apiEndpoint.replace('/', '')" (save)="onSaveForm($event)" (cancel)="onCancelForm()" />
+    }
+
+</div>

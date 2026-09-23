@@ -1,0 +1,281 @@
+<section class="viajes-view">
+
+    @if (mensajeError) {
+        <div class="alert-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            {{ mensajeError }}
+        </div>
+    }
+
+    @if (!estudianteSeleccionado()) {
+
+        @if (cargandoEstudiantes()) {
+            <div class="state-card">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Cargando estudiantes...</p>
+            </div>
+        } @else {
+
+            <div class="section-intro">
+                <div>
+                    <span class="eyebrow">Selecciona un estudiante</span>
+                    <h2>¿De quién deseas consultar el viaje?</h2>
+                    <p>Selecciona un estudiante para consultar sus viajes activos e inactivos.</p>
+                </div>
+            </div>
+
+            <div class="students-grid">
+                @for (estudiante of estudiantes(); track estudiante.id_estudiante) {
+                    <div class="student-card" (click)="seleccionarEstudiante(estudiante)">
+                        <div class="student-photo">
+                            @if (estudiante.foto_estudiante) {
+                                <img [src]="estudiante.foto_estudiante" [alt]="estudiante.nombre" />
+                            } @else {
+                                <i class="fa-solid fa-user-graduate"></i>
+                            }
+                        </div>
+
+                        <div class="student-data">
+                            <span>Estudiante</span>
+                            <h3>{{ estudiante.nombre }} {{ estudiante.apellido }}</h3>
+                            <p>{{ estudiante.nombre_colegio || 'Sin colegio' }}</p>
+                            <small>{{ estudiante.grado || 'Sin grado' }}</small>
+                        </div>
+
+                        
+                    </div>
+                } @empty {
+                    <div class="state-card">
+                        <i class="fa-solid fa-user-graduate"></i>
+                        <h3>No tienes estudiantes registrados</h3>
+                    </div>
+                }
+            </div>
+        }
+
+    } @else {
+
+        <div class="selected-header">
+            <button type="button" class="back-button" (click)="volver()">
+                <i class="fa-solid fa-arrow-left"></i>
+                Volver
+            </button>
+
+            <div class="header-student-info">
+                <span>Viajes de</span>
+                <h2>{{ estudianteSeleccionado()?.nombre }} {{ estudianteSeleccionado()?.apellido }}</h2>
+            </div>
+
+        </div>
+
+        @if (cargandoViajes()) {
+            <div class="state-card">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <p>Cargando viajes...</p>
+            </div>
+        } @else if (sinRutaAsignada()) {
+            <!-- Estado: El estudiante NO tiene ruta asignada -->
+            <div class="state-card state-no-route">
+                <div class="no-route-icon">
+                    <i class="fa-solid fa-route"></i>
+                    <i class="fa-solid fa-circle-xmark no-route-badge"></i>
+                </div>
+                <h3>Sin ruta asignada</h3>
+                <p>
+                    <strong>{{ estudianteSeleccionado()?.nombre }} {{ estudianteSeleccionado()?.apellido }}</strong> 
+                    no tiene una ruta de transporte asignada actualmente.
+                </p>
+                <p class="hint-text">
+                    <i class="fa-solid fa-info-circle"></i>
+                    Para ver viajes, el estudiante debe estar asignado a una ruta por el proveedor de transporte.
+                </p>
+            </div>
+        } @else {
+
+            <!-- Filtros de viajes: TODOS | ACTIVOS | PROGRAMADOS | FINALIZADOS -->
+            <div class="viajes-filter-bar">
+                <button 
+                    type="button" 
+                    class="filter-tab" 
+                    [class.active]="filtroEstado() === 'TODOS'"
+                    (click)="cambiarFiltro('TODOS')"
+                >
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Todos los viajes</span>
+                    <span class="badge">{{ totalCount() }}</span>
+                </button>
+
+                <button 
+                    type="button" 
+                    class="filter-tab" 
+                    [class.active]="filtroEstado() === 'ACTIVOS'"
+                    (click)="cambiarFiltro('ACTIVOS')"
+                >
+                    <i class="fa-solid fa-bus-simple"></i>
+                    <span>Activos</span>
+                    <span class="badge badge-success">{{ activosCount() }}</span>
+                </button>
+
+                <button 
+                    type="button" 
+                    class="filter-tab" 
+                    [class.active]="filtroEstado() === 'PROGRAMADOS'"
+                    (click)="cambiarFiltro('PROGRAMADOS')"
+                >
+                    <i class="fa-solid fa-clock"></i>
+                    <span>Programados</span>
+                    <span class="badge badge-muted">{{ programadosCount() }}</span>
+                </button>
+
+                <button 
+                    type="button" 
+                    class="filter-tab" 
+                    [class.active]="filtroEstado() === 'FINALIZADOS'"
+                    (click)="cambiarFiltro('FINALIZADOS')"
+                >
+                    <i class="fa-solid fa-check-circle"></i>
+                    <span>Finalizados</span>
+                    <span class="badge badge-muted">{{ finalizadosCount() }}</span>
+                </button>
+            </div>
+
+            <div class="trips-grid">
+                @for (viaje of viajesFiltrados(); track viaje.id_viaje) {
+                    <article class="trip-card">
+                        <div class="trip-header">
+                            <div class="bus-icon">
+                                <i class="fa-solid fa-bus"></i>
+                            </div>
+
+                            <div>
+                                <h3>{{ viaje.nombre_ruta  }}</h3>
+                            </div>
+
+                            @if (viaje.estado === 'ACTIVO') {
+                                <span class="status-badge status-active">
+                                    <span class="status-dot"></span>
+                                    Activo
+                                </span>
+                            } @else if (viaje.estado === 'FINALIZADO') {
+                                <span class="status-badge status-finished">
+                                    <span class="status-dot"></span>
+                                    Finalizado
+                                </span>
+                            } @else {
+                                <span class="status-badge status-pending">
+                                    <span class="status-dot"></span>
+                                    {{ viaje.estado || 'Inactivo' }}
+                                </span>
+                            }
+                        </div>
+
+                        <div class="trip-information">
+                            <div>
+                                <i class="fa-solid fa-calendar"></i>
+                                <span>{{ viaje.fecha_viaje | date:'dd/MM/yyyy' }}</span>
+                            </div>
+
+                            <div>
+                                <i class="fa-solid fa-clock"></i>
+                                <span>Inicio: {{ viaje.hora_inicio || 'Sin registrar' }}</span>
+                            </div>
+
+                            
+                        </div>
+
+                        @if (viaje.estado === 'ACTIVO') {
+                            <div class="card-action">
+                                <button class="btn-live-map" (click)="abrirModalRastreo(viaje)" type="button">
+                                    <span class="pulse-dot-small"></span>
+                                    <i class="fa-solid fa-map-location-dot"></i> Ver ruta en vivo
+                                </button>
+                            </div>
+                        }
+                    </article>
+                } @empty {
+                    <div class="state-card">
+                        <i class="fa-solid fa-bus"></i>
+                        <h3>
+                            No hay viajes
+                            {{ filtroEstado() === 'ACTIVOS' ? 'activos' :
+                               (filtroEstado() === 'PROGRAMADOS' ? 'programados' :
+                               (filtroEstado() === 'FINALIZADOS' ? 'finalizados' : '')) }}
+                        </h3>
+                        <p>No se encontraron registros de viajes para esta categoría.</p>
+                    </div>
+                }
+            </div>
+
+        }
+
+    }
+
+    <!-- Modal de Rastreo en Vivo para Tutor/Usuario -->
+    @if (modalRastreoAbierto() && viajeSeleccionado()) {
+        <div class="modal-overlay" (click)="cerrarModalRastreo()">
+            <div class="modal-map-box" (click)="$event.stopPropagation()">
+                <div class="modal-map-header">
+                    <div>
+                        <div class="modal-title-row">
+                            <h3>{{ viajeSeleccionado()!.nombre_ruta || 'Ruta en curso' }}</h3>
+                            <span class="live-tag">
+                                <span class="pulse-dot"></span> EN VIVO
+                            </span>
+                        </div>
+                        <p class="modal-subtitle">
+                            <span><i class="fa-solid fa-user-graduate"></i> {{ estudianteSeleccionado()?.nombre }} {{ estudianteSeleccionado()?.apellido }}</span>
+                            @if (viajeSeleccionado()!.nombre_chofer) {
+                                <span><i class="fa-solid fa-id-card"></i> {{ viajeSeleccionado()!.nombre_chofer }} {{ viajeSeleccionado()!.apellido_chofer }}</span>
+                            }
+                            @if (viajeSeleccionado()!.placa_vehiculo) {
+                                <span><i class="fa-solid fa-bus"></i> {{ viajeSeleccionado()!.placa_vehiculo }}</span>
+                            }
+                            <span><i class="fa-regular fa-clock"></i> Inicio: {{ viajeSeleccionado()!.hora_inicio || '--:--' }}</span>
+                        </p>
+                    </div>
+                    <button class="btn-close-icon" (click)="cerrarModalRastreo()" type="button" aria-label="Cerrar modal">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="modal-map-body">
+                    <app-mapa 
+                        [rol]="'usuario'" 
+                        [rutaDefinida]="trazadoRuta()" 
+                        [posicionChofer]="posicionChofer()" 
+                    />
+                </div>
+
+                <div class="modal-map-footer">
+                    <div class="status-hint">
+                        <i class="fa-solid fa-location-arrow"></i>
+                        <span>Siguiendo el recorrido del autobús escolar en tiempo real.</span>
+                    </div>
+                    <button class="btn-secondary" (click)="cerrarModalRastreo()" type="button">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Modal para editar estudiante usando FormComponent del proyecto -->
+    @if (estudianteAEditar()) {
+        <div class="modal-overlay" (click)="cerrarModalForm()">
+            <div class="modal-card" (click)="$event.stopPropagation()">
+                <div class="modal-header">
+                    <h3><i class="fa-solid fa-user-pen"></i> Editar Estudiante</h3>
+                    <button class="btn-close-modal" (click)="cerrarModalForm()" type="button">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <app-crud-form
+                        [fields]="formFields"
+                        [item]="estudianteAEditar()"
+                        imageFolder="estudiantes"
+                        (save)="guardarEstudiante($event)"
+                        (cancel)="cerrarModalForm()"
+                    ></app-crud-form>
+                </div>
+            </div>
+        </div>
+    }
+
+</section>

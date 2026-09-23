@@ -1,0 +1,82 @@
+<div class="attendance">
+
+    @if (ruta(); as r) {
+        <div class="checklist-card">
+
+            <div class="checklist-header">
+                <button type="button" class="back-btn" (click)="cerrar.emit()">← Volver</button>
+                <div class="checklist-title">
+                    <span class="eyebrow">
+                        Reporte de hoy · {{ fechaHoy }}
+                        @if (r.hora_inicio_estimada || r.hora_fin_estimada) {
+                            · {{ fmtHora(r.hora_inicio_estimada) }} – {{ fmtHora(r.hora_fin_estimada) }}
+                        }
+                    </span>
+                    <h2>{{ r.nombre }}</h2>
+                </div>
+            </div>
+
+            @if (cargando()) {
+                <p class="status-text">Cargando estudiantes...</p>
+            } @else {
+
+                <div class="checklist-toolbar">
+                    <div class="counters">
+                        <span class="counter presente">{{ contadores().presentes }} presentes</span>
+                        <span class="counter ausente">{{ contadores().ausentes }} ausentes</span>
+                        <span class="counter pendiente">{{ contadores().pendientes }} pendientes</span>
+                    </div>
+                    <div class="toolbar-actions">
+                        <button type="button" class="btn-bulk" (click)="marcarTodosPresentes()">
+                            ✓ Todos presentes
+                        </button>
+                        <button type="button" class="btn-primary" (click)="enviarReporte()"
+                            [disabled]="enviando() || contadores().pendientes > 0">
+                            {{ enviando() ? 'Enviando...' : 'Enviar reporte' }}
+                        </button>
+                    </div>
+                </div>
+
+                <ul class="student-list">
+                    @for (est of estudiantes(); track est.id_estudiante) {
+                    <li class="student-row"
+                        [class.is-presente]="estadoDe(est.id_estudiante) === 'PRESENTE'"
+                        [class.is-ausente]="estadoDe(est.id_estudiante) === 'AUSENTE'">
+
+                        <div class="student-info">
+                            @if (est.foto_estudiante) {
+                                <img class="student-foto" [src]="est.foto_estudiante" alt="" />
+                            } @else {
+                                <span class="student-avatar">{{ iniciales(est) }}</span>
+                            }
+                            <div class="student-names">
+                                <span class="student-nombre">{{ est.nombre }} {{ est.apellido }}</span>
+                                @if (est.grado) {
+                                    <span class="student-grado">{{ est.grado }}</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="toggle-group">
+                            <button type="button" class="toggle-btn presente"
+                                [class.active]="estadoDe(est.id_estudiante) === 'PRESENTE'"
+                                (click)="marcar(est.id_estudiante, 'PRESENTE')">
+                                Presente
+                            </button>
+                            <button type="button" class="toggle-btn ausente"
+                                [class.active]="estadoDe(est.id_estudiante) === 'AUSENTE'"
+                                (click)="marcar(est.id_estudiante, 'AUSENTE')">
+                                Ausente
+                            </button>
+                        </div>
+
+                    </li>
+                    } @empty {
+                    <li class="empty">No hay estudiantes asignados a esta ruta.</li>
+                    }
+                </ul>
+
+            }
+        </div>
+    }
+</div>

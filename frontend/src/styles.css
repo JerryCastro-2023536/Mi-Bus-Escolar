@@ -1,0 +1,210 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'leaflet/dist/leaflet.css';
+@import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+.swal2-popup.swal-brand-popup {
+    width: min(540px, 92vw) !important;
+    border-radius: 20px !important;
+    background: rgba(245, 245, 245, 0.98) !important;
+    font-family: var(--font-body, 'Inter', sans-serif) !important;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18) !important;
+    padding: 26px 28px 24px !important;
+}
+
+.swal2-container .swal2-popup,
+.swal2-container .swal2-modal,
+.swal2-container .swal2-title,
+.swal2-container .swal2-html-container,
+.swal2-container .swal2-confirm,
+.swal2-container .swal2-cancel {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.swal-brand-title,
+.swal2-popup.swal-brand-popup .swal2-title {
+    font-family: 'Montserrat', sans-serif !important;
+    color: rgba(17, 24, 39, 0.9) !important;
+    font-size: 2rem !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.03em !important;
+    margin: 10px 0 12px !important;
+}
+
+.swal2-popup.swal-brand-popup .swal2-html-container {
+    color: rgba(17, 24, 39, 0.82) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    margin-top: 0 !important;
+    line-height: 1.55 !important;
+}
+
+
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-warning {
+    border-color: var(--color-secondary, #FFD141) !important;
+    background: transparent !important;
+}
+
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-warning::before,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-warning::after,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-warning .swal2-icon__line,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-warning .swal2-icon__dot {
+    background-color: var(--color-secondary, #FFD141) !important;
+}
+
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-success {
+    width: 100px !important;
+    height: 100px !important;
+    margin: 0 auto 18px !important;
+    border: 3px solid rgba(82, 184, 113, 0.9) !important;
+    background: transparent !important;
+}
+
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-success .swal2-success-circular-line-left,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-success .swal2-success-circular-line-right,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-success .swal2-success-fix,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-success .swal2-success-ring {
+    display: none !important;
+}
+
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-success .swal2-icon__line,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-success .swal2-icon__x-mark,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-success::before,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-success::after {
+    background-color: rgba(76, 175, 102, 0.95) !important;
+}
+
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-error {
+    border-color: var(--color-danger, #DC2626) !important;
+    background: transparent !important;
+}
+
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-error .swal2-icon__line,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-error::before,
+.swal2-popup.swal-brand-popup .swal2-icon.swal2-error::after {
+    background-color: var(--color-danger, #DC2626) !important;
+}
+
+.swal2-popup.swal-brand-popup .swal2-actions {
+    margin: 24px 0 0 !important;
+    gap: 10px !important;
+}
+
+.swal-brand-btn {
+    border-radius: 12px !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-size: 1.03rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+    padding: 12px 20px !important;
+    min-width: 180px !important;
+    min-height: 44px !important;
+    border: none !important;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.swal2-popup.swal-brand-popup #swal2-confirm.swal-brand-btn {
+    background: #1d5a8b !important;
+    color: #fff !important;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) !important;
+}
+
+.swal2-popup.swal-brand-popup #swal2-confirm.swal-brand-btn:hover {
+    background: var(--color-primary-dark, #123553) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 18px rgba(26, 69, 107, 0.32) !important;
+}
+
+.swal2-popup.swal-brand-popup #swal2-cancel.swal-brand-btn {
+    background: var(--color-tertiary, #5D737E) !important;
+    color: #fff !important;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) !important;
+}
+
+.swal2-popup.swal-brand-popup #swal2-cancel.swal-brand-btn:hover {
+    background: #4C5E68 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 18px rgba(93, 115, 126, 0.35) !important;
+}
+
+.swal2-popup.swal-brand-popup .swal2-styled:focus {
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) !important;
+    outline: none !important;
+}
+
+.swal2-popup.swal2-toast {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+    font-family: 'Inter', sans-serif;
+    padding: 0;
+}
+
+.swal2-popup.swal2-toast .swal2-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #111827;
+    line-height: 1.4;
+    margin: 0;
+    padding: 13px 18px 13px 16px;
+    max-width: 340px;
+    white-space: normal;
+}
+
+.swal2-popup.swal2-toast.swal2-icon-success {
+    border-left: 4px solid #16A34A;
+}
+
+.swal2-popup.swal2-toast.swal2-icon-error {
+    border-left: 4px solid #DC2626;
+}
+
+.swal2-popup.swal2-toast .swal2-timer-progress-bar-container {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.swal2-popup.swal2-toast .swal2-timer-progress-bar {
+    height: 3px;
+}
+
+.swal2-popup.swal2-toast.swal2-icon-success .swal2-timer-progress-bar {
+    background: #16A34A;
+}
+
+.swal2-popup.swal2-toast.swal2-icon-error .swal2-timer-progress-bar {
+    background: #DC2626;
+}
+
+:root {
+    --color-primary: #1A456B;
+    --color-primary-dark: #123249;
+    --color-primary-light: #2A5A85;
+    --color-tertiary: #64748B;
+    --color-neutral: #F8FAFC;
+    --color-neutral-border: #E2E8F0;
+    --color-text-main: #0F172A;
+    --color-text-muted: #64748B;
+    --color-success-bg: #E4F5EC;
+    --color-success-fg: #1E7A46;
+    --color-error-fg: #B3261E;
+    --color-warning-bg: #FFF6E0;
+    --color-warning-fg: #8A6100;
+
+    --font-headline: 'Montserrat', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
