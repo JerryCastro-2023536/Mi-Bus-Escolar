@@ -29,7 +29,7 @@
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": ["localhost", "172.21.204.116", ".devtunnels.ms"]
+              "allowedHosts": ["localhost", "172.21.204.116", ".devtunnels.ms", "mi-bus-escolar-frontend.onrender.com"]
             },
             "ssr": {
               "entry": "src/server.ts"
