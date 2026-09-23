@@ -107,7 +107,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     if (this.rol === 'chofer') {
       this.iniciarGpsChofer();
-    } else if (this.rol === 'admin' || this.rol === 'usuario') {
+    } else if (this.debePermitirSeleccionPunto()) {
       const puntoInicial: PuntoRuta = this.puntoSeleccionado ?? {
         lat: centroInicial[0],
         lng: centroInicial[1]
@@ -117,6 +117,14 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
       this.cambioUbicacion.emit(puntoInicial);
       this.habilitarSeleccionPunto();
     }
+  }
+
+  private debePermitirSeleccionPunto(): boolean {
+    if (this.rol !== 'admin' && this.rol !== 'usuario') {
+      return false;
+    }
+
+    return !(this.posicionChofer && this.posicionChofer.lat !== undefined && this.posicionChofer.lng !== undefined);
   }
 
   private crearIconoBus(): any {
@@ -156,7 +164,7 @@ export class MapaComponent implements AfterViewInit, OnDestroy, OnChanges {
   private actualizarMarcadorPunto(punto: PuntoRuta): void {
     if (!this.L || !this.mapa) return;
 
-    const esEditable = this.rol === 'admin' || this.rol === 'usuario';
+    const esEditable = this.debePermitirSeleccionPunto();
 
     const iconoPersonalizado = this.L.icon({
       iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
