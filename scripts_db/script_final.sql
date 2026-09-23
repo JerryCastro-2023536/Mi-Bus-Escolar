@@ -52,22 +52,23 @@ CREATE TABLE IF NOT EXISTS Proveedores (
 
 CREATE TABLE IF NOT EXISTS Valoraciones (
     id_valoracion INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_proveedor INTEGER NOT NULL,
+    id_servicio INTEGER NOT NULL,
     id_usuario INTEGER,
     comentario TEXT,
     calificacion DOUBLE PRECISION NOT NULL,
 
-    CONSTRAINT fk_valoraciones_proveedor
-        FOREIGN KEY (id_proveedor)
-        REFERENCES Proveedores(id_proveedor)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
+    CONSTRAINT chk_valoraciones_calificacion
+        CHECK (calificacion >= 0 AND calificacion <= 5),
 
+    -- La FK hacia Servicios se agrega después de crear la tabla Servicios.
     CONSTRAINT fk_valoraciones_usuario
         FOREIGN KEY (id_usuario)
         REFERENCES Usuarios(id_usuario)
         ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE SET NULL,
+
+    CONSTRAINT uq_valoracion_servicio_usuario
+        UNIQUE (id_servicio, id_usuario)
 );
 
 
@@ -181,6 +182,25 @@ CREATE TABLE IF NOT EXISTS Servicios (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
+
+
+-- Valoraciones se declara antes que Servicios para conservar el orden histórico
+-- del script; la FK se agrega aquí, cuando Servicios ya existe.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_valoraciones_servicio'
+    ) THEN
+        ALTER TABLE Valoraciones
+            ADD CONSTRAINT fk_valoraciones_servicio
+            FOREIGN KEY (id_servicio)
+            REFERENCES Servicios(id_servicio)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+    END IF;
+END $$;
 
 
 -- ============================================================
@@ -567,11 +587,11 @@ CREATE INDEX IF NOT EXISTS idx_proveedores_nombre_negocio
 
 -- VALORACIONES
 
-CREATE INDEX IF NOT EXISTS idx_valoraciones_proveedor
-    ON Valoraciones(id_proveedor);
+CREATE INDEX IF NOT EXISTS idx_valoraciones_servicio
+    ON Valoraciones(id_servicio);
 
-CREATE INDEX IF NOT EXISTS idx_valoraciones_proveedor_calificacion
-    ON Valoraciones(id_proveedor, calificacion);
+CREATE INDEX IF NOT EXISTS idx_valoraciones_servicio_calificacion
+    ON Valoraciones(id_servicio, calificacion);
 
 CREATE INDEX IF NOT EXISTS idx_valoraciones_usuario
     ON Valoraciones(id_usuario);
