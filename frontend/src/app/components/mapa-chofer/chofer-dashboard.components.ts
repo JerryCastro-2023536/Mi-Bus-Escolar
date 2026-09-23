@@ -179,6 +179,9 @@ export class ChoferDashboardComponents implements OnInit {
               ? [...coordenadas].reverse()
               : [...coordenadas];
           }
+          if (this.viajeActual?.id_viaje && this.viajeActual?.estado === 'ACTIVO') {
+            this.actualizarTrazadoEnServidor();
+          }
         }
         this.cdr.detectChanges();
       },
@@ -187,6 +190,12 @@ export class ChoferDashboardComponents implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  actualizarTrazadoEnServidor(): void {
+    if (this.viajeActual?.id_viaje && this.rutaRutaAsignada) {
+      this.viajesService.guardarTrazadoActivo(this.viajeActual.id_viaje, this.rutaRutaAsignada).subscribe();
+    }
   }
 
   tomarAsistencia(tipo: 'IDA' | 'VUELTA'): void {
@@ -266,6 +275,7 @@ export class ChoferDashboardComponents implements OnInit {
               this.rutaRutaAsignada = puntosFiltrados;
             }
             localStorage.setItem('rutaPuntosGuardados', JSON.stringify(this.rutaRutaAsignada));
+            this.actualizarTrazadoEnServidor();
             this.cdr.detectChanges();
           },
           error: () => {
@@ -321,6 +331,7 @@ export class ChoferDashboardComponents implements OnInit {
       next: (res) => {
         this.viajeActual = { ...res, estado: 'ACTIVO', tipo_ruta: tipo };
         localStorage.setItem('viajeActualGuardado', JSON.stringify(this.viajeActual));
+        this.actualizarTrazadoEnServidor();
         
         if (tipo === 'IDA') {
           this.asistenciaIdaTomada = false;
@@ -354,6 +365,7 @@ export class ChoferDashboardComponents implements OnInit {
       this.rutaRutaAsignada = [...this.rutaRutaAsignada.slice(1)];
       localStorage.setItem('rutaPuntosGuardados', JSON.stringify(this.rutaRutaAsignada));
       localStorage.setItem('tipoRutaGuardada', this.tipoRutaActual);
+      this.actualizarTrazadoEnServidor();
       this.cdr.detectChanges();
     } else {
       this.rutaRutaAsignada = [];
@@ -363,6 +375,7 @@ export class ChoferDashboardComponents implements OnInit {
       localStorage.setItem('tipoRutaGuardada', 'IDA');
       
       localStorage.removeItem('rutaPuntosGuardados'); 
+      this.actualizarTrazadoEnServidor();
       
       if (idViaje) {
         localStorage.removeItem('asistenciaIda_' + idViaje);
@@ -391,8 +404,11 @@ export class ChoferDashboardComponents implements OnInit {
       this.rutaRutaAsignada = [...this.rutaRutaAsignada.slice(1)];
       localStorage.setItem('rutaPuntosGuardados', JSON.stringify(this.rutaRutaAsignada));
       localStorage.setItem('tipoRutaGuardada', this.tipoRutaActual);
+      this.actualizarTrazadoEnServidor();
       this.cdr.detectChanges();
     } else {
+      this.rutaRutaAsignada = [];
+      this.actualizarTrazadoEnServidor();
       if (this.viajeActual?.id_viaje && this.estudiantesAsistencia.length > 0) {
         const presentes = this.estudiantesAsistencia.filter(e => e.marcaLocal === 'PRESENTE' && e.estado_abordaje !== 'AUSENTE');
         presentes.forEach(e => {
