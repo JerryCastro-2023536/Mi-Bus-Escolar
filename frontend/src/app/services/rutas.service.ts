@@ -63,6 +63,22 @@ export class rutasService {
     );
   }
 
+  guardarTrazadoActivo(idViaje: number, puntos: PuntoRuta[]): Observable<any> {
+    return this.http.post(`${this.apiUrl}/viajes/${idViaje}/trazado-activo`, { puntos }).pipe(
+      catchError(() => of(null))
+    );
+  }
+
+  obtenerTrazadoActivo(idViaje: number, idRuta?: number | null): Observable<PuntoRuta[]> {
+    const url = idRuta
+      ? `${this.apiUrl}/viajes/${idViaje}/trazado-activo?idRuta=${idRuta}`
+      : `${this.apiUrl}/viajes/${idViaje}/trazado-activo`;
+    return this.http.get<PuntoRuta[]>(url).pipe(
+      timeout(8000),
+      catchError(() => of([]))
+    );
+  }
+
   iniciarRutaViaje(idChofer: number, tipo: 'IDA' | 'VUELTA' = 'IDA'): Observable<any> {
     return this.http.post(`${this.apiUrl}/viajes/iniciar/${idChofer}`, { idChofer, tipo });
   }
