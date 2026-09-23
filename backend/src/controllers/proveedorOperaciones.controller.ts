@@ -464,8 +464,11 @@ export async function getValoraciones(
     try {
         return ok(
             res,
-            "Valoraciones cargadas",
-            await service.listarValoracionesProveedor(id(req.params.idUsuario)),
+            "Valoraciones del servicio cargadas",
+            await service.listarValoracionesProveedor(
+                id(req.params.idUsuario),
+                id(req.params.idServicio),
+            ),
         );
     } catch (error) {
         next(error);
