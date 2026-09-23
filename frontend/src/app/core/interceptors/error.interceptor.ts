@@ -20,13 +20,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
     return next(req).pipe(
         catchError((error: HttpErrorResponse) => {
-            const isLandingRoute = router.url.split('?')[0] === '/landing';
-            const ignoreUnauthorizedOnLanding =
-                isLandingRoute && error.status === 401;
-
             if (
                 isPlatformBrowser(platformId) &&
-                !ignoreUnauthorizedOnLanding &&
                 !router.url.startsWith('/error/')
             ) {
                 const route = error.status === 0
@@ -35,8 +30,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
                 if (route) {
                     if (error.status === 401) {
+                        // Un 401 significa que la sesión ya no es utilizable.
+                        // Limpiamos credenciales para evitar que la UI siga
+                        // mostrando acciones de usuario autenticado.
                         loginService.logout();
                     }
+
                     void router.navigateByUrl(route);
                 }
             }
