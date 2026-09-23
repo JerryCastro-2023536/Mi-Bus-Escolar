@@ -25,18 +25,11 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "node_modules/leaflet/dist/leaflet.css",
-              "src/styles.css"
-            ],
+            "styles": ["node_modules/leaflet/dist/leaflet.css", "src/styles.css"],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": [
-                "localhost",
-                "172.21.204.116",
-                ".devtunnels.ms"
-              ]
+              "allowedHosts": ["localhost", "172.21.204.116", ".devtunnels.ms"]
             },
             "ssr": {
               "entry": "src/server.ts"
@@ -44,6 +37,12 @@
           },
           "configurations": {
             "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/enviroment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
               "budgets": [
                 {
                   "type": "initial",
