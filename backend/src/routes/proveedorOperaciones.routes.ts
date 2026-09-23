@@ -46,6 +46,6 @@ router.post(`${p}/rutas/:idRuta/estudiantes`, postEstudiante);
 router.delete(`${p}/rutas/:idRuta/estudiantes/:idAsignacion`,deleteEstudiante,);
 router.get(`${p}/incidencias`, getIncidencias);
 router.get(`${p}/viajes`, getViajes);
-router.get(`${p}/valoraciones`, getValoraciones);
+router.get(`${p}/servicios/:idServicio/valoraciones`, getValoraciones);
 
 export default router;
