@@ -49,14 +49,18 @@ export const registerUserSchema = userSchema.omit({
     correo_verificado: true,
 })
 
-export const loginUserSchema = createUserSchema.omit({
-    nombre: true,
-    apellido: true,
-    telefono: true,
-    foto_usuario: true,
-    rol: true,
-    correo_verificado: true
-})
+// Login valida únicamente el formato necesario para autenticar.
+// Las reglas de fortaleza (mayúscula, número, etc.) pertenecen al registro
+// y al cambio de contraseña; aplicarlas aquí impediría iniciar sesión a
+// usuarios históricos cuya contraseña válida fue creada con otra política.
+export const loginUserSchema = z.object({
+    correo: zUtils.requiredString("correo")
+        .email("Debe ser un correo electrónico válido")
+        .max(150, "El correo no puede exceder los 150 caracteres"),
+
+    password: zUtils.requiredString("contraseña")
+        .max(255, "La contraseña no puede exceder los 255 caracteres")
+});
 
 export const updateUserSchema = createUserSchema;
 
