@@ -8,9 +8,9 @@ export const asignacionRutaSchema = z.object({
 
 	id_ruta: zUtils.requiredPositiveInt("ID de ruta"),
 
-	id_parada_recogida: zUtils.requiredPositiveInt("ID de parada de recogida"),
+	id_parada_recogida: z.number().int().positive().nullable().optional(),
 
-	id_parada_descenso: zUtils.requiredPositiveInt("ID de parada de descenso")
+	id_parada_descenso: z.number().int().positive().nullable().optional()
 });
 
 export const createAsignacionRutaSchema = asignacionRutaSchema.omit({
@@ -18,3 +18,4 @@ export const createAsignacionRutaSchema = asignacionRutaSchema.omit({
 });
 
 export const updateAsignacionRutaSchema = createAsignacionRutaSchema;
+
