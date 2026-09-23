@@ -1,6 +1,29 @@
 import { pool } from "../config/conexion";
 
+const trazadosActivosMap = new Map<number, { lat: number; lng: number }[]>();
+
 export class ViajesService {
+
+  static guardarTrazadoActivo(idViaje: number, puntos: { lat: number; lng: number }[]) {
+    if (idViaje && Array.isArray(puntos)) {
+      trazadosActivosMap.set(Number(idViaje), puntos);
+    }
+  }
+
+  static obtenerTrazadoActivo(idViaje: number) {
+    return trazadosActivosMap.get(Number(idViaje)) || null;
+  }
+
+  static async obtenerTrazadoActivoAsync(idViaje: number, idRuta?: number) {
+    const enMemoria = trazadosActivosMap.get(Number(idViaje));
+    if (enMemoria && enMemoria.length > 0) {
+      return enMemoria;
+    }
+    if (idRuta) {
+      return this.obtenerTrazadoRutaPorAsistencia(Number(idRuta), Number(idViaje));
+    }
+    return [];
+  }
 
   static async obtenerChoferPorUsuario(idUsuario: number) {
     const { rows } = await pool.query(
@@ -100,64 +123,63 @@ export class ViajesService {
     const { rows: baseStops } = await pool.query(baseStopsQuery, [idRuta]);
     if (baseStops.length === 0) return [];
 
+    // Obtener paradas de estudiantes ausentes
     const ausentesQuery = `
       SELECT DISTINCT 
-        COALESCE(ar.id_parada_recogida, ar.id_parada_descenso) AS id_parada_recogida,
-        COALESCE(ar.id_parada_descenso, ar.id_parada_recogida) AS id_parada_descenso
+        ar.id_parada_recogida,
+        ar.id_parada_descenso
       FROM Asistencias a
       INNER JOIN Asignaciones_Ruta ar ON ar.id_estudiante = a.id_estudiante AND ar.id_ruta = $1
       WHERE a.id_viaje = $2 
-        AND (a.estado_abordaje = 'AUSENTE' OR a.estado_descenso = 'AUSENTE');
+        AND (
+          ($3 = 'IDA' AND a.estado_abordaje = 'AUSENTE')
+          OR ($3 = 'VUELTA' AND (a.estado_descenso = 'AUSENTE' OR a.estado_abordaje = 'AUSENTE'))
+        );
     `;
-    const ausentesRes = await pool.query(ausentesQuery, [idRuta, idViaje]);
+    const ausentesRes = await pool.query(ausentesQuery, [idRuta, idViaje, tipo]);
     const paradasAusentes = new Set<number>();
     for (const row of ausentesRes.rows) {
-      if (tipo === 'VUELTA' && row.id_parada_descenso) {
-        paradasAusentes.add(Number(row.id_parada_descenso));
-      } else if (row.id_parada_recogida) {
-        paradasAusentes.add(Number(row.id_parada_recogida));
-      }
+      if (row.id_parada_recogida) paradasAusentes.add(Number(row.id_parada_recogida));
+      if (row.id_parada_descenso) paradasAusentes.add(Number(row.id_parada_descenso));
     }
 
+    // Obtener paradas de estudiantes presentes
     const presentesQuery = `
       SELECT DISTINCT 
-        COALESCE(ar.id_parada_recogida, ar.id_parada_descenso) AS id_parada_recogida,
-        COALESCE(ar.id_parada_descenso, ar.id_parada_recogida) AS id_parada_descenso
+        ar.id_parada_recogida,
+        ar.id_parada_descenso
       FROM Asistencias a
       INNER JOIN Asignaciones_Ruta ar ON ar.id_estudiante = a.id_estudiante AND ar.id_ruta = $1
       WHERE a.id_viaje = $2 
         AND (
           ($3 = 'IDA' AND a.estado_abordaje = 'PRESENTE')
-          OR ($3 = 'VUELTA' AND (a.estado_descenso = 'PRESENTE' OR a.estado_abordaje = 'PRESENTE'))
+          OR ($3 = 'VUELTA' AND (a.estado_descenso = 'PRESENTE' OR (a.estado_abordaje = 'PRESENTE' AND a.estado_descenso != 'AUSENTE')))
         );
     `;
     const presentesRes = await pool.query(presentesQuery, [idRuta, idViaje, tipo]);
     const paradasPresentes = new Set<number>();
     for (const row of presentesRes.rows) {
-      if (tipo === 'VUELTA' && row.id_parada_descenso) {
-        paradasPresentes.add(Number(row.id_parada_descenso));
-      } else if (row.id_parada_recogida) {
-        paradasPresentes.add(Number(row.id_parada_recogida));
-      }
+      if (row.id_parada_recogida) paradasPresentes.add(Number(row.id_parada_recogida));
+      if (row.id_parada_descenso) paradasPresentes.add(Number(row.id_parada_descenso));
     }
 
     const minOrden = baseStops[0].orden_parada;
     const maxOrden = baseStops[baseStops.length - 1].orden_parada;
 
     let paradasFiltradas = baseStops.filter(p => {
+      // Siempre mantener inicio y fin de la ruta (terminal / colegio)
       if (p.orden_parada === minOrden || p.orden_parada === maxOrden) {
         return true;
       }
-      if (paradasPresentes.has(p.id_parada)) {
-        return true;
-      }
+      // Si hay estudiantes presentes marcados, incluir solo las paradas correspondientes a presentes
       if (paradasPresentes.size > 0) {
-        return false;
+        return paradasPresentes.has(p.id_parada);
       }
+      // Si no hay lista de presentes explícita, excluir únicamente las de ausentes
       return !paradasAusentes.has(p.id_parada);
     });
 
-    if (paradasFiltradas.length === 0) {
+    if (paradasFiltradas.length < 2) {
       paradasFiltradas = baseStops;
     }
 
@@ -221,6 +243,8 @@ export class ViajesService {
        WHERE (id_chofer = $1 OR id_ruta = $2 OR id_viaje = $3) AND estado = 'ACTIVO'`,
       [idChofer, idRuta, idViaje]
     );
+
+    trazadosActivosMap.delete(Number(idViaje));
 
     return viaje || { estado: 'FINALIZADO' };
   }
