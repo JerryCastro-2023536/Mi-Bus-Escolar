@@ -1,10 +1,12 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { LoginService } from '../../services/login';
-import { UsuarioViewService } from '../../services/usuario-view.service';
+import { UsuarioViewService, AsignacionEstudiante } from '../../services/usuario-view.service';
 import { CrudService } from '../../services/crud.service';
 import { FormComponent } from '../crud-view/form/form';
+import { MapaComponent } from '../mapa/mapa.component';
+import { PuntoRuta } from '../../models/mapas.type';
 import { estudiantesConfig } from '../../models/estudiantes.model';
 import Swal from 'sweetalert2';
 import { toastSuccess, toastError, extractMessage } from '../../helpers/swal-toast';
@@ -18,11 +20,11 @@ export type FiltroEstadoViaje = 'TODOS' | 'ACTIVOS' | 'PROGRAMADOS' | 'FINALIZAD
 @Component({
     selector: 'app-viajes-usuario',
     standalone: true,
-    imports: [CommonModule, FormComponent],
+    imports: [CommonModule, FormComponent, MapaComponent],
     templateUrl: './viajes-usuario.html',
     styleUrl: './viajes-usuario.css'
 })
-export class ViajesUsuario implements OnInit {
+export class ViajesUsuario implements OnInit, OnDestroy {
 
     private loginService = inject(LoginService);
     private usuarioViewService = inject(UsuarioViewService);
@@ -33,9 +35,19 @@ export class ViajesUsuario implements OnInit {
     viajes = signal<ViajeUsuario[]>([]);
     filtroEstado = signal<FiltroEstadoViaje>('TODOS');
 
+    asignacionEstudiante = signal<AsignacionEstudiante | null>(null);
+    sinRutaAsignada = signal(false);
+
     cargandoEstudiantes = signal(false);
     cargandoViajes = signal(false);
     mensajeError = '';
+
+    modalRastreoAbierto = signal(false);
+    viajeSeleccionado = signal<ViajeUsuario | null>(null);
+    trazadoRuta = signal<PuntoRuta[]>([]);
+    posicionChofer = signal<PuntoRuta | undefined>(undefined);
+    cargandoMapa = signal(false);
+    private intervaloRastreo: any = null;
 
     estudianteAEditar = signal<any | null>(null);
     formFields: FormField[] = (estudiantesConfig.formFieldsEdit ?? []) as FormField[];
@@ -96,13 +108,49 @@ export class ViajesUsuario implements OnInit {
         this.viajes.set([]);
         this.filtroEstado.set('TODOS');
         this.mensajeError = '';
+        this.sinRutaAsignada.set(false);
+        this.asignacionEstudiante.set(null);
         this.cargandoViajes.set(true);
 
+        // Primero verificar si el estudiante tiene una ruta asignada
         this.usuarioViewService
-            .listarTodosViajesPorEstudiante(estudiante.id_estudiante)
+            .obtenerAsignacionEstudiante(estudiante.id_estudiante)
+            .subscribe({
+                next: (asignacion) => {
+                    this.asignacionEstudiante.set(asignacion);
+
+                    if (!asignacion || !asignacion.id_ruta) {
+                        // El estudiante NO tiene ruta asignada
+                        this.sinRutaAsignada.set(true);
+                        this.cargandoViajes.set(false);
+                        return;
+                    }
+
+                    // Tiene ruta asignada, cargar viajes
+                    this.cargarViajesEstudiante(estudiante.id_estudiante);
+                },
+                error: () => {
+                    this.cargandoViajes.set(false);
+                    this.mensajeError = 'No se pudo verificar la asignación del estudiante.';
+                }
+            });
+    }
+
+    private cargarViajesEstudiante(idEstudiante: number): void {
+        this.usuarioViewService
+            .listarTodosViajesPorEstudiante(idEstudiante)
             .subscribe({
                 next: (data) => {
-                    this.viajes.set(data);
+                    // Ordenar del más reciente al más antiguo
+                    const ordenados = data.sort((a, b) => {
+                        // Primero por fecha descendente
+                        const fechaA = new Date(a.fecha_viaje).getTime();
+                        const fechaB = new Date(b.fecha_viaje).getTime();
+                        if (fechaB !== fechaA) return fechaB - fechaA;
+                        // Si misma fecha, por id_viaje descendente
+                        return b.id_viaje - a.id_viaje;
+                    });
+                    this.viajes.set(ordenados);
                     this.cargandoViajes.set(false);
                 },
                 error: () => {
@@ -121,6 +169,8 @@ export class ViajesUsuario implements OnInit {
         this.viajes.set([]);
         this.filtroEstado.set('TODOS');
         this.mensajeError = '';
+        this.sinRutaAsignada.set(false);
+        this.asignacionEstudiante.set(null);
     }
 
     editarEstudiante(estudiante: EstudianteResumen, event?: Event): void {
@@ -183,5 +233,97 @@ export class ViajesUsuario implements OnInit {
                 error: (err) => toastError(extractMessage(err, 'No se pudo eliminar al estudiante'))
             });
         });
+    }
+
+    // --- Lógica del Mapa en Vivo para Tutor / Usuario ---
+
+    abrirModalRastreo(v: ViajeUsuario): void {
+        this.viajeSeleccionado.set(v);
+        this.modalRastreoAbierto.set(true);
+        this.cargandoMapa.set(true);
+
+        if (v.id_viaje) {
+            this.usuarioViewService.obtenerTrazadoActivoViaje(v.id_viaje, v.id_ruta).subscribe({
+                next: (puntos) => {
+                    if (puntos && puntos.length > 0) {
+                        this.trazadoRuta.set(puntos);
+                    } else if (v.id_ruta) {
+                        this.usuarioViewService.obtenerTrazadoRuta(v.id_ruta).subscribe({
+                            next: (pts) => this.trazadoRuta.set(pts || []),
+                            error: () => this.trazadoRuta.set([])
+                        });
+                    }
+                    this.cargandoMapa.set(false);
+                },
+                error: () => {
+                    if (v.id_ruta) {
+                        this.usuarioViewService.obtenerTrazadoRuta(v.id_ruta).subscribe({
+                            next: (pts) => this.trazadoRuta.set(pts || []),
+                            error: () => this.trazadoRuta.set([])
+                        });
+                    }
+                    this.cargandoMapa.set(false);
+                }
+            });
+        } else if (v.id_ruta) {
+            this.usuarioViewService.obtenerTrazadoRuta(v.id_ruta).subscribe({
+                next: (puntos) => {
+                    this.trazadoRuta.set(puntos || []);
+                    this.cargandoMapa.set(false);
+                },
+                error: () => {
+                    this.trazadoRuta.set([]);
+                    this.cargandoMapa.set(false);
+                }
+            });
+        } else {
+            this.trazadoRuta.set([]);
+            this.cargandoMapa.set(false);
+        }
+
+        this.actualizarGPSChofer(v.id_viaje);
+
+        this.detenerSondeo();
+        this.intervaloRastreo = setInterval(() => {
+            this.actualizarGPSChofer(v.id_viaje);
+        }, 4000);
+    }
+
+    private actualizarGPSChofer(idViaje: number): void {
+        this.usuarioViewService.obtenerUbicacionActualViaje(idViaje).subscribe({
+            next: (data: any) => {
+                if (data && data.latitud && data.longitud) {
+                    this.posicionChofer.set({
+                        lat: Number(data.latitud),
+                        lng: Number(data.longitud)
+                    });
+                }
+                if (data && data.trazado_activo && Array.isArray(data.trazado_activo) && data.trazado_activo.length > 0) {
+                    this.trazadoRuta.set(data.trazado_activo);
+                }
+            },
+            error: (err) => {
+                console.warn('Error consultando GPS del chofer para el usuario:', err);
+            }
+        });
+    }
+
+    cerrarModalRastreo(): void {
+        this.detenerSondeo();
+        this.modalRastreoAbierto.set(false);
+        this.viajeSeleccionado.set(null);
+        this.posicionChofer.set(undefined);
+        this.trazadoRuta.set([]);
+    }
+
+    private detenerSondeo(): void {
+        if (this.intervaloRastreo) {
+            clearInterval(this.intervaloRastreo);
+            this.intervaloRastreo = null;
+        }
+    }
+
+    ngOnDestroy(): void {
+        this.detenerSondeo();
     }
 }
