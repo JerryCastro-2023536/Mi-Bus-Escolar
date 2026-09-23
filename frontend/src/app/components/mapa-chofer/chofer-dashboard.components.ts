@@ -271,8 +271,12 @@ export class ChoferDashboardComponents implements OnInit {
       if (this.rutaInfo?.id_ruta) {
         this.viajesService.obtenerTrazadoAsistencia(this.rutaInfo.id_ruta, idViaje, this.tipoAsistenciaModal).subscribe({
           next: (puntosFiltrados) => {
-            if (puntosFiltrados && puntosFiltrados.length >= 2) {
+            if (puntosFiltrados && puntosFiltrados.length >= 3) {
               this.rutaRutaAsignada = puntosFiltrados;
+            } else {
+              this.rutaRutaAsignada = this.tipoRutaActual === 'VUELTA'
+                ? [...(this.trazadoBase ?? [])].reverse()
+                : [...(this.trazadoBase ?? [])];
             }
             localStorage.setItem('rutaPuntosGuardados', JSON.stringify(this.rutaRutaAsignada));
             this.actualizarTrazadoEnServidor();
