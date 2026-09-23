@@ -11,7 +11,9 @@ import {
   getEstudiantesConAsistencia,
   patchAbordajeEstudiante,
   patchDescensoEstudiante,
-  patchAusenteEstudiante
+  patchAusenteEstudiante,
+  postTrazadoActivo,
+  getTrazadoActivo
 } from '../controllers/trazadoruta.controller';
 
 const router = Router();
@@ -19,6 +21,8 @@ const router = Router();
 
 router.get('/viajes/hoy/:idChofer', getViajeHoy);
 router.get('/viajes/:idViaje/ubicacion-actual', getUltimaUbicacionViaje);
+router.post('/viajes/:idViaje/trazado-activo', postTrazadoActivo);
+router.get('/viajes/:idViaje/trazado-activo', getTrazadoActivo);
 
 
 router.get('/rutas/:idRuta/paradas', getTrazado);
