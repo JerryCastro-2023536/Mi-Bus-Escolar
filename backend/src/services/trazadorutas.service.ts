@@ -1,3 +1,4 @@
+import { map } from 'rxjs';
 import { pool } from "../config/conexion";
 
 const trazadosActivosMap = new Map<number, { lat: number; lng: number }[]>();
@@ -5,23 +6,108 @@ const trazadosActivosMap = new Map<number, { lat: number; lng: number }[]>();
 export class ViajesService {
 
   static guardarTrazadoActivo(idViaje: number, puntos: { lat: number; lng: number }[]) {
-    if (idViaje && Array.isArray(puntos)) {
-      trazadosActivosMap.set(Number(idViaje), puntos);
+    const id = Number(idViaje);
+
+    if (!Number.isInteger(id) || id <= 0 || !Array.isArray(puntos)) {
+      return;
     }
+
+    const puntosValidos = puntos
+      .map((p) => ({
+        lat: Number(p.lat),
+        lng: Number(p.lng)
+      }))
+      .filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng));
+
+    trazadosActivosMap.set(id, puntosValidos);
   }
 
   static obtenerTrazadoActivo(idViaje: number) {
     return trazadosActivosMap.get(Number(idViaje)) || null;
   }
 
+  /**
+   * Obtiene el trazado GPS persistido del viaje.
+   * Esta es la fuente de verdad en producción, porque el Map en memoria
+   * se pierde si Render reinicia o vuelve a desplegar el backend.
+   */
+  static async obtenerTrazadoGuardado(
+    idViaje: number
+  ): Promise<{ lat: number; lng: number }[]> {
+    const id = Number(idViaje);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      return [];
+    }
+
+    const { rows } = await pool.query<{
+      lat: number;
+      lng: number;
+    }>(
+      `
+        SELECT
+          latitud::float AS lat,
+          longitud::float AS lng
+        FROM Ubicaciones_Bus
+        WHERE id_viaje = $1
+        ORDER BY fecha_hora ASC, id_ubicacion ASC;
+      `,
+      [id]
+    );
+
+    return rows
+      .map((row) => ({
+        lat: Number(row.lat),
+        lng: Number(row.lng)
+      }))
+      .filter((p) =>
+        Number.isFinite(p.lat) &&
+        Number.isFinite(p.lng)
+      );
+  }
+
+  /**
+   * Orden de resolución:
+   * 1) caché en memoria
+   * 2) ubicaciones GPS persistidas en PostgreSQL
+   * 3) trazado planificado de Ruta_Parada
+   * 4) arreglo vacío
+   */
   static async obtenerTrazadoActivoAsync(idViaje: number, idRuta?: number) {
-    const enMemoria = trazadosActivosMap.get(Number(idViaje));
+    const viajeId = Number(idViaje);
+    const rutaId = idRuta !== undefined && idRuta !== null ? Number(idRuta) : undefined;
+
+    if (!Number.isInteger(viajeId) || viajeId <= 0) {
+      return [];
+    }
+
+    // 1. Caché en memoria
+    const enMemoria = trazadosActivosMap.get(viajeId);
+
     if (enMemoria && enMemoria.length > 0) {
       return enMemoria;
     }
-    if (idRuta) {
-      return this.obtenerTrazadoRutaPorAsistencia(Number(idRuta), Number(idViaje));
+
+    // 2. Historial GPS persistido
+    const trazadoBD = await this.obtenerTrazadoGuardado(viajeId);
+
+    if (trazadoBD.length > 0) {
+      trazadosActivosMap.set(viajeId, trazadoBD);
+      return trazadoBD;
     }
+
+    // 3. Si el viaje aún no tiene GPS, mostrar la ruta planificada.
+    if (rutaId && Number.isInteger(rutaId) && rutaId > 0) {
+      const trazadoRuta = await this.obtenerTrazadoRutaPorAsistencia(rutaId, viajeId);
+
+      if (trazadoRuta.length > 0) {
+        return trazadoRuta;
+      }
+
+      // Fallback adicional: paradas completas de la ruta.
+      return this.obtenerTrazadoRuta(rutaId);
+    }
+
     return [];
   }
 
@@ -251,10 +337,37 @@ export class ViajesService {
   }
 
   static async registrarUbicacion(idViaje: number, lat: number, lng: number) {
+    const id = Number(idViaje);
+    const latitud = Number(lat);
+    const longitud = Number(lng);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error('ID de viaje inválido.');
+    }
+
+    if (!Number.isFinite(latitud) || !Number.isFinite(longitud)) {
+      throw new Error('Coordenadas inválidas.');
+    }
+
+    // Persistencia real: sobrevive reinicios/redeploys de Render.
     await pool.query(
-      `INSERT INTO Ubicaciones_Bus (id_viaje, latitud, longitud, fecha_hora) VALUES ($1, $2, $3, NOW())`,
-      [idViaje, lat, lng]
+      `
+        INSERT INTO Ubicaciones_Bus (
+          id_viaje,
+          latitud,
+          longitud,
+          fecha_hora
+        )
+        VALUES ($1, $2, $3, NOW())
+      `,
+      [id, latitud, longitud]
     );
+
+    // Caché en memoria para responder más rápido mientras el proceso siga vivo.
+    const trazadoActual = trazadosActivosMap.get(id) ?? [];
+    trazadoActual.push({ lat: latitud, lng: longitud });
+    trazadosActivosMap.set(id, trazadoActual);
+
     return true;
   }
 
