@@ -11,4 +11,7 @@ export interface ViajeUsuario {
     estado: 'PROGRAMADO' | 'ACTIVO' | 'FINALIZADO';
 
     nombre_ruta?: string;
+    nombre_chofer?: string;
+    apellido_chofer?: string;
+    placa_vehiculo?: string;
 }
