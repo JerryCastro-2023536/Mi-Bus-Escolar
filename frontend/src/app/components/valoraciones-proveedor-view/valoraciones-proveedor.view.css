@@ -1,121 +1,206 @@
 .container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 24px
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 24px;
 }
 
 .head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 15px
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
 }
 
 .head h3 {
-    margin: 0 0 4px
+  margin: 0 0 4px;
 }
 
 .head p {
-    margin: 0;
-    color: #5d737e
+  margin: 0;
+  color: #5d737e;
+}
+
+.service-selector {
+  display: grid;
+  gap: 7px;
+  max-width: 520px;
+  margin-top: 22px;
+}
+
+.service-selector label,
+.eyebrow {
+  color: #5d737e;
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.service-selector select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d8dee4;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+  outline: none;
+}
+
+.service-selector select:focus {
+  border-color: #1a456b;
+  box-shadow: 0 0 0 3px rgba(26, 69, 107, .1);
+}
+
+.selector-loading {
+  color: #9ca3af;
+  padding: 10px 0;
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid #edf0f2;
+  border-radius: 12px;
+  background: #fafbfc;
+}
+
+.summary-row > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.service-name {
+  color: #1a456b;
+  font-size: 1.05rem;
 }
 
 .summary {
-    display: grid;
-    grid-template-columns: auto auto;
-    align-items: center;
-    column-gap: 5px;
-    text-align: right
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  column-gap: 5px;
+  text-align: right;
 }
 
 .summary strong {
-    font-size: 2rem;
-    line-height: 1
+  font-size: 2rem;
+  line-height: 1;
 }
 
 .summary span {
-    font-size: 1.5rem
+  color: #f59e0b;
+  font-size: 1.5rem;
 }
 
 .summary small {
-    grid-column: 1/-1;
-    color: #9ca3af
+  grid-column: 1 / -1;
+  margin-top: 3px;
+  color: #9ca3af;
 }
 
 .reviews {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 18px;
-    max-width: 850px
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+  max-width: 850px;
 }
 
 .review {
-    border-bottom: 1px solid #eef0f2;
-    padding: 14px 0
+  border-bottom: 1px solid #eef0f2;
+  padding: 14px 0;
 }
 
 .review-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 10px
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .author {
-    display: flex;
-    align-items: center;
-    gap: 10px
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .author img,
 .avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    object-fit: cover
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #eaf2f8;
-    color: #1a456b;
-    font-weight: 700
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eaf2f8;
+  color: #1a456b;
+  font-weight: 700;
 }
 
 .stars {
-    color: #f59e0b;
-    font-size: .75rem;
-    margin-top: 4px
+  display: flex;
+  gap: 2px;
+  color: #f59e0b;
+  font-size: .78rem;
+  margin-top: 4px;
 }
 
 .review p {
-    margin: 12px 0 0;
-    color: #374151;
-    line-height: 1.55
+  margin: 12px 0 0;
+  color: #374151;
+  line-height: 1.55;
 }
 
 .review-head small {
-    color: #9ca3af
+  color: #9ca3af;
 }
 
 .alert.error {
-    background: #fef2f2;
-    color: #dc2626;
-    padding: 12px;
-    border-radius: 10px
+  margin-top: 16px;
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 10px;
 }
 
 .empty {
-    text-align: center;
-    color: #9ca3af;
-    padding: 30px
+  text-align: center;
+  color: #9ca3af;
+  padding: 30px;
+}
+
+.empty.compact {
+  text-align: left;
+  padding: 10px 0;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 18px;
+  }
+
+  .summary-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .summary {
+    text-align: left;
+  }
 }
