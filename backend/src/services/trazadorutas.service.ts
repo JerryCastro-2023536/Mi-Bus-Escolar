@@ -123,7 +123,6 @@ export class ViajesService {
     const { rows: baseStops } = await pool.query(baseStopsQuery, [idRuta]);
     if (baseStops.length === 0) return [];
 
-    // Obtener paradas de estudiantes ausentes
     const ausentesQuery = `
       SELECT DISTINCT 
         ar.id_parada_recogida,
@@ -143,7 +142,6 @@ export class ViajesService {
       if (row.id_parada_descenso) paradasAusentes.add(Number(row.id_parada_descenso));
     }
 
-    // Obtener paradas de estudiantes presentes
     const presentesQuery = `
       SELECT DISTINCT 
         ar.id_parada_recogida,
@@ -153,7 +151,7 @@ export class ViajesService {
       WHERE a.id_viaje = $2 
         AND (
           ($3 = 'IDA' AND a.estado_abordaje = 'PRESENTE')
-          OR ($3 = 'VUELTA' AND (a.estado_descenso = 'PRESENTE' OR (a.estado_abordaje = 'PRESENTE' AND a.estado_descenso != 'AUSENTE')))
+          OR ($3 = 'VUELTA' AND (a.estado_descenso = 'PRESENTE' OR a.estado_abordaje = 'PRESENTE'))
         );
     `;
     const presentesRes = await pool.query(presentesQuery, [idRuta, idViaje, tipo]);
@@ -167,15 +165,18 @@ export class ViajesService {
     const maxOrden = baseStops[baseStops.length - 1].orden_parada;
 
     let paradasFiltradas = baseStops.filter(p => {
-      // Siempre mantener inicio y fin de la ruta (terminal / colegio)
       if (p.orden_parada === minOrden || p.orden_parada === maxOrden) {
         return true;
       }
-      // Si hay estudiantes presentes marcados, incluir solo las paradas correspondientes a presentes
+
+      if (tipo === 'VUELTA' && paradasPresentes.size > 0) {
+        return paradasPresentes.has(p.id_parada);
+      }
+
       if (paradasPresentes.size > 0) {
         return paradasPresentes.has(p.id_parada);
       }
-      // Si no hay lista de presentes explícita, excluir únicamente las de ausentes
+
       return !paradasAusentes.has(p.id_parada);
     });
 
@@ -184,7 +185,7 @@ export class ViajesService {
     }
 
     const resultado = paradasFiltradas.map(p => ({ lat: p.lat, lng: p.lng }));
-    return tipo === 'VUELTA' ? resultado.reverse() : resultado;
+    return tipo === 'VUELTA' ? resultado.slice().reverse() : resultado;
   }
 
   static async iniciarViaje(idChofer: number) {
