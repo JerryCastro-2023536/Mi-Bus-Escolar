@@ -62,7 +62,11 @@ export const loginUserSchema = z.object({
         .max(255, "La contraseña no puede exceder los 255 caracteres")
 });
 
-export const updateUserSchema = createUserSchema;
+export const updateUserSchema = createUserSchema.extend({
+    // En una edición normal de perfil la contraseña no debe ser obligatoria.
+    // Los cambios de contraseña se validan en /usuarios/password/:id.
+    password: userSchema.shape.password.optional()
+});
 
 export const cambiarPasswordSchema = z.object({
     oldPassword: zUtils.requiredString("contraseña actual"),
