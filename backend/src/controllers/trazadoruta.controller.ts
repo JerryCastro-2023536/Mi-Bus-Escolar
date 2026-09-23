@@ -96,10 +96,43 @@ export const getUltimaUbicacionViaje = async (req: Request, res: Response) => {
   try {
     const { idViaje } = req.params;
     const data = await ViajesService.obtenerUltimaUbicacion(Number(idViaje));
-    res.json({ success: true, data });
+    const trazadoActivo = ViajesService.obtenerTrazadoActivo(Number(idViaje));
+    res.json({
+      success: true,
+      data: {
+        ...data,
+        trazado_activo: trazadoActivo
+      }
+    });
   } catch (error: any) {
     console.error('Error al obtener última ubicación:', error);
     res.status(500).json({ error: 'Error al obtener última ubicación del viaje' });
+  }
+};
+
+export const postTrazadoActivo = async (req: Request, res: Response) => {
+  try {
+    const { idViaje } = req.params;
+    const { puntos } = req.body;
+    if (!idViaje || !Array.isArray(puntos)) {
+      return res.status(400).json({ error: 'Parámetros inválidos' });
+    }
+    ViajesService.guardarTrazadoActivo(Number(idViaje), puntos);
+    res.json({ success: true, message: 'Trazado activo actualizado' });
+  } catch (error: any) {
+    console.error('Error guardando trazado activo:', error);
+    res.status(500).json({ error: 'Error al guardar trazado activo' });
+  }
+};
+
+export const getTrazadoActivo = async (req: Request, res: Response) => {
+  try {
+    const { idViaje } = req.params;
+    const idRuta = req.query.idRuta ? Number(req.query.idRuta) : undefined;
+    const trazado = await ViajesService.obtenerTrazadoActivoAsync(Number(idViaje), idRuta);
+    res.json(trazado);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al obtener trazado activo' });
   }
 };
 
