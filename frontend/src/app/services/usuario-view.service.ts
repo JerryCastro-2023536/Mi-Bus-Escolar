@@ -6,7 +6,7 @@ import { CrudService } from './crud.service';
 import { EstudianteResumen } from '../models/pago.model';
 import { ViajeUsuario } from '../models/viaje-usuario.model';
 import { PuntoRuta } from '../models/mapas.type';
-import { environment } from '../../environments/enviroments';
+import { environment } from '../../environments/enviroment';
 
 export interface AsignacionEstudiante {
     id_asignacion: number;
