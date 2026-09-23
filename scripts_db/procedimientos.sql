@@ -7,18 +7,16 @@
 
 CREATE OR REPLACE FUNCTION sp_valoraciones_obtener()
 RETURNS SETOF Valoraciones
-LANGUAGE plpgsql
+LANGUAGE sql
+STABLE
 AS $$
-BEGIN
-    RETURN QUERY
     SELECT *
-    FROM Valoraciones;
-END;
+    FROM Valoraciones
+    ORDER BY id_valoracion DESC;
 $$;
 
-
 CREATE OR REPLACE FUNCTION sp_valoraciones_crear(
-    p_id_proveedor INTEGER,
+    p_id_servicio INTEGER,
     p_id_usuario INTEGER,
     p_comentario TEXT,
     p_calificacion DOUBLE PRECISION
@@ -30,15 +28,15 @@ DECLARE
     v_valoracion Valoraciones;
 BEGIN
     INSERT INTO Valoraciones(
-        id_proveedor,
+        id_servicio,
         id_usuario,
         comentario,
         calificacion
     )
     VALUES (
-        p_id_proveedor,
+        p_id_servicio,
         p_id_usuario,
-        p_comentario,
+        NULLIF(TRIM(p_comentario), ''),
         p_calificacion
     )
     RETURNING * INTO v_valoracion;
@@ -47,25 +45,21 @@ BEGIN
 END;
 $$;
 
-
 CREATE OR REPLACE FUNCTION sp_valoraciones_buscar(
     p_id_valoracion INTEGER
 )
 RETURNS SETOF Valoraciones
-LANGUAGE plpgsql
+LANGUAGE sql
+STABLE
 AS $$
-BEGIN
-    RETURN QUERY
     SELECT *
-    FROM Valoraciones
-    WHERE id_valoracion = p_id_valoracion;
-END;
+    FROM Valoraciones v
+    WHERE v.id_valoracion = p_id_valoracion;
 $$;
-
 
 CREATE OR REPLACE FUNCTION sp_valoraciones_editar(
     p_id_valoracion INTEGER,
-    p_id_proveedor INTEGER,
+    p_id_servicio INTEGER,
     p_id_usuario INTEGER,
     p_comentario TEXT,
     p_calificacion DOUBLE PRECISION
@@ -76,18 +70,17 @@ AS $$
 DECLARE
     v_valoracion Valoraciones;
 BEGIN
-    UPDATE Valoraciones
-    SET id_proveedor = p_id_proveedor,
+    UPDATE Valoraciones v
+    SET id_servicio = p_id_servicio,
         id_usuario = p_id_usuario,
-        comentario = p_comentario,
+        comentario = NULLIF(TRIM(p_comentario), ''),
         calificacion = p_calificacion
-    WHERE id_valoracion = p_id_valoracion
-    RETURNING * INTO v_valoracion;
+    WHERE v.id_valoracion = p_id_valoracion
+    RETURNING v.* INTO v_valoracion;
 
     RETURN v_valoracion;
 END;
 $$;
-
 
 CREATE OR REPLACE FUNCTION sp_valoraciones_eliminar(
     p_id_valoracion INTEGER
@@ -96,14 +89,12 @@ RETURNS BOOLEAN
 LANGUAGE plpgsql
 AS $$
 BEGIN
-    DELETE FROM Valoraciones
-    WHERE id_valoracion = p_id_valoracion;
+    DELETE FROM Valoraciones v
+    WHERE v.id_valoracion = p_id_valoracion;
 
     RETURN FOUND;
 END;
 $$;
-
-
 
 -- ============================================================
 -- 2. CHOFERES
