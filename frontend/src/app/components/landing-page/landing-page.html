@@ -895,7 +895,7 @@
 
                 <a
                   class="contact-provider"
-                  [href]="'tel:' + servicio.proveedor.telefono_contacto">
+                  (click)="enviarAWhatsApp( servicio.proveedor.telefono_contacto ?? '', 'Contacta conmigo para asignar a tu estudiante' )">
                   Contactar proveedor
                 </a>
 
