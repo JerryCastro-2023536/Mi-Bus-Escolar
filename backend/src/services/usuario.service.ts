@@ -50,8 +50,39 @@ export async function agregarUsuario(u: Usuario) {
 
 export async function editarUsuarioById(id: number, u: Usuario) {
     try {
-        const hashedPassword = await bcrypt.hash(u.password, 10);
-        const values = [u.nombre, u.apellido, u.correo, hashedPassword, u.telefono, u.foto_usuario, u.rol, u.correo_verificado, id];
+        // Editar el perfil no obliga a enviar una contraseña.
+        // Si no viene, conservamos el hash actual exactamente como está.
+        const actualRes = await pool.query(
+            'SELECT * FROM sp_usuarios_buscar_por_id($1)',
+            [id]
+        );
+
+        const usuarioActual = actualRes.rows[0];
+
+        if (!usuarioActual) {
+            throw new NotFoundError(`No se puede editar: El usuario con ID ${id} no existe.`);
+        }
+
+        let passwordParaGuardar = usuarioActual.password;
+
+        // Compatibilidad con el CRUD administrativo: si se envía una nueva
+        // contraseña explícitamente, entonces sí se hashea.
+        if (u.password && u.password.trim()) {
+            passwordParaGuardar = await bcrypt.hash(u.password, 10);
+        }
+
+        const values = [
+            u.nombre,
+            u.apellido,
+            u.correo,
+            passwordParaGuardar,
+            u.telefono,
+            u.foto_usuario,
+            u.rol,
+            u.correo_verificado,
+            id
+        ];
+
         const query = 'SELECT * FROM sp_usuarios_actualizar($1, $2, $3, $4, $5, $6, $7, $8, $9)';
         const res = await pool.query(query, values);
 
@@ -59,7 +90,10 @@ export async function editarUsuarioById(id: number, u: Usuario) {
             throw new NotFoundError(`No se puede editar: El usuario con ID ${id} no existe.`);
         }
 
-        return res.rows[0];
+        const usuarioEditado = res.rows[0];
+        delete usuarioEditado.password;
+
+        return usuarioEditado;
     } catch (error) {
         errorThrower(error);
     }
