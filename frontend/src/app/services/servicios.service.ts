@@ -10,6 +10,8 @@ import {
   Observable
 } from 'rxjs';
 
+import { environment } from '../../environments/enviroment';
+
 
 /* ========================================
    SERVICIO
@@ -103,8 +105,7 @@ export class ServiciosService {
      URL DEL BACKEND
   ====================================== */
 
-  private readonly apiUrl =
-    'http://localhost:3000/api';
+  private readonly apiUrl = environment.API_URL;
 
 
   constructor(

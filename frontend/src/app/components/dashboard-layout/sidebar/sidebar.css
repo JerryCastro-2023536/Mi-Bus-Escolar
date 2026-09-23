@@ -429,3 +429,12 @@
     transition: none !important;
   }
 }
+
+/* Acceso común a la landing desde cualquier dashboard */
+.landing-btn {
+  text-decoration: none;
+}
+
+.landing-btn:hover {
+  text-decoration: none;
+}

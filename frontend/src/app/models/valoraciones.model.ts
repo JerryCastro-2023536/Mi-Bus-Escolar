@@ -1,6 +1,6 @@
 export const valoracionesConfig = {
     title: 'Valoraciones',
-    subtitle: 'Gestiona las valoraciones de los proveedores',
+    subtitle: 'Gestiona las valoraciones de los servicios',
     apiEndpoint: '/valoraciones',
     idKey: 'id_valoracion',
 
@@ -20,85 +20,24 @@ export const valoracionesConfig = {
     ],
 
     tableColumns: [
-        {
-            key: 'id_valoracion',
-            label: 'ID',
-            type: 'number'
-        },
-        {
-            key: 'id_proveedor',
-            label: 'Proveedor',
-            type: 'number'
-        },
-        {
-            key: 'id_usuario',
-            label: 'Usuario',
-            type: 'number'
-        },
-        {
-            key: 'comentario',
-            label: 'Comentario',
-            type: 'text'
-        },
-        {
-            key: 'calificacion',
-            label: 'Calificación',
-            type: 'number'
-        }
+        { key: 'id_valoracion', label: 'ID', type: 'number' },
+        { key: 'id_servicio', label: 'Servicio', type: 'number' },
+        { key: 'id_usuario', label: 'Usuario', type: 'number' },
+        { key: 'comentario', label: 'Comentario', type: 'text' },
+        { key: 'calificacion', label: 'Calificación', type: 'number' }
     ],
 
     formFields: [
-        {
-            key: 'id_proveedor',
-            label: 'ID Proveedor',
-            type: 'number',
-            required: true
-        },
-        {
-            key: 'id_usuario',
-            label: 'ID Usuario',
-            type: 'number',
-            required: true
-        },
-        {
-            key: 'comentario',
-            label: 'Comentario',
-            type: 'text'
-        },
-        {
-            key: 'calificacion',
-            label: 'Calificación',
-            type: 'number',
-            required: true
-        }
+        { key: 'id_servicio', label: 'ID Servicio', type: 'number', required: true },
+        { key: 'id_usuario', label: 'ID Usuario', type: 'number', required: true },
+        { key: 'comentario', label: 'Comentario', type: 'text' },
+        { key: 'calificacion', label: 'Calificación (0-5)', type: 'number', required: true }
     ],
 
     formFieldsEdit: [
-        {
-            key: 'id_proveedor',
-            label: 'ID Proveedor',
-            type: 'number',
-            required: true,
-            readonly: true
-        },
-        {
-            key: 'id_usuario',
-            label: 'ID Usuario',
-            type: 'number',
-            required: true,
-            readonly: true
-        },
-        {
-            key: 'comentario',
-            label: 'Comentario',
-            type: 'text',
-            required: true
-        },
-        {
-            key: 'calificacion',
-            label: 'Calificación',
-            type: 'number',
-            required: true
-        }
+        { key: 'id_servicio', label: 'ID Servicio', type: 'number', required: true, readonly: true },
+        { key: 'id_usuario', label: 'ID Usuario', type: 'number', required: true, readonly: true },
+        { key: 'comentario', label: 'Comentario', type: 'text' },
+        { key: 'calificacion', label: 'Calificación (0-5)', type: 'number', required: true }
     ]
 };

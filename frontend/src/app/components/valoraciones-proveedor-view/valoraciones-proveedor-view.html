@@ -1,52 +1,97 @@
 <div class="container">
-    <div class="card">
-        <div class="head">
-            <div>
-                <h3>Valoraciones</h3>
-                <p>Comentarios y calificaciones recibidas por tu servicio de transporte.</p>
-            </div>
-            <div class="summary">
-                <strong>{{ promedio() }}</strong>
-                <span>★</span>
-                <small>{{ valoraciones().length }} valoraciones</small>
-            </div>
-        </div>
-
-        @if(error) {
-        <div class="alert error">{{ error }}</div>
-        }
-
-        @if(cargando()) {
-        <div class="empty">Cargando valoraciones...</div>
-        } @else if(!valoraciones().length) {
-        <div class="empty">Aún no tienes valoraciones.</div>
-        } @else {
-        <div class="reviews">
-            @for(v of valoraciones(); track v.id_valoracion) {
-            <article class="review">
-                <div class="review-head">
-                    <div class="author">
-                        @if(v.foto_usuario) {
-                        <img [src]="v.foto_usuario" [alt]="v.nombre_usuario || 'Usuario'">
-                        } @else {
-                        <div class="avatar">{{ (v.nombre_usuario || "?")[0] }}</div>
-                        }
-                        <div>
-                            <strong>{{ v.nombre_usuario ? (v.nombre_usuario + ' ' + (v.apellido_usuario || '')) : 'Usuario no disponible' }}</strong>
-                            <div class="stars">
-                                @for(s of estrellas(v.calificacion); track $index) {
-                                <i class="fa-solid fa-star"></i>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                    <small>Valoración</small>
-                </div>
-
-                <p>{{ v.comentario || 'Sin comentario.' }}</p>
-            </article>
-            }
-        </div>
-        }
+  <div class="card">
+    <div class="head">
+      <div>
+        <h3>Valoraciones por servicio</h3>
+        <p>Selecciona uno de tus servicios para consultar únicamente sus comentarios y calificaciones.</p>
+      </div>
     </div>
+
+    @if (error) {
+      <div class="alert error">{{ error }}</div>
+    }
+
+    <div class="service-selector">
+      <label for="servicioValoraciones">Servicio</label>
+
+      @if (cargandoServicios()) {
+        <div class="selector-loading">Cargando servicios...</div>
+      } @else if (servicios().length) {
+        <select
+          id="servicioValoraciones"
+          [(ngModel)]="idServicioSeleccionado"
+          (ngModelChange)="cargarValoraciones()"
+        >
+          @for (servicio of servicios(); track servicio.id_servicio) {
+            <option [ngValue]="servicio.id_servicio">
+              {{ servicio.nombre }}
+            </option>
+          }
+        </select>
+      } @else {
+        <div class="empty compact">No tienes servicios registrados.</div>
+      }
+    </div>
+
+    @if (servicioSeleccionado(); as servicio) {
+      <div class="summary-row">
+        <div>
+          <span class="eyebrow">Servicio seleccionado</span>
+          <strong class="service-name">{{ servicio.nombre }}</strong>
+        </div>
+
+        <div class="summary">
+          <strong>{{ promedio() }}</strong>
+          <span>★</span>
+          <small>{{ valoraciones().length }} valoraciones</small>
+        </div>
+      </div>
+    }
+
+    @if (cargandoValoraciones()) {
+      <div class="empty">Cargando valoraciones...</div>
+    } @else if (idServicioSeleccionado && !valoraciones().length) {
+      <div class="empty">Este servicio todavía no tiene valoraciones.</div>
+    } @else if (valoraciones().length) {
+      <div class="reviews">
+        @for (v of valoraciones(); track v.id_valoracion) {
+          <article class="review">
+            <div class="review-head">
+              <div class="author">
+                @if (v.foto_usuario) {
+                  <img [src]="v.foto_usuario" [alt]="v.nombre_usuario || 'Usuario'">
+                } @else {
+                  <div class="avatar">{{ (v.nombre_usuario || '?')[0] }}</div>
+                }
+
+                <div>
+                  <strong>
+                    {{
+                      v.nombre_usuario
+                        ? (v.nombre_usuario + ' ' + (v.apellido_usuario || ''))
+                        : 'Usuario no disponible'
+                    }}
+                  </strong>
+
+                  <div class="stars" [attr.aria-label]="v.calificacion + ' de 5 estrellas'">
+                    @for (activa of estrellas(v.calificacion); track $index) {
+                      <i
+                        class="fa-star"
+                        [class.fa-solid]="activa"
+                        [class.fa-regular]="!activa"
+                      ></i>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <small>{{ v.calificacion }}/5</small>
+            </div>
+
+            <p>{{ v.comentario || 'Sin comentario.' }}</p>
+          </article>
+        }
+      </div>
+    }
+  </div>
 </div>

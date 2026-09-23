@@ -79,6 +79,11 @@
       }
 
       <div class="footer-actions">
+        <a routerLink="/landing" class="action-btn landing-btn" title="Ir a la página principal">
+          <i class="fa-solid fa-house"></i>
+          @if (!collapsed()) { <span>Página principal</span> }
+        </a>
+
         <button type="button" class="action-btn logout-btn" (click)="onLogout()" title="Cerrar sesión">
           <i class="fa-solid fa-right-from-bracket"></i>
           @if (!collapsed()) { <span>Cerrar sesión</span> }

@@ -51,9 +51,15 @@ export class Login implements OnInit {
   ngOnInit(): void {
     const user = this.loginService.getUser();
     const token = this.loginService.getToken();
+
     if (user && token) {
       this.currentUser.set(user);
       this.currentToken.set(token);
+      return;
+    }
+
+    if (this.route.snapshot.data['authMode'] === 'register') {
+      this.isLoginMode.set(false);
     }
   }
 
@@ -182,6 +188,10 @@ export class Login implements OnInit {
 
   goToDashboard(): void {
     this.router.navigateByUrl('/dashboard');
+  }
+
+  goToLanding(): void {
+    this.router.navigateByUrl('/landing');
   }
 
   private handleError(err: any): void {

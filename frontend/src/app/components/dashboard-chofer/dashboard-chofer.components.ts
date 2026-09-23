@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login';
+import { environment } from '../../../environments/enviroment';
 
 @Component({
   imports: [CommonModule, FormsModule],
@@ -75,7 +76,7 @@ export class DashboardChoferComponents implements OnInit {
     }
 
     if (userId) {
-      this.http.get<any>(`http://localhost:3000/api/chofer/usuario/${userId}`).subscribe({
+      this.http.get<any>(`${environment.API_URL}/chofer/usuario/${userId}`).subscribe({
         next: (res) => {
           const choferId = res?.id_chofer ?? res?.data?.id_chofer;
           if (choferId) {
@@ -112,7 +113,7 @@ export class DashboardChoferComponents implements OnInit {
   }
 
   cargarRutasAsignadas(): void {
-    const baseUrl = 'http://localhost:3000/api';
+    const baseUrl = environment.API_URL;
     const token = this.loginService.getToken();
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
 
@@ -167,7 +168,7 @@ export class DashboardChoferComponents implements OnInit {
       return;
     }
 
-    const baseUrl = 'http://localhost:3000/api';
+    const baseUrl = environment.API_URL;
     const token = this.loginService.getToken();
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
 

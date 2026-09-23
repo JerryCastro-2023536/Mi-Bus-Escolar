@@ -32,17 +32,25 @@
         Contacto
       </a>
 
-      <a
-        routerLink="/login"
-        class="btn btn-outline">
-        Iniciar sesión
-      </a>
+      @if (estaLogueado()) {
+        <a
+          [routerLink]="rutaDashboard()"
+          class="btn btn-primary">
+          Ir al dashboard
+        </a>
+      } @else {
+        <a
+          routerLink="/login"
+          class="btn btn-outline">
+          Iniciar sesión
+        </a>
 
-      <a
-        routerLink="/register"
-        class="btn btn-primary">
-        Registrarse
-      </a>
+        <a
+          routerLink="/register"
+          class="btn btn-primary">
+          Registrarse
+        </a>
+      }
 
     </nav>
 
@@ -76,9 +84,9 @@
       <div class="hero-buttons">
 
         <a
-          routerLink="/register"
+          [routerLink]="rutaAccionPrincipal()"
           class="btn btn-primary btn-large">
-          Comenzar ahora →
+          {{ estaLogueado() ? 'Ir al dashboard →' : 'Comenzar ahora →' }}
         </a>
 
         <a
@@ -302,7 +310,7 @@
       <p>
         Consulta servicios de transporte escolar,
         compara precios, conoce sus rutas y revisa
-        las valoraciones de cada proveedor.
+        las valoraciones de cada servicio.
       </p>
 
     </div>
@@ -357,7 +365,7 @@
 
 
     <!-- CARGANDO -->
-    @if (cargando) {
+    @if (cargando()) {
 
       <div class="services-message">
 
@@ -373,7 +381,7 @@
 
 
     <!-- ERROR -->
-    @if (errorCarga && !cargando) {
+    @if (errorCarga() && !cargando()) {
 
       <div class="services-message error-message">
 
@@ -392,14 +400,14 @@
 
 
     <!-- LISTADO DE SERVICIOS -->
-    @if (!cargando && !errorCarga) {
+    @if (!cargando() && !errorCarga()) {
 
-      @if (serviciosFiltrados.length > 0) {
+      @if (serviciosFiltrados().length > 0) {
 
         <div class="services-grid">
 
           @for (
-            servicio of serviciosFiltrados;
+            servicio of serviciosFiltrados();
             track servicio.id_servicio
           ) {
 
@@ -610,6 +618,166 @@
 
                 </div>
 
+                @if (esUsuario()) {
+
+                  @if (
+                    !valoracionPropia(servicio) &&
+                    !formularioAbierto(servicio.id_servicio)
+                  ) {
+                    <div class="review-action-row">
+                      <button
+                        type="button"
+                        class="open-review-button"
+                        (click)="abrirFormularioNuevaValoracion(servicio)"
+                      >
+                        <i class="fa-regular fa-star"></i>
+                        Añadir valoración
+                      </button>
+                    </div>
+                  }
+
+                  @if (formularioAbierto(servicio.id_servicio)) {
+                    <div class="review-form">
+
+                      <div class="review-form-heading">
+                        <div>
+                          <strong>
+                            {{
+                              enEdicion(servicio.id_servicio)
+                                ? 'Editar tu valoración'
+                                : 'Valora este servicio'
+                            }}
+                          </strong>
+
+                          <small>
+                            Selecciona de 0 a 5 estrellas.
+                          </small>
+                        </div>
+
+                        <span class="selected-rating">
+                          {{ calificacionServicio(servicio.id_servicio) }}/5
+                        </span>
+                      </div>
+
+                      <div
+                        class="rating-selector"
+                        [attr.aria-label]="
+                          'Calificación seleccionada: ' +
+                          calificacionServicio(servicio.id_servicio) +
+                          ' de 5'
+                        "
+                      >
+                        <button
+                          type="button"
+                          class="zero-star"
+                          [class.selected]="
+                            calificacionServicio(servicio.id_servicio) === 0
+                          "
+                          (click)="seleccionarCalificacion(
+                            servicio.id_servicio,
+                            0
+                          )"
+                          title="0 estrellas"
+                        >
+                          0
+                        </button>
+
+                        @for (
+                          estrella of estrellasSelector();
+                          track estrella
+                        ) {
+                          <button
+                            type="button"
+                            class="star-button"
+                            [class.active]="
+                              estrella <=
+                              calificacionServicio(servicio.id_servicio)
+                            "
+                            (click)="seleccionarCalificacion(
+                              servicio.id_servicio,
+                              estrella
+                            )"
+                            [attr.aria-label]="estrella + ' estrellas'"
+                          >
+                            ★
+                          </button>
+                        }
+                      </div>
+
+                      <textarea
+                        rows="3"
+                        maxlength="1000"
+                        [ngModel]="comentarioServicio(servicio.id_servicio)"
+                        (ngModelChange)="actualizarComentario(
+                          servicio.id_servicio,
+                          $event
+                        )"
+                        placeholder="Cuéntanos tu experiencia con este servicio..."
+                      ></textarea>
+
+                      <div class="review-form-footer">
+
+                        <div class="review-feedback">
+                          @if (
+                            errorDeServicio(servicio.id_servicio)
+                          ) {
+                            <span class="review-error">
+                              {{ errorDeServicio(servicio.id_servicio) }}
+                            </span>
+                          }
+                        </div>
+
+                        <div class="review-form-actions">
+                          <button
+                            type="button"
+                            class="cancel-review"
+                            (click)="cerrarFormularioValoracion(servicio)"
+                            [disabled]="enviando(servicio.id_servicio)"
+                          >
+                            Cancelar
+                          </button>
+
+                          <button
+                            type="button"
+                            class="submit-review"
+                            (click)="guardarValoracion(servicio)"
+                            [disabled]="enviando(servicio.id_servicio)"
+                          >
+                            {{
+                              enviando(servicio.id_servicio)
+                                ? 'Guardando...'
+                                : (
+                                    enEdicion(servicio.id_servicio)
+                                      ? 'Guardar cambios'
+                                      : 'Publicar valoración'
+                                  )
+                            }}
+                          </button>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  }
+
+                  @if (
+                    mensajeDeServicio(servicio.id_servicio) &&
+                    !formularioAbierto(servicio.id_servicio)
+                  ) {
+                    <div class="review-success standalone-feedback">
+                      {{ mensajeDeServicio(servicio.id_servicio) }}
+                    </div>
+                  }
+
+                } @else if (!estaLogueado()) {
+
+                  <p class="review-login-hint">
+                    <a routerLink="/login">Inicia sesión</a>
+                    con una cuenta de usuario para valorar este servicio.
+                  </p>
+
+                }
+
 
                 @if (servicio.valoraciones.length > 0) {
 
@@ -685,8 +853,25 @@
                         </div>
 
                         <p>
-                          {{ valoracion.comentario }}
+                          {{ valoracion.comentario || 'Sin comentario.' }}
                         </p>
+
+                        @if (esValoracionPropia(valoracion)) {
+                          <div class="own-review-actions">
+
+                            <button
+                              type="button"
+                              class="edit-review-button"
+                              (click)="abrirEdicionValoracion(
+                                servicio,
+                                valoracion
+                              )"
+                            >
+                              <i class="fa-solid fa-pen"></i>
+                              Editar valoración
+                            </button>
+                          </div>
+                        }
 
                       </div>
 
@@ -697,7 +882,7 @@
                 } @else {
 
                   <p class="muted-text">
-                    Aún no existen comentarios para este proveedor.
+                    Aún no existen comentarios para este servicio.
                   </p>
 
                 }
@@ -939,9 +1124,9 @@
 
 
     <a
-      routerLink="/register"
+      [routerLink]="rutaAccionPrincipal()"
       class="btn btn-yellow">
-      Crear mi cuenta →
+      {{ estaLogueado() ? 'Ir al dashboard →' : 'Crear mi cuenta →' }}
     </a>
 
   </div>
@@ -1016,13 +1201,19 @@
         Cuenta
       </h4>
 
-      <a routerLink="/login">
-        Iniciar sesión
-      </a>
+      @if (estaLogueado()) {
+        <a [routerLink]="rutaDashboard()">
+          Ir al dashboard
+        </a>
+      } @else {
+        <a routerLink="/login">
+          Iniciar sesión
+        </a>
 
-      <a routerLink="/register">
-        Registrarse
-      </a>
+        <a routerLink="/register">
+          Registrarse
+        </a>
+      }
 
     </div>
 

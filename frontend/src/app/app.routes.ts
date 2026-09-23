@@ -20,6 +20,14 @@ export const routes: Routes = [
     },
 
     {
+        path: 'register',
+        title: 'Crear cuenta | MiBusEscolar',
+        canActivate: [guestGuard],
+        data: { authMode: 'register' },
+        loadComponent: () => import('./components/login/login').then(m => m.Login),
+    },
+
+    {
         path: 'error/404',
         title: 'Página no encontrada | MiBusEscolar',
         data: { code: 404 },

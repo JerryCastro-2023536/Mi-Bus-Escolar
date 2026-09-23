@@ -1378,11 +1378,16 @@ $$;
 -- ============================================================
 
 -- ------------------------------------------------------------
--- VALORACIONES: listado del proveedor
+-- VALORACIONES: listado por servicio del proveedor
 -- ------------------------------------------------------------
-CREATE OR REPLACE FUNCTION sp_proveedor_valoraciones_listar(p_id_usuario_proveedor INTEGER)
+CREATE OR REPLACE FUNCTION sp_proveedor_valoraciones_listar(
+    p_id_usuario_proveedor INTEGER,
+    p_id_servicio INTEGER
+)
 RETURNS TABLE(
     id_valoracion INTEGER,
+    id_servicio INTEGER,
+    nombre_servicio VARCHAR(150),
     id_usuario INTEGER,
     nombre_usuario VARCHAR(100),
     apellido_usuario VARCHAR(100),
@@ -1390,14 +1395,28 @@ RETURNS TABLE(
     comentario TEXT,
     calificacion DOUBLE PRECISION
 )
-LANGUAGE sql STABLE AS $$
-    SELECT v.id_valoracion, v.id_usuario,
-           u.nombre, u.apellido, u.foto_usuario,
-           v.comentario, v.calificacion
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT
+        v.id_valoracion,
+        s.id_servicio,
+        s.nombre,
+        v.id_usuario,
+        u.nombre,
+        u.apellido,
+        u.foto_usuario,
+        v.comentario,
+        v.calificacion
     FROM Valoraciones v
-    JOIN Proveedores p ON p.id_proveedor=v.id_proveedor
-    LEFT JOIN Usuarios u ON u.id_usuario=v.id_usuario
-    WHERE p.id_usuario=p_id_usuario_proveedor
+    JOIN Servicios s
+        ON s.id_servicio = v.id_servicio
+    JOIN Proveedores p
+        ON p.id_proveedor = s.id_proveedor
+    LEFT JOIN Usuarios u
+        ON u.id_usuario = v.id_usuario
+    WHERE p.id_usuario = p_id_usuario_proveedor
+      AND s.id_servicio = p_id_servicio
     ORDER BY v.id_valoracion DESC;
 $$;
 

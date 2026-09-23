@@ -109,7 +109,7 @@ export const registerUsuario = async (req: Request, res: Response, next: NextFun
         const createdUser = await register(user);
 
         const token = generarToken({
-            id: createdUser.id,
+            id: createdUser.id_usuario || createdUser.id,
             email: createdUser.correo,
             rol: createdUser.rol
         });

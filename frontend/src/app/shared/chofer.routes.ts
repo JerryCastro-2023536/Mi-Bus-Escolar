@@ -44,6 +44,7 @@ export const choferRoutes: Routes = [
     {
         path: 'ruta-chofer',
         title: 'Ruta Chofer | MiBusEscolar',
+        canActivate: [roleGuard],
         loadComponent: () => import('../components/mapa-chofer/chofer-dashboard.components').then(d => d.ChoferDashboardComponents),
         data: {
             roles: ['CHOFER'],

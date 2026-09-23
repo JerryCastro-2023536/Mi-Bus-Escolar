@@ -72,7 +72,7 @@ export const proveedorRoutes: Routes = [
         title: 'Valoraciones | MiBusEscolar',
         canActivate: [roleGuard],
         loadComponent: () => import('../components/valoraciones-proveedor-view/valoraciones-proveedor-view').then(m => m.ValoracionesProveedorView),
-        data: { roles: ['PROVEEDOR'], title: 'Valoraciones', subtitle: 'Consulta las valoraciones recibidas por tu proveedor.' }
+        data: { roles: ['PROVEEDOR'], title: 'Valoraciones', subtitle: 'Selecciona un servicio y consulta sus valoraciones.' }
     },
     {
         path: 'pagos-proveedor',

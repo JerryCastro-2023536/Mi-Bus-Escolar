@@ -394,13 +394,14 @@ export async function listarViajesProveedor(idUsuario: number) {
         errorThrower(e);
     }
 }
-export async function listarValoracionesProveedor(idUsuario: number) {
+export async function listarValoracionesProveedor(idUsuario: number, idServicio: number) {
     try {
         await proveedorExiste(idUsuario);
         return (
-            await pool.query("SELECT * FROM sp_proveedor_valoraciones_listar($1)", [
-                idUsuario,
-            ])
+            await pool.query(
+                "SELECT * FROM sp_proveedor_valoraciones_listar($1, $2)",
+                [idUsuario, idServicio],
+            )
         ).rows;
     } catch (e) {
         errorThrower(e);

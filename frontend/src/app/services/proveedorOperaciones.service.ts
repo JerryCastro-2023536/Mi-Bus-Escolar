@@ -190,9 +190,11 @@ export class ProveedorOperacionesService {
             this.http.get<ApiResponse<ViajeProveedor[]>>(`${this.base}/${idUsuario}/viajes`),
         );
     }
-    valoraciones(idUsuario: number) {
+    valoraciones(idUsuario: number, idServicio: number) {
         return this.data(
-            this.http.get<ApiResponse<ValoracionProveedor[]>>(`${this.base}/${idUsuario}/valoraciones`),
+            this.http.get<ApiResponse<ValoracionProveedor[]>>(
+                `${this.base}/${idUsuario}/servicios/${idServicio}/valoraciones`,
+            ),
         );
     }
 
